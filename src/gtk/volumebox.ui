@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwVolumeBox" parent="GtkListBoxRow">
+        <child>
+            <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="valign">center</property>
+                <property name="hexpand">False</property>
+                <style>
+                    <class name="header" />
+                </style>
+                <child>
+
+                    <!--mainbox-->
+                    <object class="GtkBox">
+                        <property name="orientation">horizontal</property>
+                        <property name="spacing">0</property>
+
+                        <style>
+                            <class name="prefixes" />
+                        </style>
+
+                        <child>
+                            <object class="GtkImage" id="icon">
+                                <property name="icon-name">library-music-symbolic</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">1</property>
+                                <property name="halign">fill</property>
+                                <style>
+                                    <class name="title" />
+                                </style>
+                                <child>
+                                    <object class="GtkLabel" id="title_label">
+                                        <style>
+                                            <class name="title" />
+                                        </style>
+                                        <property name="xalign">0</property>
+                                        <property name="lines">0</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                        
+                                        <property name="label" bind-source="PwVolumeBox"
+                                            bind-property="title" bind-flags="sync-create" />
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel" id="subtitle_label">
+                                        <style>
+                                            <class name="subtitle" />
+                                        </style>
+                                        <property name="xalign">0</property>
+                                        <property name="label" bind-source="PwVolumeBox"
+                                            bind-property="subtitle" bind-flags="sync-create" />
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">on</property>
+                            </object>
+                        </child>
+
+
+                        <child>
+                            <object class="GtkDropDown">
+                                <property name="hexpand">1</property>
+                                <property name="valign">center</property>
+                                <style>
+                                    <class name="suffixes" />
+                                </style>
+                                <property name="model">
+                                    <object class="GtkStringList">
+                                        <items>
+                                            <item translatable="yes">Intel HDA</item>
+                                            <item translatable="yes">HDMI Audio</item>
+                                            <item translatable="yes">Headphones</item>
+                                        </items>
+                                    </object>
+                                </property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkToggleButton" id="toggle">
+                                <property name="hexpand">0</property>
+                                <property name="valign">center</property>
+                                <style>
+                                    <class name="suffixes" />
+                                    <class name="expander-row-arrow" />
+                                </style>
+                                <property name="icon-name">pan-down-symbolic</property>
+                            </object>
+                        </child>
+
+                    </object>
+                    <!--/mainbox-->
+
+
+                </child>
+                <child>
+                    <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <property name="valign">center</property>
+                        <property name="hexpand">1</property>
+                        <child>
+                            <object class="GtkScale" id="volume_scale">
+                                <property name="orientation">horizontal</property>
+                                <property name="draw-value">1</property>
+                                <property name="value-pos">right</property>
+                                <property name="adjustment">
+                                    <object class="GtkAdjustment">
+                                        <property name="value" bind-source="PwVolumeBox"
+                                            bind-property="volume" bind-flags="bidirectional" />
+                                        <property name="lower">0</property>
+                                        <property name="upper">1</property>
+                                        <property name="step-increment">0.01</property>
+                                        <property name="page-increment">0.1</property>
+                                        <property name="page-size">0</property>
+                                    </object>
+                                </property>
+                                <property name="digits">3</property>
+                            </object>
+
+                        </child>
+                        <child>
+                            <object class="GtkLevelBar" id="level_bar">
+                                <property name="mode">continuous</property>
+                                <property name="max-value">1.0</property>
+                                <property name="min-value">0.0</property>
+                                <property name="value" bind-source="PwVolumeBox"
+                                            bind-property="level" bind-flags="sync-create" />
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkRevealer" id="revealer">
+                        <property name="reveal-child" bind-source="toggle"
+                            bind-property="active" bind-flags="sync-create" />
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">lorem ipsum dolor sit amet</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

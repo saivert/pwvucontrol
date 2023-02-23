@@ -1,0 +1,15 @@
+[package]
+name = "pwvucontrol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gettext-rs = { version = "0.7", features = ["gettext-system"] }
+gtk = { version = "0.6.2", package = "gtk4", features = ["v4_2"]}
+
+once_cell = "1.15.0"
+
+[dependencies.adw]
+package = "libadwaita"
+version = "0.3"
+features = ["v1_2"]

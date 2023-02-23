@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=pwvucontrol
+Exec=pwvucontrol
+Icon=com.saivert.pwvucontrol
+Terminal=false
+Type=Application
+Categories=GTK;
+StartupNotify=true
