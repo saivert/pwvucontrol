@@ -18,7 +18,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-  use gtk::{
+use gtk::{
     glib,
     prelude::*,
     subclass::prelude::*,
@@ -26,26 +26,24 @@
 
 use adw::subclass::prelude::*;
 
-use std::cell::{Cell,RefCell};
+use std::cell::RefCell;
 use glib::Properties;
+
+use crate::pwnodeobject::PwNodeObject;
 
 mod imp {
 
     use super::*;
     use glib::{ParamSpec, Value};
+    use gtk::glib::subclass::Signal;
+    use once_cell::sync::Lazy;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
-        #[property(get, set)]
-        title: RefCell<String>,
-        #[property(get, set)]
-        subtitle: RefCell<String>,
-        #[property(get, set)]
-        volume: Cell<f32>,
-        #[property(get, set)]
-        level: Cell<f32>,
+        #[property(get, set, construct_only)]
+        row_data: RefCell<Option<PwNodeObject>>,
 
         // Template widgets
         #[template_child]
@@ -71,8 +69,8 @@ mod imp {
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
-            // klass.bind_template_callbacks();
-            Self::Type::bind_template_callbacks(klass);
+            klass.bind_template_callbacks();
+            // Self::Type::bind_template_callbacks(klass);
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -95,16 +93,40 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
+            let item = self.row_data.borrow();
+            let item = item.as_ref().cloned().unwrap();
+
+            item.bind_property("name", self.title_label.upcast_ref::<gtk::Label>(), "label")
+                .sync_create()
+                .build();
+
+            item.bind_property("volume", self.volume_scale.adjustment().upcast_ref::<gtk::Adjustment>(), "value")
+                .sync_create()
+                .bidirectional()
+                .build();
+
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
         }
+
+        fn signals() -> &'static [Signal] {
+            static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
+                vec![Signal::builder("max-number-reached")
+                    .param_types([i32::static_type()])
+                    .build()]
+            });
+
+            SIGNALS.as_ref()
+        }
+    
     }
     impl WidgetImpl for PwVolumeBox {}
     impl ActionRowImpl for PwVolumeBox {}
     impl PreferencesRowImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
 
+    #[gtk::template_callbacks]
     impl PwVolumeBox {
     }
 
@@ -116,10 +138,11 @@ glib::wrapper! {
         @implements gtk::Actionable;
 }
 
-#[gtk::template_callbacks]
 impl PwVolumeBox {
-    pub fn new() -> Self {
-        glib::Object::new()
+    pub fn new(row_data: &PwNodeObject) -> Self {
+        glib::Object::builder()
+            .property("row-data", &row_data)
+            .build()
     }
 
 }

@@ -57,7 +57,7 @@
                               <object class="GtkFrame">
                                 <child>
 
-                                  <object class="GtkListBox">
+                                  <object class="GtkListBox" id="playbacklist">
                                     <property name="selection-mode">none</property>
                                     <property name="show-separators">1</property>
 
@@ -65,57 +65,6 @@
                                       <class name="rich-list" />
                                     </style>
 
-                                    <child>
-                                      <object class="PwVolumeBox">
-                                        <property name="title">Music player [now playing text]</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                        <property name="volume">.5</property>
-                                        <property name="level">.75</property>
-                                      </object>
-                                    </child>
-
-                                    <child>
-                                      <object class="PwVolumeBox">
-                                        <property name="title">Deadbeef</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                        <property name="volume">.2</property>
-                                        <property name="level">.90</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="PwVolumeBox">
-                                        <property name="title">MPV</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                        <property name="volume">.01</property>
-                                        <property name="level">.5</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="PwVolumeBox">
-                                        <property name="title">Audacious</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                        <property name="volume">.32</property>
-                                        <property name="level">.6</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="PwVolumeBox">
-                                        <property name="title">Totem another very long title for some funs</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                      </object>
-                                    </child>
-
-                                    <child>
-                                      <object class="AdwActionRow">
-                                        <property name="title">Just an action row</property>
-                                        <property name="subtitle">48000Hz, stereo, 32-bit float</property>
-                                        <child type="prefix">
-                                          <object class="GtkImage" id="icon">
-                                              <property name="icon-name">library-music-symbolic</property>
-                                          </object>
-                                      </child>
-                                      </object>
-                                    </child>
 
 
                                   </object>

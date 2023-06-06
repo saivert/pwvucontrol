@@ -18,18 +18,33 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+use std::{cell::RefCell};
+use glib::value::ValueType;
 use gtk::prelude::*;
 use adw::subclass::prelude::*;
-use gtk::{gio, glib};
+use gtk::{
+    gio,
+    glib::{self, clone, Continue, Receiver},
+};
+use log::info;
+
+use crate::{
+    GtkMessage, MediaType, NodeType, PipewireLink, PipewireMessage, pwnodeobject::PwNodeObject,
+};
 
 use crate::config::VERSION;
 use crate::PwvucontrolWindow;
+use pipewire::{channel::Sender, spa::Direction};
 
 mod imp {
     use super::*;
+    use once_cell::unsync::OnceCell;
 
-    #[derive(Debug, Default)]
-    pub struct PwvucontrolApplication {}
+    #[derive(Default)]
+    pub struct PwvucontrolApplication {
+        pub(super) pw_sender: OnceCell<RefCell<Sender<GtkMessage>>>,
+        pub(super) window: OnceCell<PwvucontrolWindow>,
+    }
 
     #[glib::object_subclass]
     impl ObjectSubclass for PwvucontrolApplication {
@@ -53,6 +68,12 @@ mod imp {
         // tries to launch a "second instance" of the application. When they try
         // to do that, we'll just present any existing window.
         fn activate(&self) {
+            let window = self
+            .window
+            .get()
+            .expect("Should always be initialized in gio_application_startup");
+
+/*
             let application = self.obj();
             // Get the current window or create one if necessary
             let window = if let Some(window) = application.active_window() {
@@ -60,11 +81,24 @@ mod imp {
             } else {
                 let window = PwvucontrolWindow::new(&*application);
                 window.set_title(Some("hi"));
+                {
+                    self.window = Some(RefCell::from(window));
+                }
                 window.upcast()
             };
+ */
 
             // Ask the window manager/compositor to present the window
             window.present();
+        }
+
+        fn startup(&self) {
+            self.parent_startup();
+    
+            let window = PwvucontrolWindow::new(&self.obj());
+            self.window
+                .set(window)
+                .expect("Failed to initialize application window");
         }
     }
 
@@ -79,14 +113,110 @@ glib::wrapper! {
 }
 
 impl PwvucontrolApplication {
-    pub fn new(application_id: &str, flags: &gio::ApplicationFlags) -> Self {
-        //glib::Object::new(&[("application-id", &application_id), ("flags", flags)])
-        glib::Object::builder()
-            .property("application-id", &application_id)
-            .property("flags", flags)
+    pub(super) fn new(
+        gtk_receiver: Receiver<PipewireMessage>,
+        pw_sender: Sender<GtkMessage>,
+    ) -> Self {
+        let app:PwvucontrolApplication = glib::Object::builder()
+            .property("application-id", "com.saivert.pwvucontrol")
+            .property("flags", &gio::ApplicationFlags::empty())
             .property("resource-base-path", &"/com/saivert/pwvucontrol")
-            .build()
+            .build();
+        
+        let imp = app.imp();
+        imp.pw_sender
+            .set(RefCell::new(pw_sender))
+            // Discard the returned sender, as it does not implement `Debug`.
+            .map_err(|_| ())
+            .expect("pw_sender field was already set");
+
+        // React to messages received from the pipewire thread.
+        gtk_receiver.attach(
+            None,
+            clone!(
+                @weak app => @default-return Continue(true),
+                move |msg| {
+                    
+                    match msg {
+                        PipewireMessage::NodeAdded{ id, name, node_type } => app.add_node(id, name.as_str(), node_type),
+                        PipewireMessage::NodeRemoved{ id } => app.remove_node(id),
+                        PipewireMessage::NodeParam{id, param} => app.node_param(id, param),
+                        _ => {}
+                    };
+                    Continue(true)
+                }
+            ),
+        );
+
+        app
     }
+    
+    fn node_param(&self, id: u32, param: crate::ParamType) {
+        use crate::ParamType::*;
+        if let Some(x) = self.imp().window.get() {
+            
+            match param {
+                Volume(v) => {
+                    _ = x.imp().nodemodel.get_node(id, |node| {
+                        //node.set_volume(v);
+                   });
+                },
+                Mute(m) => {
+                   _ = x.imp().nodemodel.get_node(id, |node| {
+                        node.set_mute(m);
+                   });
+                },
+                ChannelVolumes(cv) => {
+                    _ = x.imp().nodemodel.get_node(id, |node| {
+                        if (cv.len() > 0) {
+                            node.imp().set_channel_volumes_vec(&cv);
+                            node.set_volume(cv.iter().sum::<f32>() / cv.len() as f32);
+                        } else {
+                            log::error!("cv is 0");
+                        }
+                   });
+                },
+            }
+        }
+    }
+
+    /// Add a new node to the view.
+    fn add_node(&self, id: u32, name: &str, node_type: Option<NodeType>) {
+        info!("Adding node: id {}", id);
+
+        if let Some(x) = node_type {
+            if matches!(x, NodeType::Output) {
+                if let Some(x) = self.imp().window.get() {
+                    let y = &PwNodeObject::new(id, name);
+
+                    let sender = self
+                    .imp()
+                    .pw_sender
+                    .get()
+                    .expect("pw_sender not set")
+                    .borrow_mut();
+
+                    let t = y.connect_notify_local(Some("volume"), clone!(@strong sender => move |obj, paramspec| {
+                        if let Ok(volume) = obj.property_value("volume").get::<f32>() {
+                            sender.send(GtkMessage::SetVolume{id, volume}).expect("Unable to send set volume message from app.");
+                        }
+                    }));
+                    x.imp().nodemodel.append(y);
+                }
+                return;
+            }
+        }
+
+    }
+
+    fn remove_node(&self, id: u32) {
+        info!("Remove node: id {}", id);
+
+        if let Some(x) = self.imp().window.get() {
+            x.imp().nodemodel.remove(id);
+        }
+    }
+
 
     fn setup_gactions(&self) {
         let quit_action = gio::ActionEntry::builder("quit")
