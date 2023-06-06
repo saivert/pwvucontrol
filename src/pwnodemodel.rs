@@ -1,6 +1,3 @@
-use std::borrow::BorrowMut;
-
-use glib::SignalHandlerId;
 use gtk::{subclass::prelude::*, cairo::Error};
 
 use crate::pwnodeobject::PwNodeObject;
@@ -85,18 +82,25 @@ impl PwNodeModel {
         
     }
 
-    pub fn get_node<F>(&self, id: u32, f: F) -> Result<(), Error>
+    pub fn update_node<F>(&self, id: u32, f: F) -> Result<(), ()>
     where F: FnOnce(&PwNodeObject) {
         let imp = self.imp();
         let vector = imp.0.borrow();
-        for v in vector.iter() {
-            if id == v.serial() {
-                f(v);
-                return Ok(());
-            }
+        if let Some(v) = vector.iter().find(|p|id == p.serial()) {
+            f(v);
+            return Ok(());
         }
-        Err(Error::FileNotFound)
+        Err(())
         
+    }
+
+    pub fn get_node(&self, id: u32) -> Result<PwNodeObject, ()> {
+        let imp = self.imp();
+        let vector = imp.0.borrow();
+        if let Some(v) = vector.iter().find(|p|id == p.serial()) {
+            return Ok(v.clone());
+        }
+        Err(())
     }
 }
 

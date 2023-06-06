@@ -103,6 +103,8 @@ mod imp {
             item.bind_property("volume", self.volume_scale.adjustment().upcast_ref::<gtk::Adjustment>(), "value")
                 .sync_create()
                 .bidirectional()
+                .transform_to::<f32, f64, _>(|_, y|Some(y.cbrt() as f64))
+                .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
                 .build();
 
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);

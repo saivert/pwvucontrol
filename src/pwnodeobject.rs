@@ -1,16 +1,15 @@
-use glib::{Object, Cast, ObjectExt};
+use glib::Object;
 use gtk::glib;
+
 
 mod imp {
     use std::cell::{Cell, RefCell};
-    
-    use glib::SignalHandlerId;
+    use gtk::subclass::prelude::*;
+
     use gtk::{
         glib::{self, ParamSpec, Properties, Value},
         prelude::*,
     };
-    use gtk::subclass::prelude::*;
-    
     
     // Object holding the state
     #[derive(Default, Properties)]
@@ -26,7 +25,6 @@ mod imp {
         mute: Cell<bool>,
         #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         channel_volumes: RefCell<Vec<f32>>,
-        pub blocker: once_cell::sync::OnceCell<SignalHandlerId>,
     }
     
     // The central trait for subclassing a GObject

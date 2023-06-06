@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use std::{cell::RefCell};
-use glib::value::ValueType;
+use std::cell::RefCell;
+
 use gtk::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{
@@ -44,6 +44,7 @@ mod imp {
     pub struct PwvucontrolApplication {
         pub(super) pw_sender: OnceCell<RefCell<Sender<GtkMessage>>>,
         pub(super) window: OnceCell<PwvucontrolWindow>,
+        pub(super) signalblockers: RefCell<std::collections::HashMap<u32, glib::SignalHandlerId>>,
     }
 
     #[glib::object_subclass]
@@ -157,24 +158,35 @@ impl PwvucontrolApplication {
             
             match param {
                 Volume(v) => {
-                    _ = x.imp().nodemodel.get_node(id, |node| {
+                    _ = x.imp().nodemodel.update_node(id, |node| {
                         //node.set_volume(v);
                    });
                 },
                 Mute(m) => {
-                   _ = x.imp().nodemodel.get_node(id, |node| {
+                   _ = x.imp().nodemodel.update_node(id, |node| {
                         node.set_mute(m);
                    });
                 },
                 ChannelVolumes(cv) => {
-                    _ = x.imp().nodemodel.get_node(id, |node| {
+                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
+                        if let Some(volume) = cv.get(0) {
+                            if let Some(sigid) = self.imp().signalblockers.borrow().get(&id){
+                                nodeobj.block_signal(sigid);
+                                nodeobj.set_volume(*volume);
+                                nodeobj.unblock_signal(sigid);
+                            }
+                        }
+                    }
+                    /*
+                    _ = x.imp().nodemodel.update_node(id, |node| {
                         if (cv.len() > 0) {
-                            node.imp().set_channel_volumes_vec(&cv);
+                            //node.imp().set_channel_volumes_vec(&cv);
                             node.set_volume(cv.iter().sum::<f32>() / cv.len() as f32);
                         } else {
                             log::error!("cv is 0");
                         }
                    });
+                   */
                 },
             }
         }
@@ -201,6 +213,8 @@ impl PwvucontrolApplication {
                             sender.send(GtkMessage::SetVolume{id, volume}).expect("Unable to send set volume message from app.");
                         }
                     }));
+
+                    self.imp().signalblockers.borrow_mut().insert(id, t);
                     x.imp().nodemodel.append(y);
                 }
                 return;
