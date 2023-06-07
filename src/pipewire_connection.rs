@@ -16,7 +16,12 @@
 
 mod state;
 
-use std::{cell::RefCell, collections::HashMap, rc::Rc, io::{self, BufWriter}};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    io,
+    rc::Rc,
+};
 
 use gtk::glib::{self, clone};
 use log::{debug, info, warn};
@@ -33,7 +38,7 @@ use pipewire::{
 
 use pipewire::spa::pod::deserialize::{
     DeserializeError, DeserializeSuccess, ObjectPodDeserializer, PodDeserialize, PodDeserializer,
-    Visitor
+    Visitor,
 };
 use pipewire::spa::pod::serialize::{GenError, PodSerialize, PodSerializer, SerializeSuccess};
 
@@ -71,9 +76,6 @@ pub(super) fn thread_main(
             GtkMessage::ToggleLink { port_from, port_to } => toggle_link(port_from, port_to, &core, &registry, &state),
             GtkMessage::Terminate => mainloop.quit(),
             GtkMessage::SetVolume{id, volume} => {
-                println!("Got GtkMessage::SetVolume!");
-
-                // Test pod serializing
                 let mut buf = io::Cursor::new(Vec::new());
                 let p = SomeProps {
                     channel_volumes: Some(vec![volume, volume]),
@@ -170,7 +172,6 @@ impl<'de> PodDeserialize<'de> for SomeProps {
                     match key {
                         PROPS_KEY_CHANNEL_VOLUMES => {
                             if let Value::ValueArray(ValueArray::Float(channel_volumes)) = &value {
-                                dbg!(channel_volumes);
                                 tmp.channel_volumes = Some(channel_volumes.clone());
                             }
                         }
@@ -205,26 +206,30 @@ impl PodSerialize for SomeProps {
         const OBJECT_TYPE_PROPS: u32 = 262146;
         const OBJECT_ID_PROPS: u32 = 2;
 
-        let mut object_serializer = serializer.serialize_object(OBJECT_TYPE_PROPS, OBJECT_ID_PROPS)?;
+        let mut object_serializer =
+            serializer.serialize_object(OBJECT_TYPE_PROPS, OBJECT_ID_PROPS)?;
         if let Some(channel_volumes) = &self.channel_volumes {
             object_serializer.serialize_property(
                 PROPS_KEY_CHANNEL_VOLUMES,
                 &Value::ValueArray(ValueArray::Float(channel_volumes.clone())),
-                pipewire::spa::pod::PropertyFlags::empty())?;
+                pipewire::spa::pod::PropertyFlags::empty(),
+            )?;
         }
 
         if let Some(volume) = &self.volume {
             object_serializer.serialize_property(
                 PROPS_KEY_VOLUME,
                 &Value::Float(*volume),
-                pipewire::spa::pod::PropertyFlags::empty())?;
+                pipewire::spa::pod::PropertyFlags::empty(),
+            )?;
         }
 
         if let Some(mute) = &self.mute {
             object_serializer.serialize_property(
                 PROPS_KEY_MUTE,
                 &Value::Bool(*mute),
-                pipewire::spa::pod::PropertyFlags::empty())?;
+                pipewire::spa::pod::PropertyFlags::empty(),
+            )?;
         }
 
         object_serializer.end()
@@ -259,57 +264,16 @@ fn handle_node(
                 }
             }
         }))
-        .param(clone!(@strong sender => move |seq, id, start, num, param| {
-            use pipewire::spa::pod::{Value, ValueArray};
-
-            debug!("New param! {seq} {} {start} {num}", id.0);
-
+        .param(clone!(@strong sender => move |_seq, _id, _start, _num, param| {
             let (_, x) = PodDeserializer::deserialize_from::<SomeProps>(&param).expect("Error deserializing into Value");
             if let Some(channel_volumes) = x.channel_volumes {
-                println!("Channel volumes: {:?}", channel_volumes);
                 sender.send(PipewireMessage::NodeParam{
                     id: node_id,
                     param: crate::ParamType::ChannelVolumes(channel_volumes.clone())})
                     .expect("Failed to send ChannelVolumes message");
             }
-
-
-
-            /*
-            let (_, object) = PodDeserializer::deserialize_from::<Value>(&param).expect("Error deserializing into Value");
-            if let Value::Object(obj) = object {
-                if let Some(channel_volumes_prop) = obj.properties.iter().find(|x| {x.key == 65544}) {
-                    println!("Channel volumes: {:?}", channel_volumes_prop.value);
-                    if let Value::ValueArray(ValueArray::Float(channel_volumes)) = &channel_volumes_prop.value {
-                        sender.send(PipewireMessage::NodeParam{
-                            id: node_id,
-                            param: crate::ParamType::ChannelVolumes(channel_volumes.clone())})
-                            .expect("Failed to send ChannelVolumes message");
-                    }
-                }
-                if let Some(volume_prop) = obj.properties.iter().find(|x| {x.key == 65539}) {
-                    println!("Main volume: {:?}", volume_prop.value);
-                    if let Value::Float(volume) = &volume_prop.value {
-                        sender.send(PipewireMessage::NodeParam{
-                            id: node_id,
-                            param: crate::ParamType::Volume(volume.clone())})
-                            .expect("Failed to send Volume message");
-                    }
-                }
-                if let Some(mute_prop) = obj.properties.iter().find(|x| {x.key == 65540}) {
-                    println!("Main volume: {:?}", mute_prop.value);
-                    if let Value::Bool(mute) = &mute_prop.value {
-                        sender.send(PipewireMessage::NodeParam{
-                            id: node_id,
-                            param: crate::ParamType::Mute(mute.clone())})
-                            .expect("Failed to send Mute message");
-                    }
-                }
-            }
-            */
         }))
         .register();
-
 
     proxies.borrow_mut().insert(
         node.id,

@@ -169,24 +169,19 @@ impl PwvucontrolApplication {
                 },
                 ChannelVolumes(cv) => {
                     if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        if let Some(volume) = cv.get(0) {
+                        if (cv.len() > 0) {
+                            // Widget is not handling channel_volumes to just map channel_volumes to volume property
+                            // node.imp().set_channel_volumes_vec(&cv);
+
                             if let Some(sigid) = self.imp().signalblockers.borrow().get(&id){
                                 nodeobj.block_signal(sigid);
-                                nodeobj.set_volume(*volume);
+                                nodeobj.set_volume(cv.iter().sum::<f32>() / cv.len() as f32);
                                 nodeobj.unblock_signal(sigid);
                             }
-                        }
-                    }
-                    /*
-                    _ = x.imp().nodemodel.update_node(id, |node| {
-                        if (cv.len() > 0) {
-                            //node.imp().set_channel_volumes_vec(&cv);
-                            node.set_volume(cv.iter().sum::<f32>() / cv.len() as f32);
                         } else {
                             log::error!("cv is 0");
                         }
-                   });
-                   */
+                    }
                 },
             }
         }
