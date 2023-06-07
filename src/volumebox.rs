@@ -100,6 +100,10 @@ mod imp {
                 .sync_create()
                 .build();
 
+            item.bind_property("description", self.subtitle_label.upcast_ref::<gtk::Label>(), "label")
+                .sync_create()
+                .build();
+
             item.bind_property("volume", self.volume_scale.adjustment().upcast_ref::<gtk::Adjustment>(), "value")
                 .sync_create()
                 .bidirectional()

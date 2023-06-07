@@ -1,4 +1,4 @@
-use gtk::{subclass::prelude::*, cairo::Error};
+use gtk::subclass::prelude::*;
 
 use crate::pwnodeobject::PwNodeObject;
 use gtk::{gio, glib, prelude::*};

@@ -18,8 +18,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::HashMap};
 
+use glib::ValueArray;
 use gtk::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{
@@ -44,7 +45,6 @@ mod imp {
     pub struct PwvucontrolApplication {
         pub(super) pw_sender: OnceCell<RefCell<Sender<GtkMessage>>>,
         pub(super) window: OnceCell<PwvucontrolWindow>,
-        pub(super) signalblockers: RefCell<std::collections::HashMap<u32, glib::SignalHandlerId>>,
     }
 
     #[glib::object_subclass]
@@ -142,6 +142,7 @@ impl PwvucontrolApplication {
                         PipewireMessage::NodeAdded{ id, name, node_type } => app.add_node(id, name.as_str(), node_type),
                         PipewireMessage::NodeRemoved{ id } => app.remove_node(id),
                         PipewireMessage::NodeParam{id, param} => app.node_param(id, param),
+                        PipewireMessage::NodeProps { id, props } => app.node_props(id, props),
                         _ => {}
                     };
                     Continue(true)
@@ -158,31 +159,34 @@ impl PwvucontrolApplication {
             
             match param {
                 Volume(v) => {
-                    _ = x.imp().nodemodel.update_node(id, |node| {
-                        //node.set_volume(v);
-                   });
+                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
+                        nodeobj.imp().set_volume_noevent(v);
+                   };
                 },
                 Mute(m) => {
-                   _ = x.imp().nodemodel.update_node(id, |node| {
-                        node.set_mute(m);
-                   });
+                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
+                        nodeobj.imp().set_mute_noevent(m);
+                   };
                 },
                 ChannelVolumes(cv) => {
                     if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        if (cv.len() > 0) {
-                            // Widget is not handling channel_volumes to just map channel_volumes to volume property
-                            // node.imp().set_channel_volumes_vec(&cv);
-
-                            if let Some(sigid) = self.imp().signalblockers.borrow().get(&id){
-                                nodeobj.block_signal(sigid);
-                                nodeobj.set_volume(cv.iter().sum::<f32>() / cv.len() as f32);
-                                nodeobj.unblock_signal(sigid);
-                            }
+                        if cv.len() > 0 {
+                            nodeobj.imp().set_channel_volumes_vec_noevent(&cv);
                         } else {
                             log::error!("cv is 0");
                         }
                     }
                 },
+            }
+        }
+    }
+
+    fn node_props(&self, id: u32, props: HashMap<String, String>) {
+         let window = self.imp().window.get().expect("Cannot get window");
+
+        if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
+            if let Some(medianame) = props.get("media.name") {
+                nodeobj.set_description(medianame.clone());
             }
         }
     }
@@ -203,13 +207,35 @@ impl PwvucontrolApplication {
                     .expect("pw_sender not set")
                     .borrow_mut();
 
-                    let t = y.connect_notify_local(Some("volume"), clone!(@strong sender => move |obj, paramspec| {
+                    y.imp().set_property_change_handler("volume", clone!(@strong sender => move |obj, _paramspec| {
                         if let Ok(volume) = obj.property_value("volume").get::<f32>() {
-                            sender.send(GtkMessage::SetVolume{id, volume}).expect("Unable to send set volume message from app.");
+                            sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: Some(volume), mute: None})
+                                .expect("Unable to send set volume message from app.");
                         }
                     }));
 
-                    self.imp().signalblockers.borrow_mut().insert(id, t);
+                    y.imp().set_property_change_handler("mute", clone!(@strong sender => move |obj, _paramspec| {
+                        if let Ok(mute) = obj.property_value("mute").get::<bool>() {
+                            sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: None, mute: Some(mute)})
+                                .expect("Unable to send set volume message from app.");
+                        }
+                    }));
+
+                    y.imp().set_property_change_handler("channel_volumes", clone!(@strong sender => move |obj, _paramspec| {
+                      
+                        if let Ok(va) = obj.property_value("channel_volumes").get::<ValueArray>() {
+                            let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
+                            for k in va.iter() {
+                                if let Ok(v) = k.get() {
+                                    volumevec.push(v);
+                                }
+                            }
+                            dbg!(&volumevec);
+                            sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
+                                .expect("Unable to send set volume message from app.");
+                        }
+                    }));
+
                     x.imp().nodemodel.append(y);
                 }
                 return;

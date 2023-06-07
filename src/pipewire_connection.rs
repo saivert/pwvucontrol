@@ -31,7 +31,7 @@ use pipewire::{
     prelude::*,
     properties,
     registry::{GlobalObject, Registry},
-    spa::{Direction, ForeignDict},
+    spa::{Direction, ForeignDict, StaticDict},
     types::ObjectType,
     Context, Core, MainLoop,
 };
@@ -71,16 +71,17 @@ pub(super) fn thread_main(
 
     let state = Rc::new(RefCell::new(State::new()));
 
+
     let _receiver = pw_receiver.attach(&mainloop, {
         clone!(@strong mainloop, @weak core, @weak registry, @strong state, @strong proxies => move |msg| match msg {
             GtkMessage::ToggleLink { port_from, port_to } => toggle_link(port_from, port_to, &core, &registry, &state),
             GtkMessage::Terminate => mainloop.quit(),
-            GtkMessage::SetVolume{id, volume} => {
+            GtkMessage::SetVolume{id, channel_volumes, volume, mute} => {
                 let mut buf = io::Cursor::new(Vec::new());
                 let p = SomeProps {
-                    channel_volumes: Some(vec![volume, volume]),
-                    mute: None,
-                    volume: None,
+                    channel_volumes,
+                    mute,
+                    volume,
                 };
                 if let Ok(x) = PodSerializer::serialize(&mut buf, &p) {
                     let proxies = proxies.borrow_mut();
@@ -255,13 +256,27 @@ fn handle_node(
 
     let listener = proxy
         .add_listener_local()
-        .info(clone!(@strong proxies => move |ni| {
+        .info(clone!(@strong proxies, @strong sender => move |ni| {
             if ni.change_mask().contains(pipewire::node::NodeChangeMask::PARAMS) {
                 let proxies = proxies.borrow_mut();
 
                 if let Some(ProxyItem::Node { _proxy: hi, .. }) = proxies.get(&ni.id()) {
                     hi.enum_params(0, Some(pipewire::spa::param::ParamType::Props), 0, u32::MAX);
                 }
+            }
+
+            if ni.change_mask().contains(pipewire::node::NodeChangeMask::PROPS) {
+                let dict = ni.props().expect("Cannot get props from node info");
+                let mut props: HashMap<String, String> = HashMap::new();
+
+                for (key,value) in dict.iter() {
+                    props.insert(key.to_string(), value.to_string());
+                }
+
+                sender.send(PipewireMessage::NodeProps{
+                    id: node_id,
+                    props: props,
+                    }).expect("Failed to send NodeProps message");
             }
         }))
         .param(clone!(@strong sender => move |_seq, _id, _start, _num, param| {
@@ -271,6 +286,20 @@ fn handle_node(
                     id: node_id,
                     param: crate::ParamType::ChannelVolumes(channel_volumes.clone())})
                     .expect("Failed to send ChannelVolumes message");
+            }
+
+            if let Some(volume) = x.volume {
+                sender.send(PipewireMessage::NodeParam{
+                    id: node_id,
+                    param: crate::ParamType::Volume(volume.clone())})
+                    .expect("Failed to send Volume message");
+            }
+
+            if let Some(mute) = x.mute {
+                sender.send(PipewireMessage::NodeParam{
+                    id: node_id,
+                    param: crate::ParamType::Mute(mute.clone())})
+                    .expect("Failed to send Mute message");
             }
         }))
         .register();

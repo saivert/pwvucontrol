@@ -26,6 +26,8 @@ mod pwnodeobject;
 mod pwnodemodel;
 mod pipewire_connection;
 
+use std::collections::HashMap;
+
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;
 
@@ -41,7 +43,7 @@ enum GtkMessage {
     /// Toggle a link between the two specified ports.
     ToggleLink { port_from: u32, port_to: u32 },
     /// Sets the volume of the node
-    SetVolume{id: u32, volume: f32},
+    SetVolume{id: u32, channel_volumes: Option<Vec<f32>>, volume: Option<f32>, mute: Option<bool>},
     /// Quit the event loop and let the thread finish.
     Terminate,
 }
@@ -64,6 +66,10 @@ enum PipewireMessage {
     NodeParam {
         id: u32,
         param: ParamType
+    },
+    NodeProps {
+        id: u32,
+        props: HashMap<String, String>,
     },
     PortAdded {
         id: u32,
