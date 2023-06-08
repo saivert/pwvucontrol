@@ -31,7 +31,7 @@ use pipewire::{
     prelude::*,
     properties,
     registry::{GlobalObject, Registry},
-    spa::{Direction, ForeignDict, StaticDict},
+    spa::{Direction, ForeignDict},
     types::ObjectType,
     Context, Core, MainLoop,
 };

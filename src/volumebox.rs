@@ -56,8 +56,8 @@ mod imp {
         pub volume_scale: TemplateChild<gtk::Scale>,
         #[template_child]
         pub level_bar: TemplateChild<gtk::LevelBar>,
-        // #[template_child]
-        // pub mutebtn: TemplateChild<gtk::ToggleButton>,
+        #[template_child]
+        pub mutebtn: TemplateChild<gtk::ToggleButton>,
     }
 
 
@@ -102,6 +102,11 @@ mod imp {
 
             item.bind_property("description", self.subtitle_label.upcast_ref::<gtk::Label>(), "label")
                 .sync_create()
+                .build();
+
+            item.bind_property("mute", self.mutebtn.upcast_ref::<gtk::ToggleButton>(), "active")
+                .sync_create()
+                .bidirectional()
                 .build();
 
             item.bind_property("volume", self.volume_scale.adjustment().upcast_ref::<gtk::Adjustment>(), "value")

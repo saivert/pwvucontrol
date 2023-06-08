@@ -90,6 +90,20 @@
                             </object>
                         </child>
 
+                        <!-- Mute toggle -->
+                        <child>
+                            <object class="GtkToggleButton" id="mutebtn">
+                                <property name="hexpand">0</property>
+                                <property name="valign">center</property>
+                                <style>
+                                    <class name="suffixes" />
+                                    <class name="expander-row-arrow" />
+                                </style>
+                                <property name="icon-name">audio-volume-muted-symbolic</property>
+                            </object>
+                        </child>
+
+                        <!-- Expander toggle -->
                         <child>
                             <object class="GtkToggleButton" id="toggle">
                                 <property name="hexpand">0</property>
