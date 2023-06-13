@@ -6,12 +6,14 @@ mod imp {
     use std::cell::{Cell, RefCell};
     use std::collections::HashMap;
     use glib::SignalHandlerId;
+    use glib::subclass::Signal;
     use gtk::subclass::prelude::*;
 
     use gtk::{
         glib::{self, ParamSpec, Properties, Value},
         prelude::*,
     };
+    use once_cell::sync::Lazy;
     
     // Object holding the state
     #[derive(Default, Properties)]
@@ -21,6 +23,8 @@ mod imp {
         name: RefCell<Option<String>>,
         #[property(get, set)]
         description: RefCell<Option<String>>,
+        #[property(get, set)]
+        formatstr: RefCell<Option<String>>,
         #[property(get, set)]
         serial: Cell<u32>,
         #[property(get, set)]
@@ -53,6 +57,15 @@ mod imp {
             self.derived_property(id, pspec)
         }
 
+        fn signals() -> &'static [Signal] {
+            static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
+                vec![Signal::builder("channelvolume")
+                    .param_types([u32::static_type(), f32::static_type()])
+                    .build()]
+            });
+
+            SIGNALS.as_ref()
+        }
     }
 
     impl PwNodeObject {
@@ -78,7 +91,7 @@ mod imp {
 
         pub fn set_channel_volumes_vec(&self, values: &Vec<f32>) {
             *(self.channel_volumes.borrow_mut()) = values.clone();
-            self.obj().notify_channel_volumes();           
+            self.obj().notify_channel_volumes();
         }
 
         pub fn set_channel_volumes_vec_noevent(&self, values: &Vec<f32>) {
@@ -89,6 +102,13 @@ mod imp {
                 obj.notify_channel_volumes();
                 obj.unblock_signal(sigid);
             }
+        }
+
+        pub fn set_channel_volume(&self, index: u32, volume: f32) {
+            if let Some (value) = self.channel_volumes.borrow_mut().get_mut(index as usize) {
+                *value = volume;
+            }
+            self.obj().emit_by_name::<()>("channelvolume", &[&index, &volume]);
         }
 
         pub fn set_property_change_handler<F: Fn(&super::PwNodeObject, &glib::ParamSpec) + 'static>(

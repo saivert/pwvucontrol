@@ -22,9 +22,11 @@ mod application;
 mod config;
 mod window;
 mod volumebox;
+mod channelbox;
 mod pwnodeobject;
 mod pwnodemodel;
 mod pipewire_connection;
+mod format;
 
 use std::collections::HashMap;
 
@@ -66,6 +68,12 @@ enum PipewireMessage {
     NodeParam {
         id: u32,
         param: ParamType
+    },
+    NodeFormat {
+        id: u32,
+        channels: u32,
+        rate: u32,
+        format: u32,
     },
     NodeProps {
         id: u32,

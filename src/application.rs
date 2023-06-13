@@ -143,6 +143,7 @@ impl PwvucontrolApplication {
                         PipewireMessage::NodeRemoved{ id } => app.remove_node(id),
                         PipewireMessage::NodeParam{id, param} => app.node_param(id, param),
                         PipewireMessage::NodeProps { id, props } => app.node_props(id, props),
+                        PipewireMessage::NodeFormat { id, channels, rate, format } => app.node_format(id, channels, rate, format),
                         _ => {}
                     };
                     Continue(true)
@@ -153,6 +154,15 @@ impl PwvucontrolApplication {
         app
     }
     
+
+    fn node_format(&self, id:u32, channels: u32, rate: u32, format: u32) {
+        let window = self.imp().window.get().expect("Cannot get window");
+
+        if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
+            nodeobj.set_formatstr(format!("{channels}ch {rate}Hz {}", crate::format::format_to_string(format)));
+        }
+    }
+
     fn node_param(&self, id: u32, param: crate::ParamType) {
         use crate::ParamType::*;
         if let Some(x) = self.imp().window.get() {
@@ -221,19 +231,44 @@ impl PwvucontrolApplication {
                         }
                     }));
 
-                    y.imp().set_property_change_handler("channel_volumes", clone!(@strong sender => move |obj, _paramspec| {
-                      
-                        if let Ok(va) = obj.property_value("channel_volumes").get::<ValueArray>() {
+                    y.imp().set_property_change_handler("channel-volumes", clone!(@strong sender => move |obj, _paramspec| {
+                        log::warn!("channel-volumes event handler");
+
+                    //     if let Ok(va) = obj.property_value("channel-volumes").get::<ValueArray>() {
+                    //         let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
+                    //         for k in va.iter() {
+                    //             if let Ok(v) = k.get() {
+                    //                 volumevec.push(v);
+                    //             }
+                    //         }
+                    //         dbg!(&volumevec);
+                    //         sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
+                    //             .expect("Unable to send set volume message from app.");
+                    //     }
+                    }));
+
+                    y.connect_local("channelvolume", false, clone!(@strong sender => move |args| {
+                        let obj: &PwNodeObject = args[0].get().unwrap();
+                        let index: u32 = args[1].get().unwrap();
+                        let volume: f32 = args[2].get().unwrap();
+                        log::warn!("channelvolume event handler");
+
+                        if let Ok(va) = obj.property_value("channel-volumes").get::<ValueArray>() {
                             let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
                             for k in va.iter() {
                                 if let Ok(v) = k.get() {
                                     volumevec.push(v);
                                 }
                             }
+                            if let Some(v) = volumevec.get_mut(index as usize) {
+                                *v = volume;
+                            }
                             dbg!(&volumevec);
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
                                 .expect("Unable to send set volume message from app.");
                         }
+
+                        None
                     }));
 
                     x.imp().nodemodel.append(y);

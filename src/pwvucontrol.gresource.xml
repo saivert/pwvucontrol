@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/saivert/pwvucontrol">
     <file preprocess="xml-stripblanks">gtk/volumebox.ui</file>
+    <file preprocess="xml-stripblanks">gtk/channelbox.ui</file>
     <file preprocess="xml-stripblanks">window.ui</file>
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
   </gresource>

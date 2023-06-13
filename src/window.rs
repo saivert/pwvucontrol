@@ -82,6 +82,7 @@ mod imp {
 
             let model = &self.nodemodel;
             let window = self;
+
             self.playbacklist.bind_model(
                 Some(model),
                 clone!(@weak window => @default-panic, move |item| {

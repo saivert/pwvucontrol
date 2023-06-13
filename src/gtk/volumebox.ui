@@ -46,9 +46,6 @@
                                         <property name="lines">0</property>
                                         <property name="wrap">True</property>
                                         <property name="wrap-mode">word-char</property>
-                        
-                                        <property name="label" bind-source="PwVolumeBox"
-                                            bind-property="title" bind-flags="sync-create" />
                                     </object>
                                 </child>
                                 <child>
@@ -57,8 +54,6 @@
                                             <class name="subtitle" />
                                         </style>
                                         <property name="xalign">0</property>
-                                        <property name="label" bind-source="PwVolumeBox"
-                                            bind-property="subtitle" bind-flags="sync-create" />
                                     </object>
                                 </child>
                             </object>
@@ -133,8 +128,6 @@
                                 <property name="value-pos">right</property>
                                 <property name="adjustment">
                                     <object class="GtkAdjustment">
-                                        <property name="value" bind-source="PwVolumeBox"
-                                            bind-property="volume" bind-flags="bidirectional" />
                                         <property name="lower">0</property>
                                         <property name="upper">1</property>
                                         <property name="step-increment">0.01</property>
@@ -151,8 +144,6 @@
                                 <property name="mode">continuous</property>
                                 <property name="max-value">1.0</property>
                                 <property name="min-value">0.0</property>
-                                <property name="value" bind-source="PwVolumeBox"
-                                            bind-property="level" bind-flags="sync-create" />
                             </object>
                         </child>
                     </object>
@@ -162,8 +153,17 @@
                         <property name="reveal-child" bind-source="toggle"
                             bind-property="active" bind-flags="sync-create" />
                         <child>
-                            <object class="GtkLabel">
-                                <property name="label">lorem ipsum dolor sit amet</property>
+                            <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <child>
+                                    <object class="GtkLabel" id="format">
+                                        <property name="xalign">0.5</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkListBox" id="channel_listbox">
+                                    </object>
+                                </child>
                             </object>
                         </child>
                     </object>

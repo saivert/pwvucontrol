@@ -24,7 +24,7 @@ use gtk::{
     subclass::prelude::*,
 };
 
-use adw::subclass::prelude::*;
+
 
 use std::cell::RefCell;
 use glib::Properties;
@@ -33,17 +33,21 @@ use crate::pwnodeobject::PwNodeObject;
 
 mod imp {
 
+    use crate::channelbox::PwChannelBox;
+
     use super::*;
-    use glib::{ParamSpec, Value};
+    use glib::{ParamSpec, Value, clone};
     use gtk::glib::subclass::Signal;
     use once_cell::sync::Lazy;
 
-    #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
+    #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
         #[property(get, set, construct_only)]
         row_data: RefCell<Option<PwNodeObject>>,
+
+        channel_widgets: RefCell<Vec<PwChannelBox>>,
 
         // Template widgets
         #[template_child]
@@ -58,6 +62,10 @@ mod imp {
         pub level_bar: TemplateChild<gtk::LevelBar>,
         #[template_child]
         pub mutebtn: TemplateChild<gtk::ToggleButton>,
+        #[template_child]
+        pub channel_listbox: TemplateChild<gtk::ListBox>,
+        #[template_child]
+        pub format: TemplateChild<gtk::Label>,
     }
 
 
@@ -70,7 +78,6 @@ mod imp {
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_callbacks();
-            // Self::Type::bind_template_callbacks(klass);
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -116,29 +123,62 @@ mod imp {
                 .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
                 .build();
 
+            item.bind_property("formatstr", self.format.upcast_ref::<gtk::Label>(), "label")
+                .sync_create()
+                .build();
+
+
+            self.create_channel_volumes_widgets();
+
+            item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
+                let values = nodeobj.channel_volumes();
+                let channel_widgets_len = {
+                    let channel_widgets = widget.channel_widgets.borrow();
+                    channel_widgets.len()
+                };
+
+                if values.len() != channel_widgets_len {
+                    widget.create_channel_volumes_widgets();
+                    return;
+                }
+            }));
+
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
         }
 
-        fn signals() -> &'static [Signal] {
-            static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
-                vec![Signal::builder("max-number-reached")
-                    .param_types([i32::static_type()])
-                    .build()]
-            });
-
-            SIGNALS.as_ref()
-        }
     
     }
     impl WidgetImpl for PwVolumeBox {}
-    impl ActionRowImpl for PwVolumeBox {}
-    impl PreferencesRowImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
 
     #[gtk::template_callbacks]
     impl PwVolumeBox {
+        fn clear_channel_volumes_listbox(&self) {
+            let list_box: gtk::ListBox = self.channel_listbox.get();
+
+            while let Some(row) = list_box.last_child() {
+                list_box.remove(&row);
+            }
+        }
+
+        fn create_channel_volumes_widgets(&self) {
+            self.clear_channel_volumes_listbox();
+            let item = self.row_data.borrow();
+            let item = item.as_ref().cloned().unwrap();
+            let values = item.channel_volumes();
+
+            for (i,value) in (0..).zip(values.iter()) {
+                if let Ok(volume) = value.get() {
+                    let mut list = self.channel_widgets.borrow_mut();
+                    let channelbox = PwChannelBox::new(i as u32, volume, &item);
+                    list.push(channelbox);
+                    self.channel_listbox.append(list.last().unwrap());
+                }
+            }
+ 
+        }
     }
 
 }

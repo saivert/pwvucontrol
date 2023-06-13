@@ -119,10 +119,10 @@ pub(super) fn thread_main(
                     Item::Link { .. } => PipewireMessage::LinkRemoved {id},
                 }).expect("Failed to send message");
             } else {
-                warn!(
-                    "Attempted to remove item with id {} that is not saved in state",
-                    id
-                );
+                // warn!(
+                //     "Attempted to remove item with id {} that is not saved in state",
+                //     id
+                // );
             }
 
             proxies.borrow_mut().remove(&id);
@@ -262,6 +262,7 @@ fn handle_node(
 
                 if let Some(ProxyItem::Node { _proxy: hi, .. }) = proxies.get(&ni.id()) {
                     hi.enum_params(0, Some(pipewire::spa::param::ParamType::Props), 0, u32::MAX);
+                    hi.enum_params(0, Some(pipewire::spa::param::ParamType::Format), 0, u32::MAX);
                 }
             }
 
@@ -280,26 +281,50 @@ fn handle_node(
             }
         }))
         .param(clone!(@strong sender => move |_seq, _id, _start, _num, param| {
-            let (_, x) = PodDeserializer::deserialize_from::<SomeProps>(&param).expect("Error deserializing into Value");
-            if let Some(channel_volumes) = x.channel_volumes {
-                sender.send(PipewireMessage::NodeParam{
-                    id: node_id,
-                    param: crate::ParamType::ChannelVolumes(channel_volumes.clone())})
-                    .expect("Failed to send ChannelVolumes message");
+            if _id == pipewire::spa::param::ParamType::Format {
+
+                unsafe {
+                    let mut audio_info: pipewire::spa::sys::spa_audio_info_raw = std::mem::zeroed();
+
+                    pipewire::spa::sys::spa_format_audio_raw_parse(
+                        param.as_ptr() as *const pipewire::spa::sys::spa_pod,
+                        &mut audio_info as *mut pipewire::spa::sys::spa_audio_info_raw 
+                    );
+
+                    sender.send(PipewireMessage::NodeFormat{
+                        id: node_id,
+                        channels: audio_info.channels,
+                        rate: audio_info.rate,
+                        format: audio_info.format,
+                        })
+                        .expect("Failed to send NodeFormat message");
+                }
+                return;
             }
 
-            if let Some(volume) = x.volume {
-                sender.send(PipewireMessage::NodeParam{
-                    id: node_id,
-                    param: crate::ParamType::Volume(volume.clone())})
-                    .expect("Failed to send Volume message");
-            }
+            if _id == pipewire::spa::param::ParamType::Props { 
+            
+                let (_, x) = PodDeserializer::deserialize_from::<SomeProps>(&param).expect("Error deserializing into Value");
+                if let Some(channel_volumes) = x.channel_volumes {
+                    sender.send(PipewireMessage::NodeParam{
+                        id: node_id,
+                        param: crate::ParamType::ChannelVolumes(channel_volumes.clone())})
+                        .expect("Failed to send ChannelVolumes message");
+                }
 
-            if let Some(mute) = x.mute {
-                sender.send(PipewireMessage::NodeParam{
-                    id: node_id,
-                    param: crate::ParamType::Mute(mute.clone())})
-                    .expect("Failed to send Mute message");
+                if let Some(volume) = x.volume {
+                    sender.send(PipewireMessage::NodeParam{
+                        id: node_id,
+                        param: crate::ParamType::Volume(volume.clone())})
+                        .expect("Failed to send Volume message");
+                }
+
+                if let Some(mute) = x.mute {
+                    sender.send(PipewireMessage::NodeParam{
+                        id: node_id,
+                        param: crate::ParamType::Mute(mute.clone())})
+                        .expect("Failed to send Mute message");
+                }
             }
         }))
         .register();
