@@ -4,6 +4,8 @@
     <!-- interface-name channelbox.ui -->
     <requires lib="gtk" version="4.0" />
     <template class="PwChannelBox" parent="GtkListBoxRow">
+        <property name="activatable">0</property>
+        <property name="selectable">0</property>
         <child>
             <object class="GtkBox">
                 <property name="spacing">6</property>
