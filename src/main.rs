@@ -43,6 +43,7 @@ use pipewire::spa::Direction;
 #[derive(Debug, Clone)]
 enum GtkMessage {
     /// Toggle a link between the two specified ports.
+    #[allow(dead_code)]
     ToggleLink { port_from: u32, port_to: u32 },
     /// Sets the volume of the node
     SetVolume{id: u32, channel_volumes: Option<Vec<f32>>, volume: Option<f32>, mute: Option<bool>},
@@ -57,6 +58,7 @@ enum ParamType {
     Mute(bool)
 }
 
+#[allow(dead_code)]
 /// Messages sent by the pipewire thread to notify the GTK thread.
 #[derive(Debug, Clone)]
 enum PipewireMessage {

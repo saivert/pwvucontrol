@@ -29,12 +29,14 @@ use gtk::{
 };
 use log::info;
 
+#[allow(unused)]
 use crate::{
     GtkMessage, MediaType, NodeType, PipewireLink, PipewireMessage, pwnodeobject::PwNodeObject,
 };
 
 use crate::config::VERSION;
 use crate::PwvucontrolWindow;
+#[allow(unused)]
 use pipewire::{channel::Sender, spa::Direction};
 
 mod imp {
@@ -231,7 +233,7 @@ impl PwvucontrolApplication {
                             if let Some(v) = volumevec.get_mut(index as usize) {
                                 *v = volume;
                             }
-                            dbg!(&volumevec);
+
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
                                 .expect("Unable to send set volume message from app.");
                         }

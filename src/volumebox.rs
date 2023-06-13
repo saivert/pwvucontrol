@@ -37,8 +37,6 @@ mod imp {
 
     use super::*;
     use glib::{ParamSpec, Value, clone};
-    use gtk::glib::subclass::Signal;
-    use once_cell::sync::Lazy;
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
