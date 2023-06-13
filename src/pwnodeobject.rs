@@ -97,11 +97,15 @@ mod imp {
         pub fn set_channel_volumes_vec_noevent(&self, values: &Vec<f32>) {
             *(self.channel_volumes.borrow_mut()) = values.clone();
             let obj = self.obj();
+            // If a signal blocker is registered then use it
             if let Some(sigid) = self.signalblockers.borrow().get("channel-volumes") {
                 obj.block_signal(sigid);
                 obj.notify_channel_volumes();
                 obj.unblock_signal(sigid);
+                return;
             }
+            // Otherwise just let the property change notify happen
+            obj.notify_channel_volumes();
         }
 
         pub fn set_channel_volume(&self, index: u32, volume: f32) {
@@ -111,7 +115,7 @@ mod imp {
             self.obj().emit_by_name::<()>("channelvolume", &[&index, &volume]);
         }
 
-        pub fn set_property_change_handler<F: Fn(&super::PwNodeObject, &glib::ParamSpec) + 'static>(
+        pub fn set_property_change_handler_with_blocker<F: Fn(&super::PwNodeObject, &glib::ParamSpec) + 'static>(
             &self,
             name: &str,
             handler: F,
@@ -128,7 +132,7 @@ mod imp {
                 obj.unblock_signal(sigid);
                 return;
             }
-            log::error!("Missing signal handler id for volume event");
+            obj.set_volume(volume);
         }
 
         pub fn set_mute_noevent(&self, mute: bool) {
@@ -139,7 +143,7 @@ mod imp {
                 obj.unblock_signal(sigid);
                 return;
             }
-            log::error!("Missing signal handler id for volume event");
+            obj.set_mute(mute);
         }
 
 

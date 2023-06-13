@@ -74,21 +74,6 @@ mod imp {
             .get()
             .expect("Should always be initialized in gio_application_startup");
 
-/*
-            let application = self.obj();
-            // Get the current window or create one if necessary
-            let window = if let Some(window) = application.active_window() {
-                window
-            } else {
-                let window = PwvucontrolWindow::new(&*application);
-                window.set_title(Some("hi"));
-                {
-                    self.window = Some(RefCell::from(window));
-                }
-                window.upcast()
-            };
- */
-
             // Ask the window manager/compositor to present the window
             window.present();
         }
@@ -208,7 +193,7 @@ impl PwvucontrolApplication {
         if let Some(x) = node_type {
             if matches!(x, NodeType::Output) {
                 if let Some(x) = self.imp().window.get() {
-                    let y = &PwNodeObject::new(id, name);
+                    let nodeobj = &PwNodeObject::new(id, name);
 
                     let sender = self
                     .imp()
@@ -217,41 +202,24 @@ impl PwvucontrolApplication {
                     .expect("pw_sender not set")
                     .borrow_mut();
 
-                    y.imp().set_property_change_handler("volume", clone!(@strong sender => move |obj, _paramspec| {
+                    nodeobj.imp().set_property_change_handler_with_blocker("volume", clone!(@strong sender => move |obj, _paramspec| {
                         if let Ok(volume) = obj.property_value("volume").get::<f32>() {
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: Some(volume), mute: None})
                                 .expect("Unable to send set volume message from app.");
                         }
                     }));
 
-                    y.imp().set_property_change_handler("mute", clone!(@strong sender => move |obj, _paramspec| {
+                    nodeobj.imp().set_property_change_handler_with_blocker("mute", clone!(@strong sender => move |obj, _paramspec| {
                         if let Ok(mute) = obj.property_value("mute").get::<bool>() {
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: None, mute: Some(mute)})
                                 .expect("Unable to send set volume message from app.");
                         }
                     }));
 
-                    y.imp().set_property_change_handler("channel-volumes", clone!(@strong sender => move |obj, _paramspec| {
-                        log::warn!("channel-volumes event handler");
-
-                    //     if let Ok(va) = obj.property_value("channel-volumes").get::<ValueArray>() {
-                    //         let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
-                    //         for k in va.iter() {
-                    //             if let Ok(v) = k.get() {
-                    //                 volumevec.push(v);
-                    //             }
-                    //         }
-                    //         dbg!(&volumevec);
-                    //         sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
-                    //             .expect("Unable to send set volume message from app.");
-                    //     }
-                    }));
-
-                    y.connect_local("channelvolume", false, clone!(@strong sender => move |args| {
+                    nodeobj.connect_local("channelvolume", false, clone!(@strong sender => move |args| {
                         let obj: &PwNodeObject = args[0].get().unwrap();
                         let index: u32 = args[1].get().unwrap();
                         let volume: f32 = args[2].get().unwrap();
-                        log::warn!("channelvolume event handler");
 
                         if let Ok(va) = obj.property_value("channel-volumes").get::<ValueArray>() {
                             let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
@@ -271,7 +239,7 @@ impl PwvucontrolApplication {
                         None
                     }));
 
-                    x.imp().nodemodel.append(y);
+                    x.imp().nodemodel.append(nodeobj);
                 }
                 return;
             }

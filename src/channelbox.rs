@@ -18,14 +18,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use gtk::{
-    glib,
-    prelude::*,
-    subclass::prelude::*,
-};
+use gtk::{glib, prelude::*, subclass::prelude::*};
 
-use std::cell::RefCell;
 use glib::Properties;
+use std::cell::RefCell;
 
 use crate::pwnodeobject::PwNodeObject;
 
@@ -34,7 +30,7 @@ mod imp {
     use std::cell::Cell;
 
     use super::*;
-    use glib::{ParamSpec, Value, clone};
+    use glib::{clone, ParamSpec, Value};
 
     #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]
@@ -54,7 +50,6 @@ mod imp {
         pub scale: TemplateChild<gtk::Scale>,
     }
 
-
     #[glib::object_subclass]
     impl ObjectSubclass for PwChannelBox {
         const NAME: &'static str = "PwChannelBox";
@@ -70,7 +65,6 @@ mod imp {
             obj.init_template();
         }
     }
-
 
     impl ObjectImpl for PwChannelBox {
         fn properties() -> &'static [ParamSpec] {
@@ -93,7 +87,7 @@ mod imp {
                 let values = nodeobj.channel_volumes();
                 let index = widget.channelindex.get();
                 if let Some(Ok(volume)) = values.nth(index).map(|x| x.get::<f32>()) {
-                    widget.obj().set_volume(volume);
+                    widget.obj().set_volume(volume.cbrt());
                 }
             }));
 
@@ -101,29 +95,15 @@ mod imp {
 
             adjustment.connect_value_changed(clone!(@weak self as widget, @weak item => move |x| {
                 let index = widget.channelindex.get();
-                item.imp().set_channel_volume(index, x.value() as f32);
+                item.imp().set_channel_volume(index, x.value().powi(3) as f32);
             }));
-
         }
-
-        // fn signals() -> &'static [Signal] {
-        //     static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
-        //         vec![Signal::builder("max-number-reached")
-        //             .param_types([i32::static_type()])
-        //             .build()]
-        //     });
-
-        //     SIGNALS.as_ref()
-        // }
-    
     }
     impl WidgetImpl for PwChannelBox {}
     impl ListBoxRowImpl for PwChannelBox {}
 
     #[gtk::template_callbacks]
-    impl PwChannelBox {
-    }
-
+    impl PwChannelBox {}
 }
 
 glib::wrapper! {
@@ -140,5 +120,4 @@ impl PwChannelBox {
             .property("row-data", row_data)
             .build()
     }
-
 }

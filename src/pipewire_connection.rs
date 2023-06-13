@@ -283,22 +283,23 @@ fn handle_node(
         .param(clone!(@strong sender => move |_seq, _id, _start, _num, param| {
             if _id == pipewire::spa::param::ParamType::Format {
 
-                unsafe {
+                let audio_info = unsafe {
                     let mut audio_info: pipewire::spa::sys::spa_audio_info_raw = std::mem::zeroed();
 
                     pipewire::spa::sys::spa_format_audio_raw_parse(
                         param.as_ptr() as *const pipewire::spa::sys::spa_pod,
                         &mut audio_info as *mut pipewire::spa::sys::spa_audio_info_raw 
                     );
+                    audio_info
+                };
+                sender.send(PipewireMessage::NodeFormat{
+                    id: node_id,
+                    channels: audio_info.channels,
+                    rate: audio_info.rate,
+                    format: audio_info.format,
+                    })
+                    .expect("Failed to send NodeFormat message");
 
-                    sender.send(PipewireMessage::NodeFormat{
-                        id: node_id,
-                        channels: audio_info.channels,
-                        rate: audio_info.rate,
-                        format: audio_info.format,
-                        })
-                        .expect("Failed to send NodeFormat message");
-                }
                 return;
             }
 
