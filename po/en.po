@@ -1,0 +1,81 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-13 22:41+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: data/com.saivert.pwvucontrol.desktop.in:3
+msgid "pwvucontrol"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.appdata.xml.in:7
+msgid "No description"
+msgstr ""
+
+#: src/window.ui:19
+msgid "Pipewire Volume Control"
+msgstr ""
+
+#: src/window.ui:37
+msgid "Playback"
+msgstr ""
+
+#: src/window.ui:87
+msgid "Recording"
+msgstr ""
+
+#: src/window.ui:140
+msgid "_Preferences"
+msgstr ""
+
+#: src/window.ui:144
+msgid "_Keyboard Shortcuts"
+msgstr ""
+
+#: src/window.ui:148
+msgid "_About Pwvucontrol"
+msgstr ""
+
+#: src/gtk/help-overlay.ui:11
+msgctxt "shortcut window"
+msgid "General"
+msgstr ""
+
+#: src/gtk/help-overlay.ui:14
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr ""
+
+#: src/gtk/help-overlay.ui:20
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr ""
+
+#: src/gtk/volumebox.ui:66
+msgid "on"
+msgstr ""
+
+#: src/gtk/volumebox.ui:81
+msgid "Intel HDA"
+msgstr ""
+
+#: src/gtk/volumebox.ui:82
+msgid "HDMI Audio"
+msgstr ""
+
+#: src/gtk/volumebox.ui:83
+msgid "Headphones"
+msgstr ""

@@ -63,7 +63,7 @@
 
                         <child>
                             <object class="GtkLabel">
-                                <property name="label">on</property>
+                                <property name="label" translatable="yes">on</property>
                             </object>
                         </child>
 

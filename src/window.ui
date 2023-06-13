@@ -16,7 +16,7 @@
               <object class="AdwViewSwitcherTitle" id="title">
                 <property name="stack">stack</property>
                 <property name="visible">true</property>
-                <property name="title">Pipewire Volume Control</property>
+                <property name="title" translatable="yes">Pipewire Volume Control</property>
               </object>
             </property>
             <child type="end">
@@ -34,7 +34,7 @@
             <child>
               <object class="AdwViewStackPage">
                 <property name="name">playback</property>
-                <property name="title">Playback</property>
+                <property name="title" translatable="yes">Playback</property>
                 <property name="icon-name">audio-speakers-symbolic</property>
                 <property name="child">
 
@@ -84,7 +84,7 @@
               <object class="AdwViewStackPage">
                 <property name="visible">true</property>
                 <property name="name">recording</property>
-                <property name="title">Recording</property>
+                <property name="title" translatable="yes">Recording</property>
                 <property name="icon-name">audio-input-microphone-symbolic</property>
                 <property name="child">
 

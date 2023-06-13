@@ -42,6 +42,8 @@ mod imp {
         channelindex: Cell<u32>,
         #[property(get, set)]
         volume: Cell<f32>,
+        #[property(get, set)]
+        selectable: Cell<bool>,
 
         // Template widgets
         #[template_child]

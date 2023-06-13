@@ -2,3 +2,6 @@ data/com.saivert.pwvucontrol.desktop.in
 data/com.saivert.pwvucontrol.appdata.xml.in
 data/com.saivert.pwvucontrol.gschema.xml
 src/window.ui
+src/gtk/help-overlay.ui
+src/gtk/channelbox.ui
+src/gtk/volumebox.ui
