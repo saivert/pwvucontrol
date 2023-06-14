@@ -64,6 +64,8 @@ mod imp {
         pub channel_listbox: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub format: TemplateChild<gtk::Label>,
+        #[template_child]
+        pub revealer: TemplateChild<gtk::Revealer>,
     }
 
 
@@ -139,6 +141,10 @@ mod imp {
                     widget.create_channel_volumes_widgets();
                     return;
                 }
+            }));
+
+            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
+                widget.obj().grab_focus();
             }));
 
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
