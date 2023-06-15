@@ -146,7 +146,13 @@ impl PwvucontrolApplication {
         let window = self.imp().window.get().expect("Cannot get window");
 
         if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            nodeobj.set_formatstr(format!("{channels}ch {rate}Hz {}", crate::format::format_to_string(format)));
+            nodeobj.imp().set_format(pipewire::spa::sys::spa_audio_info_raw {
+                channels,
+                rate,
+                format,
+                position,
+                flags: 0,
+            });
         }
     }
 

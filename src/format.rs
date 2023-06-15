@@ -60,3 +60,10 @@ pub fn get_channel_name(channel: u32) -> &'static str {
     };
     c_str.to_str().unwrap()
 }
+
+pub fn get_channel_name_for_position(index: u32, format: Option<spa_audio_info_raw>) -> String {
+    match format {
+        Some(f) => get_channel_name(f.position[index as usize]).to_string(),
+        None => index.to_string()
+    }
+}

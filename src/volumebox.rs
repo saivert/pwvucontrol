@@ -137,6 +137,10 @@ mod imp {
                     channel_widgets.len()
                 };
 
+                if let Some(f) = nodeobj.imp().format() {
+                    nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, crate::format::format_to_string(f.format)));
+                }
+
                 if values.len() != channel_widgets_len {
                     widget.create_channel_volumes_widgets();
                     return;

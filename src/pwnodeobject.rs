@@ -34,6 +34,8 @@ mod imp {
         #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         channel_volumes: RefCell<Vec<f32>>,
         signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
+
+        format: Cell<Option<pipewire::spa::sys::spa_audio_info_raw>>
     }
     
     // The central trait for subclassing a GObject
@@ -144,6 +146,30 @@ mod imp {
                 return;
             }
             obj.set_mute(mute);
+        }
+
+        pub fn set_format(&self, format: pipewire::spa::sys::spa_audio_info_raw) {
+            self.format.set(Some(format));
+
+            self.obj().notify_channel_volumes();
+        }
+
+        pub fn set_format_noevent(&self, format: pipewire::spa::sys::spa_audio_info_raw) {
+            self.format.set(Some(format));
+
+            let obj = self.obj();
+            // Reuse channel-volumes event here because channel-volumes may also change if format changes
+            if let Some(sigid) = self.signalblockers.borrow().get("channel-volumes") {
+                obj.block_signal(sigid);
+                obj.notify_channel_volumes();
+                obj.unblock_signal(sigid);
+                return;
+            }
+            obj.notify_channel_volumes();
+        }
+
+        pub fn format(&self) -> Option<pipewire::spa::sys::spa_audio_info_raw> {
+            self.format.get()
         }
 
 
