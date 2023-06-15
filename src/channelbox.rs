@@ -39,6 +39,8 @@ mod imp {
         #[property(get, set, construct_only)]
         row_data: RefCell<Option<PwNodeObject>>,
         #[property(get, set)]
+        channelname: RefCell<String>,
+        #[property(get, set)]
         channelindex: Cell<u32>,
         #[property(get, set)]
         volume: Cell<f32>,
@@ -114,10 +116,13 @@ glib::wrapper! {
 
 impl PwChannelBox {
     pub fn new(channelindex: u32, volume: f32, row_data: &PwNodeObject) -> Self {
+        // TODO: Get channel position instead
+        let channelname = channelindex.to_string();
         glib::Object::builder()
             .property("channelindex", channelindex)
             .property("volume", volume)
             .property("row-data", row_data)
+            .property("channelname", channelname)
             .build()
     }
 }

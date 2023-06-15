@@ -48,3 +48,15 @@ pub fn format_to_string(format: u32) -> &'static str {
 
     }
 }
+
+pub fn get_channel_name(channel: u32) -> &'static str {
+    let c_str = unsafe {
+        let c_buf =
+            spa_debug_type_find_short_name(spa_type_audio_channel, channel);
+        if c_buf.is_null() {
+            return "Unknown";
+        }
+        std::ffi::CStr::from_ptr(c_buf)
+    };
+    c_str.to_str().unwrap()
+}

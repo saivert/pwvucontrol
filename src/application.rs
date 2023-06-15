@@ -130,7 +130,7 @@ impl PwvucontrolApplication {
                         PipewireMessage::NodeRemoved{ id } => app.remove_node(id),
                         PipewireMessage::NodeParam{id, param} => app.node_param(id, param),
                         PipewireMessage::NodeProps { id, props } => app.node_props(id, props),
-                        PipewireMessage::NodeFormat { id, channels, rate, format } => app.node_format(id, channels, rate, format),
+                        PipewireMessage::NodeFormat { id, channels, rate, format, position } => app.node_format(id, channels, rate, format, position),
                         _ => {}
                     };
                     Continue(true)
@@ -142,7 +142,7 @@ impl PwvucontrolApplication {
     }
     
 
-    fn node_format(&self, id:u32, channels: u32, rate: u32, format: u32) {
+    fn node_format(&self, id:u32, channels: u32, rate: u32, format: u32, position: [u32; 64]) {
         let window = self.imp().window.get().expect("Cannot get window");
 
         if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {

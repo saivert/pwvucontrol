@@ -166,6 +166,7 @@
                                 </child>
                                 <child>
                                     <object class="GtkListBox" id="channel_listbox">
+                                        <property name="selection-mode">none</property>
                                     </object>
                                 </child>
                             </object>

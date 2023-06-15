@@ -297,6 +297,7 @@ fn handle_node(
                     channels: audio_info.channels,
                     rate: audio_info.rate,
                     format: audio_info.format,
+                    position: audio_info.position,
                     })
                     .expect("Failed to send NodeFormat message");
 

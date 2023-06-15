@@ -76,6 +76,7 @@ enum PipewireMessage {
         channels: u32,
         rate: u32,
         format: u32,
+        position: [u32; 64],
     },
     NodeProps {
         id: u32,

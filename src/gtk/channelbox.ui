@@ -12,7 +12,7 @@
                 <child>
                     <object class="GtkLabel" id="label">
                         <property name="label" bind-source="PwChannelBox"
-                            bind-property="channelindex" bind-flags="bidirectional" />
+                            bind-property="channelname" bind-flags="sync-create" />
                     </object>
                 </child>
                 <child>
