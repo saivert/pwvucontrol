@@ -10,10 +10,8 @@ glib = { version = "0.17", features = ["log"] }
 log = "0.4.11"
 im-rc = "15.1.0"
 once_cell = "1.15.0"
-#pipewire = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test", features = ["v0_3_44"]}
+pipewire = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test", features = ["v0_3_44"]}
 #libspa-sys = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test"}
-pipewire = {path = "/home/saivert/code/pipewire-rs/pipewire", features = ["v0_3_44"]}
-#libspa-sys = {path = "/home/saivert/code/pipewire-rs/libspa-sys"}
 
 [dependencies.adw]
 package = "libadwaita"
