@@ -160,8 +160,8 @@ fn main() -> gtk::glib::ExitCode {
 
     gtk::glib::set_application_name("Pwvucontrol");
 
-    let resources = gio::Resource::load(PKGDATADIR.to_owned() + "/pwvucontrol.gresource")
-        .or(gio::Resource::load("pwvucontrol.gresource")).expect("Could not load resources");
+    let resources = gio::Resource::load("pwvucontrol.gresource")
+        .or(gio::Resource::load(PKGDATADIR.to_owned() + "/pwvucontrol.gresource")).expect("Could not load resources");
 
     // Load resources
     gio::resources_register(&resources);
