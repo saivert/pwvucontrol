@@ -31,8 +31,6 @@ use crate::application::PwvucontrolApplication;
 
 
 mod imp {
-    use std::cell::Cell;
-
     use gtk::glib::clone;
 
     use crate::{volumebox::PwVolumeBox, pwnodemodel::PwNodeModel, pwnodeobject::PwNodeObject};
@@ -42,8 +40,6 @@ mod imp {
     #[derive(Debug, Default, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]
     pub struct PwvucontrolWindow {
-        pub counter: Cell<u32>,
-        // Template widgets
         #[template_child]
         pub header_bar: TemplateChild<adw::HeaderBar>,
         #[template_child]
@@ -67,7 +63,6 @@ mod imp {
             
             klass.bind_template();
             klass.bind_template_callbacks();
-            // Self::Type::bind_template_callbacks(klass);
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
