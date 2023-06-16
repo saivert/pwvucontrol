@@ -33,8 +33,10 @@ mod imp {
         mute: Cell<bool>,
         #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         channel_volumes: RefCell<Vec<f32>>,
-        signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
+        #[property(get, set, builder(crate::NodeType::Undefined))]
+        node_type: Cell<crate::NodeType>,
 
+        signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
         format: Cell<Option<pipewire::spa::sys::spa_audio_info_raw>>
     }
     
@@ -181,10 +183,11 @@ glib::wrapper! {
 }
 
 impl PwNodeObject {
-    pub fn new(serial: u32, name: &str) -> Self {
+    pub fn new(serial: u32, name: &str, nodetype: crate::NodeType) -> Self {
         Object::builder()
             .property("serial", serial)
             .property("name", name)
+            .property("node-type", nodetype)
             .build()
     }
 }

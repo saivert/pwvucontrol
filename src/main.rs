@@ -113,8 +113,11 @@ enum PipewireMessage {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, glib::Enum, Default)]
+#[enum_type(name = "NodeType")]
 pub enum NodeType {
+    #[default]
+    Undefined,
     Input,
     Output,
     Sink,

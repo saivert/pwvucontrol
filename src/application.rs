@@ -198,10 +198,10 @@ impl PwvucontrolApplication {
     fn add_node(&self, id: u32, name: &str, node_type: Option<NodeType>) {
         info!("Adding node: id {}", id);
 
-        if let Some(x) = node_type {
-            if matches!(x, NodeType::Output) {
+        if let Some(t) = node_type {
+            if matches!(t, NodeType::Output | NodeType::Input) {
                 if let Some(x) = self.imp().window.get() {
-                    let nodeobj = &PwNodeObject::new(id, name);
+                    let nodeobj = &PwNodeObject::new(id, name, t);
 
                     let sender = self
                     .imp()

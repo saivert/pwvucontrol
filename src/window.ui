@@ -97,26 +97,36 @@
                       <object class="GtkViewport">
                         <property name="scroll-to-focus">1</property>
                         <child>
-                          <object class="GtkListBox">
-                            <property name="selection-mode">none</property>
-                            <property name="show-separators">1</property>
-                            <child>
-                              <object class="AdwActionRow">
-                                <property name="title">Hi!</property>
-                                <child type="suffix">
-                                  <object class="GtkButton" id="btn">
-                                    <property name="label">Click me!</property>
-                                    <property name="valign">center</property>
-                                    <signal name="clicked" handler="ok_button_clicked" swapped="yes" />
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="margin-start">10</property>
+                            <property name="margin-end">10</property>
+                            <property name="margin-top">5</property>
+                            <property name="margin-bottom">5</property>
+                            <child><!-- frame -->
+                              <object class="GtkFrame">
+                                <child>
+
+                                  <object class="GtkListBox" id="recordlist">
+                                    <property name="selection-mode">none</property>
+                                    <property name="show-separators">1</property>
+
+                                    <style>
+                                      <class name="rich-list" />
+                                    </style>
+
+
+
                                   </object>
                                 </child>
                               </object>
-                            </child>
+                            </child><!-- /frame -->
                           </object>
                         </child>
                       </object>
                     </child>
-                  </object>
+                  </object><!-- /scrolledwindow -->
+
                   
                 </property>
               </object>
