@@ -40,7 +40,7 @@ mod imp {
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]
-    #[template(resource = "/com/saivert/pwvucontrol/window.ui")]
+    #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]
     pub struct PwvucontrolWindow {
         pub counter: Cell<u32>,
         // Template widgets
