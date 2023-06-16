@@ -86,12 +86,14 @@ mod imp {
             let item = item.as_ref().cloned().unwrap();
 
             item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
-                let values = nodeobj.channel_volumes();
+                let values = nodeobj.imp().channel_volumes_vec();
                 let index = widget.channelindex.get();
                 let channelname = crate::format::get_channel_name_for_position(index, nodeobj.imp().format());
-                if let Some(Ok(volume)) = values.nth(index).map(|x| x.get::<f32>()) {
+                if let Some(volume) = values.get(index as usize) {
                     widget.obj().set_volume(volume.cbrt());
                     widget.obj().set_channelname(channelname);
+                } else {
+                    log::error!("channel volumes array out of bounds");
                 }
             }));
 

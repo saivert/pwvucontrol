@@ -175,17 +175,14 @@ mod imp {
             self.clear_channel_volumes_listbox();
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
-            let values = item.channel_volumes();
 
-            for (i,value) in (0..).zip(values.iter()) {
-                if let Ok(volume) = value.get() {
-                    let mut list = self.channel_widgets.borrow_mut();
-                    let channelbox = PwChannelBox::new(i as u32, volume, &item);
-                    list.push(channelbox);
-                    self.channel_listbox.append(list.last().unwrap());
-                }
+            let valuesvec = item.imp().channel_volumes_vec();
+            for (i,volume) in (0..).zip(valuesvec.iter()) {
+                let mut list = self.channel_widgets.borrow_mut();
+                let channelbox = PwChannelBox::new(i as u32, *volume, &item);
+                list.push(channelbox);
+                self.channel_listbox.append(list.last().unwrap());
             }
- 
         }
     }
 

@@ -93,6 +93,10 @@ mod imp {
             });
         }
 
+        pub fn channel_volumes_vec(&self) -> Vec<f32> {
+            self.channel_volumes.borrow().clone()
+        }
+
         pub fn set_channel_volumes_vec(&self, values: &Vec<f32>) {
             *(self.channel_volumes.borrow_mut()) = values.clone();
             self.obj().notify_channel_volumes();

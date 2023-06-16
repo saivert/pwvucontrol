@@ -229,21 +229,12 @@ impl PwvucontrolApplication {
                         let index: u32 = args[1].get().unwrap();
                         let volume: f32 = args[2].get().unwrap();
 
-                        if let Ok(va) = obj.property_value("channel-volumes").get::<ValueArray>() {
-                            let mut volumevec: Vec<f32> = Vec::with_capacity(va.len());
-                            for k in va.iter() {
-                                if let Ok(v) = k.get() {
-                                    volumevec.push(v);
-                                }
-                            }
-                            if let Some(v) = volumevec.get_mut(index as usize) {
-                                *v = volume;
-                            }
-
-                            sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
-                                .expect("Unable to send set volume message from app.");
+                        let mut volumevec = obj.imp().channel_volumes_vec();
+                        if let Some(v) = volumevec.get_mut(index as usize) {
+                            *v = volume;
                         }
-
+                        sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
+                                .expect("Unable to send set volume message from app.");
                         None
                     }));
 
