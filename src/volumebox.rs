@@ -103,27 +103,27 @@ mod imp {
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
 
-            item.bind_property("name", self.title_label.upcast_ref::<gtk::Label>(), "label")
+            item.bind_property("name", &self.title_label.get(), "label")
                 .sync_create()
                 .build();
 
-            item.bind_property("description", self.subtitle_label.upcast_ref::<gtk::Label>(), "label")
+            item.bind_property("description", &self.subtitle_label.get(), "label")
                 .sync_create()
                 .build();
 
-            item.bind_property("mute", self.mutebtn.upcast_ref::<gtk::ToggleButton>(), "active")
+            item.bind_property("mute", &self.mutebtn.get(), "active")
                 .sync_create()
                 .bidirectional()
                 .build();
 
-            item.bind_property("volume", self.volume_scale.adjustment().upcast_ref::<gtk::Adjustment>(), "value")
+            item.bind_property("volume", &self.volume_scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to::<f32, f64, _>(|_, y|Some(y.cbrt() as f64))
                 .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
                 .build();
 
-            item.bind_property("formatstr", self.format.upcast_ref::<gtk::Label>(), "label")
+            item.bind_property("formatstr", &self.format.get(), "label")
                 .sync_create()
                 .build();
 
