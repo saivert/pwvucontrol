@@ -195,3 +195,30 @@ impl PwNodeObject {
             .build()
     }
 }
+
+
+#[test]
+fn test_nodetype() {
+    let object = PwNodeObject::new(0, "test", crate::NodeType::Input);
+
+    assert_eq!(object.node_type(), crate::NodeType::Input);
+}
+
+#[test]
+fn test_channel_volume_get() {
+    use glib::{ValueArray, Value};
+    use gtk::subclass::prelude::*;
+
+    let object = PwNodeObject::new(0, "test", crate::NodeType::Input);
+    let mut value = ValueArray::new(2);
+    value.append(&Value::from(0.5f32));
+    value.append(&Value::from(0.6f32));
+    object.set_channel_volumes(value);
+
+    let vec = object.imp().channel_volumes_vec();
+
+    assert_eq!(vec.len(), 2);
+
+    assert_eq!(vec[0], 0.5);
+    assert_eq!(vec[1], 0.6);
+}
