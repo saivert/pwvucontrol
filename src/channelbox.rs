@@ -86,9 +86,9 @@ mod imp {
             let item = item.as_ref().cloned().unwrap();
 
             item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
-                let values = nodeobj.imp().channel_volumes_vec();
+                let values = nodeobj.channel_volumes_vec();
                 let index = widget.channelindex.get();
-                let channelname = crate::format::get_channel_name_for_position(index, nodeobj.imp().format());
+                let channelname = crate::format::get_channel_name_for_position(index, nodeobj.format());
                 if let Some(volume) = values.get(index as usize) {
                     widget.obj().set_volume(volume.cbrt());
                     widget.obj().set_channelname(channelname);
@@ -101,7 +101,7 @@ mod imp {
 
             adjustment.connect_value_changed(clone!(@weak self as widget, @weak item => move |x| {
                 let index = widget.channelindex.get();
-                item.imp().set_channel_volume(index, x.value().powi(3) as f32);
+                item.set_channel_volume(index, x.value().powi(3) as f32);
             }));
         }
     }
@@ -120,7 +120,7 @@ glib::wrapper! {
 
 impl PwChannelBox {
     pub fn new(channelindex: u32, volume: f32, row_data: &PwNodeObject) -> Self {
-        let channelname = crate::format::get_channel_name_for_position(channelindex, row_data.imp().format());
+        let channelname = crate::format::get_channel_name_for_position(channelindex, row_data.format());
 
         glib::Object::builder()
             .property("channelindex", channelindex)

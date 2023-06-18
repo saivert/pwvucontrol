@@ -145,7 +145,7 @@ impl PwvucontrolApplication {
         let window = self.imp().window.get().expect("Cannot get window");
 
         if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            nodeobj.imp().set_format(pipewire::spa::sys::spa_audio_info_raw {
+            nodeobj.set_format(pipewire::spa::sys::spa_audio_info_raw {
                 channels,
                 rate,
                 format,
@@ -162,18 +162,18 @@ impl PwvucontrolApplication {
             match param {
                 Volume(v) => {
                     if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        nodeobj.imp().set_volume_noevent(v);
+                        nodeobj.set_volume_noevent(v);
                    };
                 },
                 Mute(m) => {
                     if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        nodeobj.imp().set_mute_noevent(m);
+                        nodeobj.set_mute_noevent(m);
                    };
                 },
                 ChannelVolumes(cv) => {
                     if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
                         if cv.len() > 0 {
-                            nodeobj.imp().set_channel_volumes_vec_noevent(&cv);
+                            nodeobj.set_channel_volumes_vec_noevent(&cv);
                         } else {
                             log::error!("cv is 0");
                         }
@@ -209,14 +209,14 @@ impl PwvucontrolApplication {
                     .expect("pw_sender not set")
                     .borrow_mut();
 
-                    nodeobj.imp().set_property_change_handler_with_blocker("volume", clone!(@strong sender => move |obj, _paramspec| {
+                    nodeobj.set_property_change_handler_with_blocker("volume", clone!(@strong sender => move |obj, _paramspec| {
                         if let Ok(volume) = obj.property_value("volume").get::<f32>() {
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: Some(volume), mute: None})
                                 .expect("Unable to send set volume message from app.");
                         }
                     }));
 
-                    nodeobj.imp().set_property_change_handler_with_blocker("mute", clone!(@strong sender => move |obj, _paramspec| {
+                    nodeobj.set_property_change_handler_with_blocker("mute", clone!(@strong sender => move |obj, _paramspec| {
                         if let Ok(mute) = obj.property_value("mute").get::<bool>() {
                             sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: None, mute: Some(mute)})
                                 .expect("Unable to send set volume message from app.");
@@ -228,7 +228,7 @@ impl PwvucontrolApplication {
                         let index: u32 = args[1].get().unwrap();
                         let volume: f32 = args[2].get().unwrap();
 
-                        let mut volumevec = obj.imp().channel_volumes_vec();
+                        let mut volumevec = obj.channel_volumes_vec();
                         if let Some(v) = volumevec.get_mut(index as usize) {
                             *v = volume;
                         }
