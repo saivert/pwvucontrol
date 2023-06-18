@@ -78,7 +78,7 @@ pub(super) fn thread_main(
             GtkMessage::Terminate => mainloop.quit(),
             GtkMessage::SetVolume{id, channel_volumes, volume, mute} => {
                 let mut buf = io::Cursor::new(Vec::new());
-                let p = SomeProps {
+                let p = FormatProps {
                     channel_volumes,
                     mute,
                     volume,
@@ -133,7 +133,7 @@ pub(super) fn thread_main(
 }
 
 //#[derive(Default)]
-struct SomeProps {
+struct FormatProps {
     volume: Option<f32>,
     mute: Option<bool>,
     channel_volumes: Option<Vec<f32>>,
@@ -143,7 +143,7 @@ const PROPS_KEY_CHANNEL_VOLUMES: u32 = 65544;
 const PROPS_KEY_VOLUME: u32 = 65539;
 const PROPS_KEY_MUTE: u32 = 65540;
 
-impl<'de> PodDeserialize<'de> for SomeProps {
+impl<'de> PodDeserialize<'de> for FormatProps {
     fn deserialize(
         deserializer: PodDeserializer<'de>,
     ) -> Result<(Self, DeserializeSuccess<'de>), DeserializeError<&'de [u8]>>
@@ -154,14 +154,14 @@ impl<'de> PodDeserialize<'de> for SomeProps {
         struct ObjectVisitor;
 
         impl<'de> Visitor<'de> for ObjectVisitor {
-            type Value = SomeProps;
+            type Value = FormatProps;
             type ArrayElem = std::convert::Infallible;
 
             fn visit_object(
                 &self,
                 object_deserializer: &mut ObjectPodDeserializer<'de>,
             ) -> Result<Self::Value, DeserializeError<&'de [u8]>> {
-                let mut tmp = SomeProps {
+                let mut tmp = FormatProps {
                     channel_volumes: None,
                     volume: None,
                     mute: None,
@@ -198,7 +198,7 @@ impl<'de> PodDeserialize<'de> for SomeProps {
     }
 }
 
-impl PodSerialize for SomeProps {
+impl PodSerialize for FormatProps {
     fn serialize<O: io::Write + io::Seek>(
         &self,
         serializer: PodSerializer<O>,
@@ -306,7 +306,7 @@ fn handle_node(
 
             if _id == pipewire::spa::param::ParamType::Props { 
             
-                let (_, x) = PodDeserializer::deserialize_from::<SomeProps>(&param).expect("Error deserializing into Value");
+                let (_, x) = PodDeserializer::deserialize_from::<FormatProps>(&param).expect("Error deserializing into Value");
                 if let Some(channel_volumes) = x.channel_volumes {
                     sender.send(PipewireMessage::NodeParam{
                         id: node_id,

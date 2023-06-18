@@ -20,7 +20,6 @@
 
 use std::{cell::RefCell, collections::HashMap};
 
-use glib::ValueArray;
 use gtk::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{
