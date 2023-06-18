@@ -76,24 +76,7 @@ pub(super) fn thread_main(
         clone!(@strong mainloop, @weak core, @weak registry, @strong state, @strong proxies => move |msg| match msg {
             GtkMessage::ToggleLink { port_from, port_to } => toggle_link(port_from, port_to, &core, &registry, &state),
             GtkMessage::Terminate => mainloop.quit(),
-            GtkMessage::SetVolume{id, channel_volumes, volume, mute} => {
-                let mut buf = io::Cursor::new(Vec::new());
-                let p = FormatProps {
-                    channel_volumes,
-                    mute,
-                    volume,
-                };
-                if let Ok(x) = PodSerializer::serialize(&mut buf, &p) {
-                    let proxies = proxies.borrow_mut();
-
-                    if let Some(ProxyItem::Node { _proxy: node, .. }) = proxies.get(&id) {
-                        node.set_param(pipewire::spa::param::ParamType::Props, 0, &x.0.get_ref());
-                    }
-
-                } else {
-                    log::error!("Cannot serialize SomeProps");
-                }
-            },
+            GtkMessage::SetVolume{id, channel_volumes, volume, mute} => set_volume(id, channel_volumes, volume, mute, &proxies),
         })
     });
 
@@ -556,5 +539,30 @@ fn toggle_link(
         ) {
             warn!("Failed to create link: {}", e);
         }
+    }
+}
+
+fn set_volume(
+    id: u32,
+    channel_volumes: Option<Vec<f32>>,
+    volume: Option<f32>,
+    mute: Option<bool>,
+    proxies: &Rc<RefCell<HashMap<u32, ProxyItem>>>,
+) {
+    let mut buf = io::Cursor::new(Vec::new());
+    let p = FormatProps {
+        channel_volumes,
+        mute,
+        volume,
+    };
+    if let Ok(x) = PodSerializer::serialize(&mut buf, &p) {
+        let proxies = proxies.borrow_mut();
+
+        if let Some(ProxyItem::Node { _proxy: node, .. }) = proxies.get(&id) {
+            node.set_param(pipewire::spa::param::ParamType::Props, 0, &x.0.get_ref());
+        }
+
+    } else {
+        log::error!("Cannot serialize SomeProps");
     }
 }
