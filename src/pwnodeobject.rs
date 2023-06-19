@@ -36,7 +36,7 @@ mod imp {
         node_type: Cell<crate::NodeType>,
 
         pub(super) signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
-        pub(super) format: Cell<Option<pipewire::spa::sys::spa_audio_info_raw>>
+        pub(super) format: Cell<Option<pipewire::spa::sys::spa_audio_info_raw>>,
     }
     
     // The central trait for subclassing a GObject

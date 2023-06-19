@@ -137,7 +137,7 @@ mod imp {
                     channel_widgets.len()
                 };
 
-                if let Some(f) = nodeobj.imp().format() {
+                if let Some(f) = nodeobj.format() {
                     nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, crate::format::format_to_string(f.format)));
                 }
 
@@ -176,7 +176,7 @@ mod imp {
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
 
-            let valuesvec = item.imp().channel_volumes_vec();
+            let valuesvec = item.channel_volumes_vec();
             for (i,volume) in (0..).zip(valuesvec.iter()) {
                 let mut list = self.channel_widgets.borrow_mut();
                 let channelbox = PwChannelBox::new(i as u32, *volume, &item);
