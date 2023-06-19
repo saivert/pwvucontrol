@@ -48,6 +48,8 @@
                                         <property name="lines">0</property>
                                         <property name="wrap">True</property>
                                         <property name="wrap-mode">word-char</property>
+                                        <property name="lines">2</property>
+                                        <property name="ellipsize">PANGO_ELLIPSIZE_END</property>
                                     </object>
                                 </child>
                                 <child>
@@ -56,6 +58,8 @@
                                             <class name="subtitle" />
                                         </style>
                                         <property name="xalign">0</property>
+                                        <property name="lines">1</property>
+                                        <property name="ellipsize">PANGO_ELLIPSIZE_END</property>
                                     </object>
                                 </child>
                             </object>

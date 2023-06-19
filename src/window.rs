@@ -48,6 +48,8 @@ mod imp {
         pub playbacklist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub recordlist: TemplateChild<gtk::ListBox>,
+        #[template_child]
+        pub outputlist: TemplateChild<gtk::ListBox>,
 
         pub nodemodel: PwNodeModel,
     }
