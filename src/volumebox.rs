@@ -169,6 +169,8 @@ mod imp {
             while let Some(row) = list_box.last_child() {
                 list_box.remove(&row);
             }
+
+            self.channel_widgets.borrow_mut().clear();
         }
 
         fn create_channel_volumes_widgets(&self) {
