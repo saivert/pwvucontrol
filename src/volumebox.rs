@@ -21,7 +21,6 @@
 use gtk::{
     glib,
     prelude::*,
-    subclass::prelude::*,
 };
 
 
@@ -33,10 +32,12 @@ use crate::pwnodeobject::PwNodeObject;
 
 mod imp {
 
-    use crate::channelbox::PwChannelBox;
+    use crate::{channelbox::PwChannelBox, pwchannelobject::PwChannelObject};
+    use gtk::subclass::prelude::*;
 
     use super::*;
     use glib::{ParamSpec, Value, clone};
+    use gtk::gio;
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
@@ -45,7 +46,7 @@ mod imp {
         #[property(get, set, construct_only)]
         row_data: RefCell<Option<PwNodeObject>>,
 
-        channel_widgets: RefCell<Vec<PwChannelBox>>,
+        channelmodel: gio::ListStore,
 
         // Template widgets
         #[template_child]
@@ -127,24 +128,37 @@ mod imp {
                 .sync_create()
                 .build();
 
+            log::info!("binding model");
 
-            self.create_channel_volumes_widgets();
+            self.channel_listbox.bind_model(
+                Some(&self.channelmodel),
+                clone!(@weak self as widget => @default-panic, move |item| {
+                    PwChannelBox::new(
+                        item.clone().downcast_ref::<PwChannelObject>()
+                        .expect("RowData is of wrong type")
+                    )
+                    .upcast::<gtk::Widget>()
+                }),
+            );
 
-            item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
-                let values = nodeobj.channel_volumes();
-                let channel_widgets_len = {
-                    let channel_widgets = widget.channel_widgets.borrow();
-                    channel_widgets.len()
-                };
+            item.connect_local("format", false, clone!(@weak self as widget, @weak item as nodeobj => @default-panic, move |_| {
+                let values = nodeobj.channel_volumes_vec();
+                let oldlen = widget.channelmodel.n_items();
 
                 if let Some(f) = nodeobj.format() {
                     nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, crate::format::format_to_string(f.format)));
                 }
+                log::info!("channel volumes notify, values.len = {}, oldlen = {}", values.len(), oldlen);
 
-                if values.len() != channel_widgets_len {
-                    widget.create_channel_volumes_widgets();
-                    return;
+                if values.len() as u32 != oldlen {
+                    widget.channelmodel.remove_all();
+                    for (i,v) in values.iter().enumerate() {
+                        widget.channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
+                    }
+
+                    return None;
                 }
+                None
             }));
 
             self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
@@ -163,29 +177,6 @@ mod imp {
 
     #[gtk::template_callbacks]
     impl PwVolumeBox {
-        fn clear_channel_volumes_listbox(&self) {
-            let list_box: gtk::ListBox = self.channel_listbox.get();
-
-            while let Some(row) = list_box.last_child() {
-                list_box.remove(&row);
-            }
-
-            self.channel_widgets.borrow_mut().clear();
-        }
-
-        fn create_channel_volumes_widgets(&self) {
-            self.clear_channel_volumes_listbox();
-            let item = self.row_data.borrow();
-            let item = item.as_ref().cloned().unwrap();
-
-            let valuesvec = item.channel_volumes_vec();
-            for (i,volume) in (0..).zip(valuesvec.iter()) {
-                let mut list = self.channel_widgets.borrow_mut();
-                let channelbox = PwChannelBox::new(i as u32, *volume, &item);
-                list.push(channelbox);
-                self.channel_listbox.append(list.last().unwrap());
-            }
-        }
     }
 
 }

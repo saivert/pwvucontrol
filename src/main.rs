@@ -27,6 +27,7 @@ mod pwnodeobject;
 mod pwnodemodel;
 mod pipewire_connection;
 mod format;
+mod pwchannelobject;
 
 use std::collections::HashMap;
 

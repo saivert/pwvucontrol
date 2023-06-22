@@ -145,7 +145,7 @@ impl PwvucontrolApplication {
         let window = self.imp().window.get().expect("Cannot get window");
 
         if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            nodeobj.set_format(pipewire::spa::sys::spa_audio_info_raw {
+            nodeobj.set_format_noevent(pipewire::spa::sys::spa_audio_info_raw {
                 channels,
                 rate,
                 format,

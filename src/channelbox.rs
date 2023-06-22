@@ -23,11 +23,11 @@ use gtk::{glib, prelude::*, subclass::prelude::*};
 use glib::Properties;
 use std::cell::RefCell;
 
-use crate::pwnodeobject::PwNodeObject;
+use crate::pwchannelobject::PwChannelObject;
 
 mod imp {
 
-    use std::cell::Cell;
+    use crate::pwchannelobject::PwChannelObject;
 
     use super::*;
     use glib::{clone, ParamSpec, Value};
@@ -37,19 +37,14 @@ mod imp {
     #[properties(wrapper_type = super::PwChannelBox)]
     pub struct PwChannelBox {
         #[property(get, set, construct_only)]
-        row_data: RefCell<Option<PwNodeObject>>,
-        #[property(get, set)]
-        channelname: RefCell<String>,
-        #[property(get, set)]
-        channelindex: Cell<u32>,
-        #[property(get, set)]
-        volume: Cell<f32>,
+        row_data: RefCell<Option<PwChannelObject>>,
 
         // Template widgets
         #[template_child]
         pub label: TemplateChild<gtk::Label>,
         #[template_child]
         pub scale: TemplateChild<gtk::Scale>,
+
     }
 
     #[glib::object_subclass]
@@ -85,25 +80,19 @@ mod imp {
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
 
-            item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
-                let values = nodeobj.channel_volumes_vec();
-                let index = widget.channelindex.get();
-                let channelname = crate::format::get_channel_name_for_position(index, nodeobj.format());
-                if let Some(volume) = values.get(index as usize) {
-                    widget.obj().set_volume(volume.cbrt());
-                    widget.obj().set_channelname(channelname);
-                } else {
-                    log::error!("channel volumes array out of bounds");
-                }
-            }));
+            item.bind_property("volume", &self.scale.adjustment(), "value")
+                .sync_create()
+                .bidirectional()
+                .transform_to::<f32, f64, _>(|_, y|Some(y.cbrt() as f64))
+                .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
+                .build();
 
-            let adjustment = self.scale.adjustment();
-
-            adjustment.connect_value_changed(clone!(@weak self as widget, @weak item => move |x| {
-                let index = widget.channelindex.get();
-                item.set_channel_volume(index, x.value().powi(3) as f32);
-            }));
+            item.bind_property("name", &self.label.get(), "label")
+                .sync_create()
+                .build();
         }
+
+
     }
     impl WidgetImpl for PwChannelBox {}
     impl ListBoxRowImpl for PwChannelBox {}
@@ -119,14 +108,9 @@ glib::wrapper! {
 }
 
 impl PwChannelBox {
-    pub fn new(channelindex: u32, volume: f32, row_data: &PwNodeObject) -> Self {
-        let channelname = crate::format::get_channel_name_for_position(channelindex, row_data.format());
-
+    pub fn new(channelobj: &PwChannelObject) -> Self {
         glib::Object::builder()
-            .property("channelindex", channelindex)
-            .property("volume", volume)
-            .property("row-data", row_data)
-            .property("channelname", channelname)
+            .property("row-data", channelobj)
             .build()
     }
 }
