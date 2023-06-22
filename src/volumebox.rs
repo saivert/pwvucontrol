@@ -67,6 +67,8 @@ mod imp {
         pub format: TemplateChild<gtk::Label>,
         #[template_child]
         pub revealer: TemplateChild<gtk::Revealer>,
+        #[template_child]
+        pub channellock: TemplateChild<gtk::ToggleButton>,
     }
 
 
@@ -126,6 +128,11 @@ mod imp {
 
             item.bind_property("formatstr", &self.format.get(), "label")
                 .sync_create()
+                .build();
+
+            item.bind_property("channellock", &self.channellock.get(), "active")
+                .sync_create()
+                .bidirectional()
                 .build();
 
             log::info!("binding model");

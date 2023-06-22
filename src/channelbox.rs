@@ -30,7 +30,7 @@ mod imp {
     use crate::pwchannelobject::PwChannelObject;
 
     use super::*;
-    use glib::{clone, ParamSpec, Value};
+    use glib::{ParamSpec, Value};
 
     #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]

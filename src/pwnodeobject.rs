@@ -37,6 +37,9 @@ mod imp {
 
         pub(super) signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
         pub(super) format: Cell<Option<pipewire::spa::sys::spa_audio_info_raw>>,
+
+        #[property(get, set)]
+        pub(super) channellock: Cell<bool>,
     }
     
     // The central trait for subclassing a GObject
