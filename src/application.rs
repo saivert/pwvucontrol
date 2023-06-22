@@ -145,7 +145,7 @@ impl PwvucontrolApplication {
         let window = self.imp().window.get().expect("Cannot get window");
 
         if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            nodeobj.set_format_noevent(pipewire::spa::sys::spa_audio_info_raw {
+            nodeobj.set_format(pipewire::spa::sys::spa_audio_info_raw {
                 channels,
                 rate,
                 format,
@@ -223,18 +223,11 @@ impl PwvucontrolApplication {
                         }
                     }));
 
-                    nodeobj.connect_local("channelvolume", false, clone!(@strong sender => move |args| {
-                        let obj: &PwNodeObject = args[0].get().unwrap();
-                        let index: u32 = args[1].get().unwrap();
-                        let volume: f32 = args[2].get().unwrap();
+                    nodeobj.set_property_change_handler_with_blocker("channel-volumes",clone!(@strong sender => move |obj, _paramspec| {
+                        let volumevec = obj.channel_volumes_vec();
 
-                        let mut volumevec = obj.channel_volumes_vec();
-                        if let Some(v) = volumevec.get_mut(index as usize) {
-                            *v = volume;
-                        }
                         sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
                                 .expect("Unable to send set volume message from app.");
-                        None
                     }));
 
                     x.imp().nodemodel.append(nodeobj);

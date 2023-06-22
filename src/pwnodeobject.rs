@@ -62,9 +62,7 @@ mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
-                vec![Signal::builder("channelvolume")
-                    .param_types([u32::static_type(), f32::static_type()])
-                    .build(),
+                vec![
                     Signal::builder("format")
                     .build()
                     ]
@@ -138,7 +136,7 @@ impl PwNodeObject {
         if let Some (value) = self.imp().channel_volumes.borrow_mut().get_mut(index as usize) {
             *value = volume;
         }
-        self.emit_by_name::<()>("channelvolume", &[&index, &volume]);
+        self.notify_channel_volumes();
     }
 
     pub fn set_property_change_handler_with_blocker<F: Fn(&PwNodeObject, &glib::ParamSpec) + 'static>(
@@ -173,26 +171,13 @@ impl PwNodeObject {
     pub fn set_format(&self, format: pipewire::spa::sys::spa_audio_info_raw) {
         self.imp().format.set(Some(format));
 
-        // self.notify_channel_volumes();
-        self.emit_by_name::<()>("format", &[]);
-    }
-
-    pub fn set_format_noevent(&self, format: pipewire::spa::sys::spa_audio_info_raw) {
-        self.imp().format.set(Some(format));
-
-        // Reuse channel-volumes event here because channel-volumes may also change if format changes
-        if let Some(sigid) = self.imp().signalblockers.borrow().get("channel-volumes") {
-            self.block_signal(sigid);
-            self.emit_by_name::<()>("format", &[]);
-            self.unblock_signal(sigid);
-            return;
-        }
         self.emit_by_name::<()>("format", &[]);
     }
 
     pub fn format(&self) -> Option<pipewire::spa::sys::spa_audio_info_raw> {
         self.imp().format.get()
     }
+
 }
 
 
