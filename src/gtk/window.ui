@@ -131,6 +131,60 @@
                 </property>
               </object>
             </child>
+
+
+            <child>
+              <object class="AdwViewStackPage">
+                <property name="visible">true</property>
+                <property name="name">outputdevices</property>
+                <property name="title" translatable="yes">Output Devices</property>
+                <property name="icon-name">soundcard-symbolic</property>
+                <property name="child">
+
+                  <object class="GtkScrolledWindow">
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="min-content-height">200</property>
+                    <property name="hexpand">0</property>
+                    <property name="vexpand">1</property>
+                    <child>
+                      <object class="GtkViewport">
+                        <property name="scroll-to-focus">1</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="orientation">vertical</property>
+                            <property name="margin-start">10</property>
+                            <property name="margin-end">10</property>
+                            <property name="margin-top">5</property>
+                            <property name="margin-bottom">5</property>
+                            <child><!-- frame -->
+                              <object class="GtkFrame">
+                                <child>
+
+                                  <object class="GtkListBox" id="outputlist">
+                                    <property name="selection-mode">none</property>
+                                    <property name="show-separators">1</property>
+
+                                    <style>
+                                      <class name="rich-list" />
+                                    </style>
+
+
+
+                                  </object>
+                                </child>
+                              </object>
+                            </child><!-- /frame -->
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object><!-- /scrolledwindow -->
+
+                  
+                </property>
+              </object>
+            </child>
+
           </object>
         </child>
         <child type="end">

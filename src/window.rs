@@ -48,6 +48,8 @@ mod imp {
         pub playbacklist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub recordlist: TemplateChild<gtk::ListBox>,
+        #[template_child]
+        pub outputlist: TemplateChild<gtk::ListBox>,
 
         pub nodemodel: PwNodeModel,
     }
@@ -144,3 +146,12 @@ impl PwvucontrolWindow {
 
 }
 
+impl Default for PwvucontrolWindow {
+    fn default() -> Self {
+        PwvucontrolApplication::default()
+            .active_window()
+            .unwrap()
+            .downcast()
+            .unwrap()
+    }
+}
