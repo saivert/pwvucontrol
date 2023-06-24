@@ -69,6 +69,8 @@ mod imp {
         pub revealer: TemplateChild<gtk::Revealer>,
         #[template_child]
         pub channellock: TemplateChild<gtk::ToggleButton>,
+        #[template_child]
+        pub outputdevice_dropdown: TemplateChild<gtk::DropDown>,
     }
 
 
@@ -134,6 +136,19 @@ mod imp {
                 .sync_create()
                 .bidirectional()
                 .build();
+
+
+            let factory = gtk::SignalListItemFactory::new();
+            factory.connect_setup(|_, item| {
+                let label = gtk::Label::new(None);
+                label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+                item.property_expression("item")
+                                .chain_property::<gtk::StringObject>("string")
+                                .bind(&label, "label", gtk::Widget::NONE);
+                item.set_child(Some(&label));
+            });
+
+            self.outputdevice_dropdown.set_factory(Some(&factory));
 
             log::info!("binding model");
 
