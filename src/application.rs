@@ -272,3 +272,12 @@ impl PwvucontrolApplication {
         about.present();
     }
 }
+
+impl Default for PwvucontrolApplication {
+    fn default() -> Self {
+        gio::Application::default()
+            .expect("Could not get default GApplication")
+            .downcast()
+            .unwrap()
+    }
+}

@@ -162,6 +162,7 @@ fn main() -> gtk::glib::ExitCode {
         .expect("Unable to set the text domain encoding");
     textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
+    gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
     gtk::glib::set_application_name("Pwvucontrol");
 
     let resources = gio::Resource::load("pwvucontrol.gresource")

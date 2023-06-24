@@ -146,3 +146,12 @@ impl PwvucontrolWindow {
 
 }
 
+impl Default for PwvucontrolWindow {
+    fn default() -> Self {
+        PwvucontrolApplication::default()
+            .active_window()
+            .unwrap()
+            .downcast()
+            .unwrap()
+    }
+}
