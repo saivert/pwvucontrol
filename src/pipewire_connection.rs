@@ -235,20 +235,78 @@ fn handle_node(
 
     let node_id = node.id.clone();
 
+    let props = node
+        .props
+        .as_ref()
+        .expect("Node object is missing properties");
+
+    // Get the nicest possible name for the node, using a fallback chain of possible name attributes.
+    let name = String::from(
+        props
+            .get("node.description")
+            .or_else(|| props.get("node.nick"))
+            .or_else(|| props.get("node.name"))
+            .unwrap_or_default(),
+    );
+
+    // FIXME: Instead of checking these props, the "EnumFormat" parameter should be checked instead.
+    let media_type = props.get("media.class").and_then(|class| {
+        if class.contains("Audio") {
+            Some(MediaType::Audio)
+        } else if class.contains("Video") {
+            Some(MediaType::Video)
+        } else if class.contains("Midi") {
+            Some(MediaType::Midi)
+        } else {
+            None
+        }
+    });
+
+    let media_class = |class: &str| {
+        if class.contains("Sink") {
+            Some(NodeType::Sink)
+        } else if class.contains("Output") {
+            Some(NodeType::Output)
+        } else if class.contains("Input") {
+            Some(NodeType::Input)
+        } else if class.contains("Source") {
+            Some(NodeType::Source)
+        } else {
+            None
+        }
+    };
+
+    let node_type = props
+        .get("media.category")
+        .and_then(|class| {
+            if class.contains("Duplex") {
+                None
+            } else {
+                props.get("media.class").and_then(media_class)
+            }
+        })
+        .or_else(|| props.get("media.class").and_then(media_class));
+
+    state.borrow_mut().insert(
+        node.id,
+        Item::Node {
+            // widget: node_widget,
+            media_type,
+        },
+    );
+   
+    if !matches!(media_type, Some(MediaType::Audio)) {
+        return;
+    }
+
     let proxy: pipewire::node::Node = registry.bind(node).expect("Failed to bind to node proxy");
+
+    proxy.subscribe_params(&[pipewire::spa::param::ParamType::Format, pipewire::spa::param::ParamType::Props]);
+    proxy.enum_params(0, Some(pipewire::spa::param::ParamType::Format), 0, <u32>::MAX);
 
     let listener = proxy
         .add_listener_local()
         .info(clone!(@strong proxies, @strong sender => move |ni| {
-            if ni.change_mask().contains(pipewire::node::NodeChangeMask::PARAMS) {
-                let proxies = proxies.borrow_mut();
-
-                if let Some(ProxyItem::Node { _proxy: hi, .. }) = proxies.get(&ni.id()) {
-                    hi.enum_params(0, Some(pipewire::spa::param::ParamType::Props), 0, u32::MAX);
-                    hi.enum_params(0, Some(pipewire::spa::param::ParamType::Format), 0, u32::MAX);
-                }
-            }
-
             if ni.change_mask().contains(pipewire::node::NodeChangeMask::PROPS) {
                 let dict = ni.props().expect("Cannot get props from node info");
                 let mut props: HashMap<String, String> = HashMap::new();
@@ -319,66 +377,6 @@ fn handle_node(
         ProxyItem::Node {
             _proxy: proxy,
             _listener: listener,
-        },
-    );
-
-    let props = node
-        .props
-        .as_ref()
-        .expect("Node object is missing properties");
-
-    // Get the nicest possible name for the node, using a fallback chain of possible name attributes.
-    let name = String::from(
-        props
-            .get("node.description")
-            .or_else(|| props.get("node.nick"))
-            .or_else(|| props.get("node.name"))
-            .unwrap_or_default(),
-    );
-
-    // FIXME: Instead of checking these props, the "EnumFormat" parameter should be checked instead.
-    let media_type = props.get("media.class").and_then(|class| {
-        if class.contains("Audio") {
-            Some(MediaType::Audio)
-        } else if class.contains("Video") {
-            Some(MediaType::Video)
-        } else if class.contains("Midi") {
-            Some(MediaType::Midi)
-        } else {
-            None
-        }
-    });
-
-    let media_class = |class: &str| {
-        if class.contains("Sink") {
-            Some(NodeType::Sink)
-        } else if class.contains("Output") {
-            Some(NodeType::Output)
-        } else if class.contains("Input") {
-            Some(NodeType::Input)
-        } else if class.contains("Source") {
-            Some(NodeType::Source)
-        } else {
-            None
-        }
-    };
-
-    let node_type = props
-        .get("media.category")
-        .and_then(|class| {
-            if class.contains("Duplex") {
-                None
-            } else {
-                props.get("media.class").and_then(media_class)
-            }
-        })
-        .or_else(|| props.get("media.class").and_then(media_class));
-
-    state.borrow_mut().insert(
-        node.id,
-        Item::Node {
-            // widget: node_widget,
-            media_type,
         },
     );
 
