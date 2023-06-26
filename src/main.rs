@@ -25,11 +25,7 @@ mod volumebox;
 mod channelbox;
 mod pwnodeobject;
 mod pwnodemodel;
-mod pipewire_connection;
-mod format;
 mod pwchannelobject;
-
-use std::collections::HashMap;
 
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;
@@ -38,83 +34,8 @@ use config::{GETTEXT_PACKAGE, LOCALEDIR, PKGDATADIR};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, textdomain};
 use gtk::gio;
 use gtk::prelude::*;
-use pipewire::spa::Direction;
 
-/// Messages sent by the GTK thread to notify the pipewire thread.
-#[derive(Debug, Clone)]
-enum GtkMessage {
-    /// Toggle a link between the two specified ports.
-    #[allow(dead_code)]
-    ToggleLink { port_from: u32, port_to: u32 },
-    /// Sets the volume of the node
-    SetVolume{id: u32, channel_volumes: Option<Vec<f32>>, volume: Option<f32>, mute: Option<bool>},
-    /// Quit the event loop and let the thread finish.
-    Terminate,
-}
-
-#[derive(Debug, Clone)]
-enum ParamType {
-    Volume(f32),
-    ChannelVolumes(Vec<f32>),
-    Mute(bool)
-}
-
-#[allow(dead_code)]
-/// Messages sent by the pipewire thread to notify the GTK thread.
-#[derive(Debug, Clone)]
-enum PipewireMessage {
-    NodeAdded {
-        id: u32,
-        name: String,
-        node_type: Option<NodeType>,
-    },
-    NodeParam {
-        id: u32,
-        param: ParamType
-    },
-    NodeFormat {
-        id: u32,
-        channels: u32,
-        rate: u32,
-        format: u32,
-        position: [u32; 64],
-    },
-    NodeProps {
-        id: u32,
-        props: HashMap<String, String>,
-    },
-    PortAdded {
-        id: u32,
-        node_id: u32,
-        name: String,
-        direction: Direction,
-        media_type: Option<MediaType>,
-    },
-    LinkAdded {
-        id: u32,
-        node_from: u32,
-        port_from: u32,
-        node_to: u32,
-        port_to: u32,
-        active: bool,
-    },
-    LinkStateChanged {
-        id: u32,
-        active: bool,
-    },
-    NodeRemoved {
-        id: u32,
-    },
-    PortRemoved {
-        id: u32,
-        node_id: u32,
-    },
-    LinkRemoved {
-        id: u32,
-    },
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, glib::Enum, Default)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default, glib::Enum)]
 #[enum_type(name = "NodeType")]
 pub enum NodeType {
     #[default]
@@ -125,23 +46,7 @@ pub enum NodeType {
     Source
 }
 
-#[derive(Debug, Copy, Clone)]
-pub enum MediaType {
-    Audio,
-    Video,
-    Midi,
-}
-
-#[derive(Debug, Clone)]
-pub struct PipewireLink {
-    pub node_from: u32,
-    pub port_from: u32,
-    pub node_to: u32,
-    pub port_to: u32,
-}
-
-
-static GLIB_LOGGER: glib::GlibLogger = glib::GlibLogger::new(
+/* static GLIB_LOGGER: glib::GlibLogger = glib::GlibLogger::new(
     glib::GlibLoggerFormat::Structured,
     glib::GlibLoggerDomain::CrateTarget,
 );
@@ -151,11 +56,11 @@ fn init_glib_logger() {
 
     // Glib does not have a "Trace" log level, so only print messages "Debug" or higher priority.
     log::set_max_level(log::LevelFilter::Debug);
-}
+} */
 
 
 fn main() -> gtk::glib::ExitCode {
-    init_glib_logger();
+    // init_glib_logger();
     // Set up gettext translations
     bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8")
@@ -171,25 +76,9 @@ fn main() -> gtk::glib::ExitCode {
     // Load resources
     gio::resources_register(&resources);
 
-    // Aquire main context so that we can attach the gtk channel later.
-    let ctx = glib::MainContext::default();
-    let _guard = ctx.acquire().unwrap();
-
-    // Start the pipewire thread with channels in both directions.
-    let (gtk_sender, gtk_receiver) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
-    let (pw_sender, pw_receiver) = pipewire::channel::channel();
-    let pw_thread =
-        std::thread::spawn(move || pipewire_connection::thread_main(gtk_sender, pw_receiver));
-
-    let app = PwvucontrolApplication::new(gtk_receiver, pw_sender.clone());
+    let app = PwvucontrolApplication::new();
 
     let exitcode = app.run();
-
-    pw_sender
-        .send(GtkMessage::Terminate)
-        .expect("Failed to send message");
-
-    pw_thread.join().expect("Pipewire thread panicked");
 
     exitcode
 }

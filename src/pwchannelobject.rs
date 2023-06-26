@@ -14,6 +14,8 @@ mod imp {
 
     use crate::pwnodeobject::PwNodeObject;
 
+    use wireplumber as wp;
+
     // Object holding the state
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwChannelObject)]
@@ -30,7 +32,7 @@ mod imp {
 
         handler: RefCell<Option<SignalHandlerId>>,
 
-        block_volume_send: Cell<bool>,
+        pub block_volume_send: Cell<bool>,
     }
 
     // The central trait for subclassing a GObject
@@ -57,43 +59,19 @@ mod imp {
         fn constructed(&self) {
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
-
-            *self.handler.borrow_mut() = Some(item.connect_channel_volumes_notify(clone!(@weak self as channelobj => @default-panic, move |nodeobj| {
-                let values = nodeobj.channel_volumes_vec();
-                let index = channelobj.index.get();
-                let channelname = crate::format::get_channel_name_for_position(index, nodeobj.format());
-                if let Some(pwvolume) = values.get(index as usize) {
-                    let volume = *pwvolume;
-                    if channelobj.obj().volume() != volume {
-                        log::info!("pipewire -> app: setting volume {volume} for index {index}");
-                        channelobj.block_volume_send.set(true);
-                        channelobj.obj().set_volume(volume);
-                        channelobj.block_volume_send.set(false);
-                    } else {
-                        log::info!("pipewire -> app: volume unchanged");
-                    }
-                    if channelobj.obj().name() != channelname {
-                        log::info!("pipewire -> app: setting channel name '{channelname}' for index {index}");
-                        channelobj.obj().set_name(channelname);
-                    }
-                } else {
-                    log::error!("channel volumes array out of bounds");
-                }
-            })));
-
         }
 
         fn dispose(&self) {
-            if let Some(signal) = self.handler.take() {
-                log::info!("Dispose: Disconnected signal handler");
-                self.row_data.borrow_mut().as_ref().cloned().unwrap().disconnect(signal);
-            }
+            // if let Some(signal) = self.handler.take() {
+            //     log::info!("Dispose: Disconnected signal handler");
+            //     self.row_data.borrow_mut().as_ref().cloned().unwrap().disconnect(signal);
+            // }
         }
     }
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            log::info!("Got set_volume on channel object {:?}", value.get::<f32>());
+            wp::log::info!("Got set_volume on channel object {:?}", value.get::<f32>());
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
@@ -117,7 +95,7 @@ glib::wrapper! {
 
 impl PwChannelObject {
     pub fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
-        let channelname = crate::format::get_channel_name_for_position(index, row_data.format());
+        let channelname = index.to_string();
 
         glib::Object::builder()
             .property("index", index)

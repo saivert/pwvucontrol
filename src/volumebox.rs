@@ -35,6 +35,8 @@ mod imp {
     use crate::{channelbox::PwChannelBox, pwchannelobject::PwChannelObject};
     use gtk::subclass::prelude::*;
 
+    use wireplumber as wp;
+
     use super::*;
     use glib::{ParamSpec, Value, clone};
     use gtk::gio;
@@ -168,9 +170,9 @@ mod imp {
                 let oldlen = widget.channelmodel.n_items();
 
                 if let Some(f) = nodeobj.format() {
-                    nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, crate::format::format_to_string(f.format)));
+                    nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, f.format));
                 }
-                log::info!("channel volumes notify, values.len = {}, oldlen = {}", values.len(), oldlen);
+                wp::log::info!("channel volumes notify, values.len = {}, oldlen = {}", values.len(), oldlen);
 
                 if values.len() as u32 != oldlen {
                     widget.channelmodel.remove_all();
@@ -181,6 +183,19 @@ mod imp {
                     return None;
                 }
                 None
+            }));
+
+            item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
+                let values = nodeobj.channel_volumes_vec();
+                for (i,v) in values.iter().enumerate() {
+                    if let Some(item) = widget.channelmodel.item(i as u32) {
+                        let channelobj = item.downcast_ref::<PwChannelObject>()
+                            .expect("RowData is of wrong type");
+                        channelobj.imp().block_volume_send.set(true);
+                        channelobj.set_volume(v);
+                        channelobj.imp().block_volume_send.set(false);
+                    }
+                }
             }));
 
             self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {

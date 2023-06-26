@@ -10,8 +10,9 @@ glib = { version = "0.17", features = ["log"] }
 log = "0.4.11"
 im-rc = "15.1.0"
 once_cell = "1.15.0"
-pipewire = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test", features = ["v0_3_44"]}
-#libspa-sys = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test"}
+wireplumber = { git = "https://github.com/arcnmx/wireplumber.rs.git",  rev = "ff1a07c43a9ee1859b2b197d253f2b19cb7763e6", features = ["v0_4_12"] }
+futures = "0.3"
+anyhow = "1.0"
 
 [dependencies.adw]
 package = "libadwaita"

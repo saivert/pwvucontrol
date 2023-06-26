@@ -18,34 +18,38 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use std::{cell::RefCell, collections::HashMap};
-
-use gtk::prelude::*;
-use adw::subclass::prelude::*;
-use gtk::{
+ use gtk::{
     gio,
-    glib::{self, clone, Continue, Receiver},
+    glib::{self, clone},
+    prelude::*,
+    subclass::prelude::*,
 };
-use log::info;
 
-#[allow(unused)]
-use crate::{
-    GtkMessage, MediaType, NodeType, PipewireLink, PipewireMessage, pwnodeobject::PwNodeObject,
-};
+use adw::subclass::prelude::*;
+
+use wireplumber as wp;
 
 use crate::config::VERSION;
 use crate::PwvucontrolWindow;
-#[allow(unused)]
-use pipewire::{channel::Sender, spa::Direction};
 
 mod imp {
+    use std::{str::FromStr, cell::Cell};
+
+    use anyhow::{format_err, Context, Result};
+
+    use crate::pwnodeobject::PwNodeObject;
+
     use super::*;
     use once_cell::unsync::OnceCell;
+    use wp::{pw::ProxyExt, plugin::*};
 
     #[derive(Default)]
     pub struct PwvucontrolApplication {
-        pub(super) pw_sender: OnceCell<RefCell<Sender<GtkMessage>>>,
         pub(super) window: OnceCell<PwvucontrolWindow>,
+        pub wp_core: OnceCell<wp::core::Core>,
+        pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
+        pub count: Cell<u32>,
+
     }
 
     #[glib::object_subclass]
@@ -77,6 +81,7 @@ mod imp {
 
             // Ask the window manager/compositor to present the window
             window.present();
+            self.setup_wp_connection();
         }
 
         fn startup(&self) {
@@ -91,6 +96,110 @@ mod imp {
 
     impl GtkApplicationImpl for PwvucontrolApplication {}
     impl AdwApplicationImpl for PwvucontrolApplication {}
+
+    impl PwvucontrolApplication {
+        fn setup_wp_connection(&self) {
+            wp::core::Core::init();
+
+            wireplumber::Log::set_default_level("3");
+
+
+            let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), None);
+            let wp_om = wp::registry::ObjectManager::new();
+
+            wp_core.connect();
+
+            wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");
+            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None).expect("loadig mixer-api plugin");
+
+            let plugin_names = vec!["mixer-api", "default-nodes-api"];
+
+            glib::MainContext::default().spawn_local(clone!(@weak self as app, @weak wp_core as core, @weak wp_om as om => async move {
+                for plugin_name in plugin_names {
+                    if let Some(plugin) = Plugin::find(&core, plugin_name) {
+                        let result = plugin.activate_future(PluginFeatures::ENABLED)
+                        .await;
+                        if result.is_err() {
+                            wp::log::critical!("Cannot activate plugin {plugin_name}");
+                        } else {
+                            wp::log::info!("Activated plugin {plugin_name}");
+                            let count = app.count.get() + 1;
+                            app.count.set(count);
+                            dbg!(count);
+                            if count == 2 {
+                                core.install_object_manager(&om);
+                            }
+                        }
+                    } else {
+                        wp::log::critical!("Cannot find plugin {plugin_name}");
+                        app.obj().quit();
+                    }
+                }
+            }));
+
+            wp_om.add_interest_full(
+                {
+                    let interest = wp::registry::ObjectInterest::new_type(
+                        wp::pw::Node::static_type(),
+                    );
+                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Device', 'Audio/Sink')").expect("variant");
+                    interest.add_constraint(
+                        wp::registry::ConstraintType::PwGlobalProperty,
+                        "media.class",
+                        wp::registry::ConstraintVerb::InList,
+                        Some(&variant));
+    
+                    interest
+                }
+            );
+
+            wp_om.request_object_features(
+                wp::pw::Node::static_type(),
+                wp::core::ObjectFeatures::ALL,
+            );
+
+            wp_om.request_object_features(
+                wp::pw::GlobalProxy::static_type(),
+                wp::core::ObjectFeatures::ALL,
+            );
+
+            wp_om.connect_object_added(
+                clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+                    if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                        wp::log::info!("added: {:?}", node.name());
+                        let pwobj = PwNodeObject::new(node.bound_id(), &node.name().unwrap_or("Missing".to_string()), node);
+                        let window = imp.window.get().unwrap();
+                        let model = &window.imp().nodemodel;
+                        model.append(&pwobj);
+                    } else {
+                        unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+                    }
+                }),
+            );
+
+            wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
+                if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                    wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
+                    let window = imp.window.get().unwrap();
+                    let model = &window.imp().nodemodel;
+                    model.remove(node.bound_id());
+
+                } else {
+                    unreachable!("Object must be one of the above");
+                }
+            }));
+
+
+            self.wp_core
+                .set(wp_core)
+                .expect("wp_core should only be set once during application activation");
+            self.wp_object_manager
+                .set(wp_om)
+                .expect("wp_object_manager should only be set once during application activation");
+   
+        }
+
+    }
 }
 
 glib::wrapper! {
@@ -100,152 +209,13 @@ glib::wrapper! {
 }
 
 impl PwvucontrolApplication {
-    pub(super) fn new(
-        gtk_receiver: Receiver<PipewireMessage>,
-        pw_sender: Sender<GtkMessage>,
-    ) -> Self {
-        let app:PwvucontrolApplication = glib::Object::builder()
+    pub(super) fn new() -> Self {
+        glib::Object::builder()
             .property("application-id", "com.saivert.pwvucontrol")
             .property("flags", &gio::ApplicationFlags::empty())
             .property("resource-base-path", &"/com/saivert/pwvucontrol")
-            .build();
-        
-        let imp = app.imp();
-        imp.pw_sender
-            .set(RefCell::new(pw_sender))
-            // Discard the returned sender, as it does not implement `Debug`.
-            .map_err(|_| ())
-            .expect("pw_sender field was already set");
-
-        // React to messages received from the pipewire thread.
-        gtk_receiver.attach(
-            None,
-            clone!(
-                @weak app => @default-return Continue(true),
-                move |msg| {
-                    
-                    match msg {
-                        PipewireMessage::NodeAdded{ id, name, node_type } => app.add_node(id, name.as_str(), node_type),
-                        PipewireMessage::NodeRemoved{ id } => app.remove_node(id),
-                        PipewireMessage::NodeParam{id, param} => app.node_param(id, param),
-                        PipewireMessage::NodeProps { id, props } => app.node_props(id, props),
-                        PipewireMessage::NodeFormat { id, channels, rate, format, position } => app.node_format(id, channels, rate, format, position),
-                        _ => {}
-                    };
-                    Continue(true)
-                }
-            ),
-        );
-
-        app
+            .build()
     }
-    
-
-    fn node_format(&self, id:u32, channels: u32, rate: u32, format: u32, position: [u32; 64]) {
-        let window = self.imp().window.get().expect("Cannot get window");
-
-        if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            nodeobj.set_format(pipewire::spa::sys::spa_audio_info_raw {
-                channels,
-                rate,
-                format,
-                position,
-                flags: 0,
-            });
-        }
-    }
-
-    fn node_param(&self, id: u32, param: crate::ParamType) {
-        use crate::ParamType::*;
-        if let Some(x) = self.imp().window.get() {
-            
-            match param {
-                Volume(v) => {
-                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        nodeobj.set_volume_noevent(v);
-                   };
-                },
-                Mute(m) => {
-                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        nodeobj.set_mute_noevent(m);
-                   };
-                },
-                ChannelVolumes(cv) => {
-                    if let Ok(nodeobj) = x.imp().nodemodel.get_node(id) {
-                        if cv.len() > 0 {
-                            nodeobj.set_channel_volumes_vec_noevent(&cv);
-                        } else {
-                            log::error!("cv is 0");
-                        }
-                    }
-                },
-            }
-        }
-    }
-
-    fn node_props(&self, id: u32, props: HashMap<String, String>) {
-         let window = self.imp().window.get().expect("Cannot get window");
-
-        if let Ok(nodeobj) = window.imp().nodemodel.get_node(id) {
-            if let Some(medianame) = props.get("media.name") {
-                nodeobj.set_description(medianame.clone());
-            }
-        }
-    }
-
-    /// Add a new node to the view.
-    fn add_node(&self, id: u32, name: &str, node_type: Option<NodeType>) {
-        info!("Adding node: id {}", id);
-
-        if let Some(t) = node_type {
-            if matches!(t, NodeType::Output | NodeType::Input) {
-                if let Some(x) = self.imp().window.get() {
-                    let nodeobj = &PwNodeObject::new(id, name, t);
-
-                    let sender = self
-                    .imp()
-                    .pw_sender
-                    .get()
-                    .expect("pw_sender not set")
-                    .borrow_mut();
-
-                    nodeobj.set_property_change_handler_with_blocker("volume", clone!(@strong sender => move |obj, _paramspec| {
-                        if let Ok(volume) = obj.property_value("volume").get::<f32>() {
-                            sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: Some(volume), mute: None})
-                                .expect("Unable to send set volume message from app.");
-                        }
-                    }));
-
-                    nodeobj.set_property_change_handler_with_blocker("mute", clone!(@strong sender => move |obj, _paramspec| {
-                        if let Ok(mute) = obj.property_value("mute").get::<bool>() {
-                            sender.send(GtkMessage::SetVolume{id, channel_volumes: None, volume: None, mute: Some(mute)})
-                                .expect("Unable to send set volume message from app.");
-                        }
-                    }));
-
-                    nodeobj.set_property_change_handler_with_blocker("channel-volumes",clone!(@strong sender => move |obj, _paramspec| {
-                        let volumevec = obj.channel_volumes_vec();
-
-                        sender.send(GtkMessage::SetVolume{id, channel_volumes: Some(volumevec), volume: None, mute: None})
-                                .expect("Unable to send set volume message from app.");
-                    }));
-
-                    x.imp().nodemodel.append(nodeobj);
-                }
-                return;
-            }
-        }
-
-    }
-
-    fn remove_node(&self, id: u32) {
-        info!("Remove node: id {}", id);
-
-        if let Some(x) = self.imp().window.get() {
-            x.imp().nodemodel.remove(id);
-        }
-    }
-
 
     fn setup_gactions(&self) {
         let quit_action = gio::ActionEntry::builder("quit")

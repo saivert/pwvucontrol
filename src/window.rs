@@ -83,7 +83,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.node_type() == crate::NodeType::Output;
+                    return o.nodetype() == crate::NodeType::Output;
                 }
                 false
             });
@@ -102,13 +102,32 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.node_type() == crate::NodeType::Input;
+                    return o.nodetype() == crate::NodeType::Input;
                 }
                 false
             });
             let ref filterlistmodel = gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
             self.recordlist.bind_model(
+                Some(filterlistmodel),
+                clone!(@weak window => @default-panic, move |item| {
+                    PwVolumeBox::new(
+                        item.downcast_ref::<PwNodeObject>()
+                            .expect("RowData is of wrong type"),
+                    )
+                    .upcast::<gtk::Widget>()
+                }),
+            );
+
+            let filter = gtk::CustomFilter::new(|x| {
+                if let Some(o) = x.downcast_ref::<PwNodeObject>() {
+                    return o.nodetype() == crate::NodeType::Sink;
+                }
+                false
+            });
+            let ref filterlistmodel = gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+
+            self.outputlist.bind_model(
                 Some(filterlistmodel),
                 clone!(@weak window => @default-panic, move |item| {
                     PwVolumeBox::new(
