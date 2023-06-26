@@ -230,39 +230,36 @@ impl PwNodeObject {
         let node = self.imp().wpnode.get().expect("WpNode must be set on PwNodeObject");
         let result = mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
         if let Some(r) = result {
-            let dict: glib::VariantDict = r.clone().into();
+            let map: HashMap<String, glib::Variant> = r.get().unwrap();
             let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
 
-            let result = dict.lookup::<glib::VariantDict>("channelVolumes");
-            if let Ok(Some(channel_volumes)) = result {
-                for v in channel_volumes.to_variant().iter() {
-                    let index_str: String = v.child_get(0);
+            let result: Option<HashMap<String, glib::Variant>> = map.get("channelVolumes").and_then(|x|x.get());
+            if let Some(channel_volumes) = result {
+                for (index_str, v) in channel_volumes.iter() {
                     let index: u32 = index_str.parse().expect("erroneous index");
-                    if let Ok(Some(v2)) = v.try_child_get::<glib::Variant>(1) {
-                        let dict: glib::VariantDict = v2.into();
-                        let channelname: Option<String> = dict.lookup("channel").map_or(None, |x|x);
-                        let channel = t_audiochannel.find_value_from_short_name(&channelname.unwrap_or_default());
-                        let volume: Option<f64> = dict.lookup("volume").map_or(None, |x|x);
+                    let map: HashMap<String, glib::Variant> = v.get().unwrap();
+                    let volume: Option<f64> = map.get("volume").and_then(|x|x.get());
+                    let channelname: String = map.get("channel").and_then(|x|x.get()).unwrap_or_default();
+                    let channel = t_audiochannel.find_value_from_short_name(&channelname);
 
-                        if let (Some(c), Some(v)) = (channel, volume) {
-                            wp::log::info!("Index: {index}, Number: {} = {}", c.number(), v);
-                            self.set_channel_volume(index, v as f32); // TODO: get index via channel map, index of vardict must not be relied upon
-                        } else {
-                            wp::log::critical!("Got invalid data via mixer-api");
-                        }
+                    if let (Some(c), Some(v)) = (channel, volume) {
+                        wp::log::info!("Index: {index}, Number: {} = {}", c.number(), v);
+                        self.set_channel_volume(index, v as f32); // TODO: get index via channel map, index of vardict must not be relied upon
+                    } else {
+                        wp::log::critical!("Got invalid data via mixer-api");
                     }
                 }
             } else {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
 
-            let volume: Option<f64> = dict.lookup("volume").map_or(None, |x|x);
+            let volume: Option<f64> =  map.get("volume").and_then(|x|x.get());
             if let Some(v) = volume {
                 self.set_volume(v as f32);
                 wp::log::info!("Setting volume to {v}");
             }
 
-            let mute: Option<bool> = dict.lookup("mute").map_or(None, |x|x);
+            let mute: Option<bool> = map.get("mute").and_then(|x|x.get());
             if let Some(m) = mute {
                 self.set_mute(m);
                 wp::log::info!("Setting mute to {m:?}");
