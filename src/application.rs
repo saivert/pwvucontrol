@@ -35,7 +35,6 @@ use crate::PwvucontrolWindow;
 mod imp {
     use std::{str::FromStr, cell::Cell};
 
-    use anyhow::{format_err, Context, Result};
 
     use crate::pwnodeobject::PwNodeObject;
 
