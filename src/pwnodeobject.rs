@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use glib::{clone, subclass::prelude::*, Object, ObjectExt, ToVariant};
 use gtk::glib;
 
@@ -60,6 +62,8 @@ mod imp {
 
         pub(super) wpnode: OnceCell<wp::pw::Node>,
         pub(super) mixerapi: OnceCell<wp::plugin::Plugin>,
+
+        pub(super) block: Cell<bool>,
     }
 
     // The central trait for subclassing a GObject
@@ -76,7 +80,15 @@ mod imp {
         }
 
         fn set_property(&self, id: usize, value: &Value, pspec: &ParamSpec) {
-            self.derived_set_property(id, value, pspec)
+            self.derived_set_property(id, value, pspec);
+            match pspec.name() {
+                "volume" | "mute" => {
+                    if self.block.get() == false {
+                        self.obj().send_volume();
+                    }
+                },
+                _ => {},
+            }
         }
 
         fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
@@ -158,9 +170,17 @@ impl PwNodeObject {
 
         let mixerapi = wp::plugin::Plugin::find(&core, "mixer-api").expect("Get mixer-api");
 
-        obj.imp().mixerapi.set(mixerapi.clone()).expect("mixerapi only set once in PwNodeObject");
+        // If we need to set cubic scale...
+        // let t = glib::Type::from_name("WpMixerApiVolumeScale").unwrap();
+        // let v = glib::Value::from_type(t);
+        // unsafe {
+        //     glib::gobject_ffi::g_value_set_enum(v.as_ptr(), 1);
+        // }
+        // mixerapi.set_property("scale", v);
 
-        mixerapi.connect_local("changed", false, clone!(@weak obj => @default-return None, move |x| {
+        obj.imp().mixerapi.set(mixerapi).expect("mixerapi only set once in PwNodeObject");
+
+        obj.imp().mixerapi.get().unwrap().connect_local("changed", true, clone!(@weak obj => @default-return None, move |x| {
             // let mixerapi: wp::plugin::Plugin = x[0].get().expect("MixerApi in changed event");
             let id: u32 = x[1].get().expect("Id in in changed event");
             wp::log::info!("From mixer-api changed event: {id}");
@@ -170,19 +190,21 @@ impl PwNodeObject {
             None
         }));
 
-        // wpnode.connect_params_changed(clone!(@weak obj as imp => move |_node,what| {
-        //     wp::log::info!("params-changed! {what}");
-        //     match what {
-        //         "Props" => imp.update_channel_volumes(),
-        //         "Format" => imp.update_format(),
-        //         _ => {},
-        //     }
-        // }));
+        node.connect_params_changed(clone!(@weak obj => move |_node,what| {
+            wp::log::info!("params-changed! {what}");
+            obj.imp().block.set(true);
+            match what {
+                // "Props" => obj.update_channel_volumes(),
+                "Format" => obj.update_format(),
+                _ => {},
+            }
+            obj.imp().block.set(false);
+        }));
 
         obj.label_set_description();
         obj.update_channel_volumes();
         obj.update_format();
-        obj.update_volume_using_mixerapi();
+        // obj.update_volume_using_mixerapi();
 
         obj
     }
@@ -253,6 +275,8 @@ impl PwNodeObject {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
 
+            self.imp().block.set(true);
+
             let volume: Option<f64> =  map.get("volume").and_then(|x|x.get());
             if let Some(v) = volume {
                 self.set_volume(v as f32);
@@ -264,6 +288,7 @@ impl PwNodeObject {
                 self.set_mute(m);
                 wp::log::info!("Setting mute to {m:?}");
             }
+            self.imp().block.set(false);
 
         }
     }
@@ -339,18 +364,67 @@ impl PwNodeObject {
             if pod.is_object() {
                 let keys =
                     wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
-                let key = keys
+                let channelvolumes_key = keys
                     .find_value_from_short_name("channelVolumes")
+                    .expect("channelVolumes key");
+                let volume_key = keys
+                    .find_value_from_short_name("volume")
                     .expect("volume key");
+                let mute_key = keys
+                    .find_value_from_short_name("mute")
+                    .expect("mute key");
 
-                if let Some(val) = pod.find_spa_property(&key) {
+                if let Some(val) = pod.find_spa_property(&channelvolumes_key) {
                     let mut volumes: Vec<f32> = Vec::new();
                     for a in val.array_iterator() {
                         volumes.push(a);
                     }
+                    if volumes.len() == 0 {
+                        wp::log::warning!("Got 0 channel volumes, ignoring...");
+                        return;
+                    }
+                    if *volumes.first().unwrap() == 0f32 {
+                        wp::log::warning!("Got 0 as first volume, ignoring...");
+                        return;
+                    }
                     self.set_channel_volumes_vec(&volumes);
+                    let avgvol: f32 = volumes.iter().sum::<f32>() / volumes.len() as f32;
+                    self.set_volume(avgvol);
+                }
+
+                // if let Some(val) = pod.find_spa_property(&volume_key) {
+                //     if let Some(volume) = val.float() {
+                //         self.set_volume(volume);
+                //     }
+                // }
+
+                if let Some(val) = pod.find_spa_property(&mute_key) {
+                    if let Some(mute) = val.boolean() {
+                        self.set_mute(mute);
+                    }
                 }
             }
+        }
+    }
+
+    pub fn send_volume(&self) {
+        let imp = self.imp();
+        let node = imp.wpnode.get().expect("node in send_volume");
+        let mixerapi = self.imp().mixerapi.get().expect("Mixer api must be set on PwNodeObject");
+        let bound_id = node.bound_id();
+        let result = mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
+        if result.is_none() {
+            wp::log::warning!("Node {bound_id} does not support volume");
+            return;
+        }
+
+        let variant = glib::VariantDict::new(None);
+        variant.insert("volume", self.volume() as f64);
+        variant.insert("mute", self.mute());
+
+        let result = mixerapi.emit_by_name::<bool>("set-volume", &[&bound_id, &variant.to_variant()]);
+        if result == false {
+            wp::log::warning!("Cannot set volume on {bound_id}");
         }
     }
 
