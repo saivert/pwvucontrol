@@ -300,8 +300,8 @@ impl PwNodeObject {
             if let Ok(Some(iter)) = res {
                 for a in iter {
                     let pod: wp::spa::SpaPod = a.get().unwrap();
-                    if pod.is_object() {
-                        wp::log::info!("pod is object");
+                    if !pod.is_object() {
+                        continue;
                     }
 
                     let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Format").expect("id table");
@@ -310,45 +310,50 @@ impl PwNodeObject {
                     let format_key = keys.find_value_from_short_name("format").expect("format key");
                     let position_key = keys.find_value_from_short_name("position").expect("position key");
 
-                    let choice = pod.find_spa_property(&channels_key).expect("Channels!");
-                    let channels = match choice.choice_child() {
-                        Some(x) => x.int().expect("Channels int"),
-                        None => 0,
-                    };
-
-                    let choice = pod.find_spa_property(&rate_key).expect("Rate!");
-                    let rate = match choice.choice_child() {
-                        Some(x) => x.int().expect("Rate int"),
-                        None => 0,
-                    };
+                    fn get_pod_maybe_choice(pod: wp::spa::SpaPod) -> wp::spa::SpaPod {
+                        if pod.is_choice() {
+                            pod.choice_child().unwrap()
+                        } else {
+                            pod
+                        }
+                    }
 
                     let choice = pod.find_spa_property(&format_key).expect("Format!");
-                    let format = match choice.choice_child() {
-                        Some(x) => x.id().expect("Format id"),
-                        None => 0,
-                    };
+                    let format = get_pod_maybe_choice(choice).id().expect("Format id");
+                    if format == 0 {
+                        wp::log::warning!("Format is 0, ignoring...");
+                        return;
+                    }
 
-                    let choice = pod.find_spa_property(&position_key).expect("Position!");
-                    let position: [u32; 64] = match choice.choice_child() {
-                        Some(x) => {
-                            let vec: Vec<u32> = x.array_iterator().map(|x: i32| x as u32).collect();
+                    let choice = pod.find_spa_property(&channels_key).expect("Channels!");
+                    let channels = get_pod_maybe_choice(choice).int().expect("Channels int");
+
+                    let choice = pod.find_spa_property(&rate_key).expect("Rate!");
+                    let rate = get_pod_maybe_choice(choice).int().expect("Rate int");
+
+                    let positionpod = pod.find_spa_property(&position_key).expect("Position!");
+                    let position: [u32; 64] = {
+                            let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
                             let mut a = [0u32;64];
                             for (i,v) in vec.iter().enumerate() {
                                 a[i] = *v;
                             }
                             a
-                        },
-                        None => [0; 64],
-                    };
+                        };
 
                     wp::log::info!("For id {}, Got rate {rate}, format {format}, channels {channels}", node.bound_id());
+
+                    let t_format = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioFormat").expect("audio format type");
+                    let formatname = t_format.values().find(|x| x.number() == format).and_then(|x|x.short_name()).unwrap();
+
+                    widget.set_formatstr(format!("{}ch {}Hz {}", channels, rate, formatname));
 
                     widget.set_format(AudioFormat { channels, format, rate, positions: position });
                 }
             } else {
                 wp::log::debug!("enum_params async call didn't return anything useful");
             }
-
+            
         }));
     }
 
