@@ -169,9 +169,6 @@ mod imp {
                 let values = nodeobj.channel_volumes_vec();
                 let oldlen = widget.channelmodel.n_items();
 
-                if let Some(f) = nodeobj.format() {
-                    nodeobj.set_formatstr(format!("{}ch {}Hz {}", f.channels, f.rate, f.format));
-                }
                 wp::log::info!("channel volumes notify, values.len = {}, oldlen = {}", values.len(), oldlen);
 
                 if values.len() as u32 != oldlen {
