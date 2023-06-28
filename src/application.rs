@@ -102,8 +102,9 @@ mod imp {
 
             wireplumber::Log::set_default_level("3");
 
+            let props = wp::pw::Properties::new_string("media.category=Manager");
 
-            let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), None);
+            let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), Some(props));
             let wp_om = wp::registry::ObjectManager::new();
 
             wp_core.connect();
