@@ -130,7 +130,7 @@ glib::wrapper! {
 }
 
 impl PwNodeObject {
-    pub fn new(serial: u32, name: &str, node: &wp::pw::Node) -> Self {
+    pub fn new(node: &wp::pw::Node) -> Self {
         let nodetype = match node.get_pw_property("media.class").as_deref() {
             Some("Stream/Output/Audio") => NodeType::Output,
             Some("Stream/Input/Audio") => NodeType::Input,
@@ -139,8 +139,7 @@ impl PwNodeObject {
         };
 
         let obj: PwNodeObject = Object::builder()
-            .property("serial", serial)
-            .property("name", name)
+            .property("serial", node.bound_id())
             .property("nodetype", nodetype)
             .build();
 
@@ -204,6 +203,7 @@ impl PwNodeObject {
         obj.label_set_description();
         obj.update_channel_volumes();
         obj.update_format();
+        obj.label_set_name();
         // obj.update_volume_using_mixerapi();
 
         obj

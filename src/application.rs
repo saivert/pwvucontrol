@@ -167,7 +167,7 @@ mod imp {
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                         wp::log::info!("added: {:?}", node.name());
-                        let pwobj = PwNodeObject::new(node.bound_id(), &node.name().unwrap_or("Missing".to_string()), node);
+                        let pwobj = PwNodeObject::new(node);
                         let window = imp.window.get().unwrap();
                         let model = &window.imp().nodemodel;
                         model.append(&pwobj);
