@@ -222,7 +222,7 @@ glib::wrapper! {
 }
 
 impl PwVolumeBox {
-    pub fn new(row_data: &PwNodeObject) -> Self {
+    pub(crate) fn new(row_data: &PwNodeObject) -> Self {
         glib::Object::builder()
             .property("row-data", &row_data)
             .build()

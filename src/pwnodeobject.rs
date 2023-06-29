@@ -228,7 +228,7 @@ impl PwNodeObject {
         self.set_description(name);
     }
 
-    pub fn update_format(&self) {
+    pub(crate) fn update_format(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
         node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(@weak self as widget, @weak node => move |res| {
@@ -290,7 +290,7 @@ impl PwNodeObject {
         }));
     }
 
-    pub fn update_channel_volumes(&self) {
+    pub(crate) fn update_channel_volumes(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
         let params = node
@@ -454,16 +454,16 @@ impl PwNodeObject {
         None
     }
 
-    pub fn channel_volumes_vec(&self) -> Vec<f32> {
+    pub(crate) fn channel_volumes_vec(&self) -> Vec<f32> {
         self.imp().channel_volumes.borrow().clone()
     }
 
-    pub fn set_channel_volumes_vec(&self, values: &Vec<f32>) {
+    pub(crate) fn set_channel_volumes_vec(&self, values: &Vec<f32>) {
         *(self.imp().channel_volumes.borrow_mut()) = values.clone();
         self.notify_channel_volumes();
     }
 
-    pub fn set_channel_volumes_vec_noevent(&self, values: &Vec<f32>) {
+    pub(crate) fn set_channel_volumes_vec_noevent(&self, values: &Vec<f32>) {
         *(self.imp().channel_volumes.borrow_mut()) = values.clone();
 
         // If a signal blocker is registered then use it
@@ -477,7 +477,7 @@ impl PwNodeObject {
         self.notify_channel_volumes();
     }
 
-    pub fn set_channel_volume(&self, index: u32, volume: f32) {
+    pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
         if let Some(value) = self
             .imp()
             .channel_volumes
@@ -489,7 +489,7 @@ impl PwNodeObject {
         self.notify_channel_volumes();
     }
 
-    pub fn set_property_change_handler_with_blocker<
+    pub(crate) fn set_property_change_handler_with_blocker<
         F: Fn(&PwNodeObject, &glib::ParamSpec) + 'static,
     >(
         &self,
@@ -503,7 +503,7 @@ impl PwNodeObject {
             .insert(name.to_string(), sigid);
     }
 
-    pub fn set_volume_noevent(&self, volume: f32) {
+    pub(crate) fn set_volume_noevent(&self, volume: f32) {
         if let Some(sigid) = self.imp().signalblockers.borrow().get("volume") {
             self.block_signal(sigid);
             self.set_volume(volume);
@@ -513,7 +513,7 @@ impl PwNodeObject {
         self.set_volume(volume);
     }
 
-    pub fn set_mute_noevent(&self, mute: bool) {
+    pub(crate) fn set_mute_noevent(&self, mute: bool) {
         if let Some(sigid) = self.imp().signalblockers.borrow().get("mute") {
             self.block_signal(sigid);
             self.set_mute(mute);
@@ -523,13 +523,13 @@ impl PwNodeObject {
         self.set_mute(mute);
     }
 
-    pub fn set_format(&self, format: AudioFormat) {
+    pub(crate) fn set_format(&self, format: AudioFormat) {
         self.imp().format.set(Some(format));
 
         self.emit_by_name::<()>("format", &[]);
     }
 
-    pub fn format(&self) -> Option<AudioFormat> {
+    pub(crate) fn format(&self) -> Option<AudioFormat> {
         self.imp().format.get()
     }
 }

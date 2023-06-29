@@ -108,7 +108,7 @@ glib::wrapper! {
 }
 
 impl PwChannelBox {
-    pub fn new(channelobj: &PwChannelObject) -> Self {
+    pub(crate) fn new(channelobj: &PwChannelObject) -> Self {
         glib::Object::builder()
             .property("row-data", channelobj)
             .build()

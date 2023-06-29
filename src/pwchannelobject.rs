@@ -96,7 +96,7 @@ glib::wrapper! {
 }
 
 impl PwChannelObject {
-    pub fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
+    pub(crate) fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
         let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
         let channel = row_data.format().unwrap().positions[index as usize];
         let channelname = t_audiochannel.values().find(|x| x.number() == channel).and_then(|x|x.short_name()).unwrap();
