@@ -24,10 +24,8 @@ enum PropertyChanged {
 
 mod imp {
     use glib::subclass::Signal;
-    use glib::SignalHandlerId;
     use gtk::subclass::prelude::*;
     use std::cell::{Cell, RefCell};
-    use std::collections::HashMap;
 
     use gtk::{
         glib::{self, ParamSpec, Properties, Value},
@@ -60,7 +58,6 @@ mod imp {
         #[property(get, set, builder(crate::NodeType::Undefined))]
         nodetype: Cell<crate::NodeType>,
 
-        pub(super) signalblockers: RefCell<HashMap<String, SignalHandlerId>>,
         pub(super) format: Cell<Option<AudioFormat>>,
 
         #[property(get, set)]
@@ -361,13 +358,6 @@ impl PwNodeObject {
         }
     }
 
-    fn make_volume_pod(volume: f32) -> Option<wp::spa::SpaPod> {
-        let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
-        podbuilder.add_property("volume");
-        podbuilder.add_float(volume);
-        podbuilder.end()
-    }
-
     fn send_volume(&self, what: PropertyChanged) {
         let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
         let node = self.imp().wpnode.get().expect("WpNode set");
@@ -384,7 +374,7 @@ impl PwNodeObject {
 
                     // Just set all channels to the same volume
                     let channelspod = wp::spa::SpaPodBuilder::new_array();
-                    for v in self.channel_volumes_vec().iter() {
+                    for _ in self.channel_volumes_vec().iter() {
                         channelspod.add_float(self.volume());
                     }
                     if let Some(newpod) = channelspod.end() {
@@ -507,20 +497,6 @@ impl PwNodeObject {
         self.notify_channel_volumes();
     }
 
-    pub(crate) fn set_channel_volumes_vec_noevent(&self, values: &Vec<f32>) {
-        *(self.imp().channel_volumes.borrow_mut()) = values.clone();
-
-        // If a signal blocker is registered then use it
-        if let Some(sigid) = self.imp().signalblockers.borrow().get("channel-volumes") {
-            self.block_signal(sigid);
-            self.notify_channel_volumes();
-            self.unblock_signal(sigid);
-            return;
-        }
-        // Otherwise just let the property change notify happen
-        self.notify_channel_volumes();
-    }
-
     pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
         if let Some(value) = self
             .imp()
@@ -531,40 +507,6 @@ impl PwNodeObject {
             *value = volume;
         }
         self.notify_channel_volumes();
-    }
-
-    pub(crate) fn set_property_change_handler_with_blocker<
-        F: Fn(&PwNodeObject, &glib::ParamSpec) + 'static,
-    >(
-        &self,
-        name: &str,
-        handler: F,
-    ) {
-        let sigid = self.connect_notify_local(Some(name), handler);
-        self.imp()
-            .signalblockers
-            .borrow_mut()
-            .insert(name.to_string(), sigid);
-    }
-
-    pub(crate) fn set_volume_noevent(&self, volume: f32) {
-        if let Some(sigid) = self.imp().signalblockers.borrow().get("volume") {
-            self.block_signal(sigid);
-            self.set_volume(volume);
-            self.unblock_signal(sigid);
-            return;
-        }
-        self.set_volume(volume);
-    }
-
-    pub(crate) fn set_mute_noevent(&self, mute: bool) {
-        if let Some(sigid) = self.imp().signalblockers.borrow().get("mute") {
-            self.block_signal(sigid);
-            self.set_mute(mute);
-            self.unblock_signal(sigid);
-            return;
-        }
-        self.set_mute(mute);
     }
 
     pub(crate) fn set_format(&self, format: AudioFormat) {

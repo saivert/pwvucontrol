@@ -40,7 +40,7 @@ mod imp {
 
     use super::*;
     use once_cell::unsync::OnceCell;
-    use wp::{pw::{ProxyExt, PipewireObjectExt, PipewireObjectExt2}, plugin::*};
+    use wp::{pw::{ProxyExt, PipewireObjectExt2}, plugin::*};
 
     #[derive(Default)]
     pub struct PwvucontrolApplication {

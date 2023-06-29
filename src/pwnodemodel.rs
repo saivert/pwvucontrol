@@ -82,26 +82,6 @@ impl PwNodeModel {
         
     }
 
-    pub(crate) fn update_node<F>(&self, id: u32, f: F) -> Result<(), ()>
-    where F: FnOnce(&PwNodeObject) {
-        let imp = self.imp();
-        let vector = imp.0.borrow();
-        if let Some(v) = vector.iter().find(|p|id == p.serial()) {
-            f(v);
-            return Ok(());
-        }
-        Err(())
-        
-    }
-
-    pub(crate) fn get_node(&self, id: u32) -> Result<PwNodeObject, ()> {
-        let imp = self.imp();
-        let vector = imp.0.borrow();
-        if let Some(v) = vector.iter().find(|p|id == p.serial()) {
-            return Ok(v.clone());
-        }
-        Err(())
-    }
 }
 
 impl Default for PwNodeModel {

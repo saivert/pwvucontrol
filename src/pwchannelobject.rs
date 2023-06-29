@@ -5,7 +5,6 @@ use crate::pwnodeobject::PwNodeObject;
 use wireplumber as wp;
 
 mod imp {
-    use glib::{SignalHandlerId, clone};
     use gtk::subclass::prelude::*;
     use std::cell::{Cell, RefCell};
 
@@ -32,8 +31,6 @@ mod imp {
         #[property(get, set = Self::set_volume)]
         volume: Cell<f32>,
 
-        // handler: RefCell<Option<SignalHandlerId>>,
-
         pub block_volume_send: Cell<bool>,
     }
 
@@ -56,18 +53,6 @@ mod imp {
 
         fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
             self.derived_property(id, pspec)
-        }
-
-        // fn constructed(&self) {
-        //     let item = self.row_data.borrow();
-        //     let item = item.as_ref().cloned().unwrap();
-        // }
-
-        fn dispose(&self) {
-            // if let Some(signal) = self.handler.take() {
-            //     log::info!("Dispose: Disconnected signal handler");
-            //     self.row_data.borrow_mut().as_ref().cloned().unwrap().disconnect(signal);
-            // }
         }
     }
 
