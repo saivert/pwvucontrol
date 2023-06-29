@@ -50,11 +50,11 @@ glib::wrapper! {
 
 // Constructor for new instances. This simply calls glib::Object::new()
 impl PwNodeModel {
-    pub fn new() -> PwNodeModel {
+    pub(crate) fn new() -> PwNodeModel {
         glib::Object::new()
     }
 
-    pub fn append(&self, obj: &PwNodeObject) {
+    pub(crate) fn append(&self, obj: &PwNodeObject) {
         let imp = self.imp();
         let index = {
             // Borrow the data only once and ensure the borrow guard is dropped
@@ -68,7 +68,7 @@ impl PwNodeModel {
         self.items_changed(index as u32, 0, 1);
     }
 
-    pub fn remove(&self, id: u32) {
+    pub(crate) fn remove(&self, id: u32) {
         let imp = self.imp();
         let mut vector = imp.0.borrow_mut();
         for (i,v) in (0..).zip(vector.iter()) {
@@ -82,7 +82,7 @@ impl PwNodeModel {
         
     }
 
-    pub fn update_node<F>(&self, id: u32, f: F) -> Result<(), ()>
+    pub(crate) fn update_node<F>(&self, id: u32, f: F) -> Result<(), ()>
     where F: FnOnce(&PwNodeObject) {
         let imp = self.imp();
         let vector = imp.0.borrow();
@@ -94,7 +94,7 @@ impl PwNodeModel {
         
     }
 
-    pub fn get_node(&self, id: u32) -> Result<PwNodeObject, ()> {
+    pub(crate) fn get_node(&self, id: u32) -> Result<PwNodeObject, ()> {
         let imp = self.imp();
         let vector = imp.0.borrow();
         if let Some(v) = vector.iter().find(|p|id == p.serial()) {
