@@ -1,12 +1,12 @@
-use std::collections::HashMap;
-
-use glib::{clone, subclass::prelude::*, Object, ObjectExt, ToVariant};
+use glib::{clone, subclass::prelude::*, Object, ObjectExt, ToVariant, StaticType, Cast};
 use gtk::glib;
 
 use wireplumber as wp;
 use wp::pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt};
 
 use crate::{NodeType, application::PwvucontrolApplication};
+
+mod mixerapi;
 
 #[derive(Copy, Clone, Debug)]
 pub struct AudioFormat {
@@ -91,6 +91,14 @@ mod imp {
             }
         }
 
+        fn notify(&self, pspec: &ParamSpec) {
+            if pspec.name() == "channel-volumes" {
+                if self.block.get() == false {
+                    self.obj().send_volume();
+                }
+            }
+        }
+
         fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
             self.derived_property(id, pspec)
         }
@@ -162,38 +170,11 @@ impl PwNodeObject {
             }),
         );
 
-        // Use mixer-api
-
-        let app = PwvucontrolApplication::default();
-        let core = app.imp().wp_core.get().expect("Core setup");
-
-        let mixerapi = wp::plugin::Plugin::find(&core, "mixer-api").expect("Get mixer-api");
-
-        // If we need to set cubic scale...
-        // let t = glib::Type::from_name("WpMixerApiVolumeScale").unwrap();
-        // let v = glib::Value::from_type(t);
-        // unsafe {
-        //     glib::gobject_ffi::g_value_set_enum(v.as_ptr(), 1);
-        // }
-        // mixerapi.set_property("scale", v);
-
-        obj.imp().mixerapi.set(mixerapi).expect("mixerapi only set once in PwNodeObject");
-
-        obj.imp().mixerapi.get().unwrap().connect_local("changed", true, clone!(@weak obj => @default-return None, move |x| {
-            // let mixerapi: wp::plugin::Plugin = x[0].get().expect("MixerApi in changed event");
-            let id: u32 = x[1].get().expect("Id in in changed event");
-            wp::log::info!("From mixer-api changed event: {id}");
-            if id == obj.serial() {
-                obj.update_volume_using_mixerapi();
-            }
-            None
-        }));
-
         node.connect_params_changed(clone!(@weak obj => move |_node,what| {
             wp::log::info!("params-changed! {what}");
             obj.imp().block.set(true);
             match what {
-                // "Props" => obj.update_channel_volumes(),
+                "Props" => obj.update_channel_volumes(),
                 "Format" => obj.update_format(),
                 _ => {},
             }
@@ -247,52 +228,6 @@ impl PwNodeObject {
         self.set_description(name);
     }
 
-    pub fn update_volume_using_mixerapi(&self) {
-        let mixerapi = self.imp().mixerapi.get().expect("Mixer api must be set on PwNodeObject");
-        let node = self.imp().wpnode.get().expect("WpNode must be set on PwNodeObject");
-        let result = mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
-        if let Some(r) = result {
-            let map: HashMap<String, glib::Variant> = r.get().unwrap();
-            let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
-
-            let result: Option<HashMap<String, glib::Variant>> = map.get("channelVolumes").and_then(|x|x.get());
-            if let Some(channel_volumes) = result {
-                for (index_str, v) in channel_volumes.iter() {
-                    let index: u32 = index_str.parse().expect("erroneous index");
-                    let map: HashMap<String, glib::Variant> = v.get().unwrap();
-                    let volume: Option<f64> = map.get("volume").and_then(|x|x.get());
-                    let channelname: String = map.get("channel").and_then(|x|x.get()).unwrap_or_default();
-                    let channel = t_audiochannel.find_value_from_short_name(&channelname);
-
-                    if let (Some(c), Some(v)) = (channel, volume) {
-                        wp::log::info!("Index: {index}, Number: {} = {}", c.number(), v);
-                        self.set_channel_volume(index, v as f32); // TODO: get index via channel map, index of vardict must not be relied upon
-                    } else {
-                        wp::log::critical!("Got invalid data via mixer-api");
-                    }
-                }
-            } else {
-                wp::log::critical!("Cannot get channel volumes via mixer-api");
-            }
-
-            self.imp().block.set(true);
-
-            let volume: Option<f64> =  map.get("volume").and_then(|x|x.get());
-            if let Some(v) = volume {
-                self.set_volume(v as f32);
-                wp::log::info!("Setting volume to {v}");
-            }
-
-            let mute: Option<bool> = map.get("mute").and_then(|x|x.get());
-            if let Some(m) = mute {
-                self.set_mute(m);
-                wp::log::info!("Setting mute to {m:?}");
-            }
-            self.imp().block.set(false);
-
-        }
-    }
-
     pub fn update_format(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
@@ -331,15 +266,13 @@ impl PwNodeObject {
                     let choice = pod.find_spa_property(&rate_key).expect("Rate!");
                     let rate = get_pod_maybe_choice(choice).int().expect("Rate int");
 
-                    let positionpod = pod.find_spa_property(&position_key).expect("Position!");
-                    let position: [u32; 64] = {
-                            let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
-                            let mut a = [0u32;64];
-                            for (i,v) in vec.iter().enumerate() {
-                                a[i] = *v;
-                            }
-                            a
-                        };
+                    let choice = pod.find_spa_property(&position_key).expect("Position!");
+                    let positionpod = get_pod_maybe_choice(choice);
+                    let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
+                    let mut a = [0u32;64];
+                    for (i,v) in (0..).zip(vec.iter()) {
+                        a[i] = *v;
+                    }
 
                     wp::log::info!("For id {}, Got rate {rate}, format {format}, channels {channels}", node.bound_id());
 
@@ -348,7 +281,7 @@ impl PwNodeObject {
 
                     widget.set_formatstr(format!("{}ch {}Hz {}", channels, rate, formatname));
 
-                    widget.set_format(AudioFormat { channels, format, rate, positions: position });
+                    widget.set_format(AudioFormat { channels, format, rate, positions: a });
                 }
             } else {
                 wp::log::debug!("enum_params async call didn't return anything useful");
@@ -393,15 +326,15 @@ impl PwNodeObject {
                         return;
                     }
                     self.set_channel_volumes_vec(&volumes);
-                    let avgvol: f32 = volumes.iter().sum::<f32>() / volumes.len() as f32;
-                    self.set_volume(avgvol);
+                    // let avgvol: f32 = volumes.iter().sum::<f32>() / volumes.len() as f32;
+                    // self.set_volume(avgvol);
                 }
 
-                // if let Some(val) = pod.find_spa_property(&volume_key) {
-                //     if let Some(volume) = val.float() {
-                //         self.set_volume(volume);
-                //     }
-                // }
+                if let Some(val) = pod.find_spa_property(&volume_key) {
+                    if let Some(volume) = val.float() {
+                        self.set_volume(volume);
+                    }
+                }
 
                 if let Some(val) = pod.find_spa_property(&mute_key) {
                     if let Some(mute) = val.boolean() {
@@ -412,25 +345,113 @@ impl PwNodeObject {
         }
     }
 
+
+
     pub fn send_volume(&self) {
-        let imp = self.imp();
-        let node = imp.wpnode.get().expect("node in send_volume");
-        let mixerapi = self.imp().mixerapi.get().expect("Mixer api must be set on PwNodeObject");
-        let bound_id = node.bound_id();
-        let result = mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
-        if result.is_none() {
-            wp::log::warning!("Node {bound_id} does not support volume");
-            return;
+        let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
+
+        podbuilder.add_property("volume");
+        podbuilder.add_float(self.volume());
+
+        podbuilder.add_property("mute");
+        podbuilder.add_boolean(self.mute());
+
+        let channelspod = wp::spa::SpaPodBuilder::new_array();
+        for v in self.channel_volumes_vec().iter() {
+            channelspod.add_float(*v);
+        }
+        if let Some(newpod) = channelspod.end() {
+            podbuilder.add_property("channelVolumes");
+            podbuilder.add_pod(&newpod);
         }
 
-        let variant = glib::VariantDict::new(None);
-        variant.insert("volume", self.volume() as f64);
-        variant.insert("mute", self.mute());
+        let node = self.imp().wpnode.get().expect("WpNode set");
 
-        let result = mixerapi.emit_by_name::<bool>("set-volume", &[&bound_id, &variant.to_variant()]);
-        if result == false {
-            wp::log::warning!("Cannot set volume on {bound_id}");
+        if let Some(pod) = podbuilder.end() {
+
+            // Check if this is a device node
+            if let Ok(Some(id)) = node.device_id() {
+                if let Ok(dev) = node.pw_property::<i32>("card.profile.device") {
+
+                    if let Some(device) = &Self::lookup_device_from_id(id) {
+                        if let Some(idx) = Self::find_route_index(device, dev) {
+                            let builder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
+                            builder.add_property("index");
+                            builder.add_int(idx);
+                            builder.add_property("device");
+                            builder.add_int(dev);
+                            builder.add_property("props");
+                            builder.add_pod(&pod);
+                            if let Some(newpod) = builder.end() {
+                                device.set_param("Route", 0, newpod);
+                            }
+                        } else {
+                            wp::log::warning!("Cannot find route index");
+                        }
+                    } else {
+                        wp::log::warning!("Cannot lookup device from id");
+                    }
+                } else {
+                    wp::log::warning!("Cannot get card.profile.device");
+                }
+            } else {
+                node.set_param("Props", 0, pod);
+            }
+
         }
+    }
+
+    fn lookup_device_from_id(id: u32) -> Option<wp::pw::Device> {
+        let app = PwvucontrolApplication::default();
+        let om = app.imp().wp_object_manager.get().expect("Object manager set on application object");
+        let interest = wp::registry::ObjectInterest::new_type(
+            wp::pw::Device::static_type(),
+        );
+        interest.add_constraint(
+            wp::registry::ConstraintType::GProperty,
+            "bound-id",
+            wp::registry::ConstraintVerb::Equals,
+            Some(&id.to_variant()),
+        );
+
+        if let Some(obj) = om.lookup_full(interest) {
+            return obj.dynamic_cast::<wp::pw::Device>().ok();
+            
+        }
+
+        None
+    }
+
+    fn find_route_index(obj: &wp::pw::Device, dev: i32) -> Option<i32> {
+        if let Some(iter) = obj.enum_params_sync("Route", None) {
+            for a in iter {
+                let pod: wp::spa::SpaPod = a.get().unwrap();
+
+                let keys =
+                    wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
+                let index_key = keys
+                    .find_value_from_short_name("index")
+                    .expect("index key");
+                let device_key = keys
+                    .find_value_from_short_name("device")
+                    .expect("device key");
+                // let props_key = keys
+                //     .find_value_from_short_name("props")
+                //     .expect("props key");
+
+                let r_dev: Option<i32> = pod.spa_property(&device_key);
+                let r_index: Option<i32> = pod.spa_property(&index_key);
+
+                if let (Some(r_dev), Some(r_idx)) = (r_dev, r_index) {
+                    if dev == r_dev {
+                        return Some(r_idx);
+                    }
+                } else {
+                    continue;
+                }
+            }
+        }
+        None
     }
 
     pub fn channel_volumes_vec(&self) -> Vec<f32> {
