@@ -2,6 +2,8 @@ use gtk::glib;
 
 use crate::pwnodeobject::PwNodeObject;
 
+use wireplumber as wp;
+
 mod imp {
     use glib::{SignalHandlerId, clone};
     use gtk::subclass::prelude::*;
@@ -30,7 +32,7 @@ mod imp {
         #[property(get, set = Self::set_volume)]
         volume: Cell<f32>,
 
-        handler: RefCell<Option<SignalHandlerId>>,
+        // handler: RefCell<Option<SignalHandlerId>>,
 
         pub block_volume_send: Cell<bool>,
     }
@@ -56,10 +58,10 @@ mod imp {
             self.derived_property(id, pspec)
         }
 
-        fn constructed(&self) {
-            let item = self.row_data.borrow();
-            let item = item.as_ref().cloned().unwrap();
-        }
+        // fn constructed(&self) {
+        //     let item = self.row_data.borrow();
+        //     let item = item.as_ref().cloned().unwrap();
+        // }
 
         fn dispose(&self) {
             // if let Some(signal) = self.handler.take() {
@@ -71,7 +73,7 @@ mod imp {
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            wp::log::info!("Got set_volume on channel object {:?}", value.get::<f32>());
+            wp::log::info!("Got set_volume on channel object {} = {:?}", self.obj().name(), value.get::<f32>());
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
@@ -95,7 +97,10 @@ glib::wrapper! {
 
 impl PwChannelObject {
     pub fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
-        let channelname = index.to_string();
+        let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
+        let channel = row_data.format().unwrap().positions[index as usize];
+        let channelname = t_audiochannel.values().find(|x| x.number() == channel).and_then(|x|x.short_name()).unwrap();
+
 
         glib::Object::builder()
             .property("index", index)
