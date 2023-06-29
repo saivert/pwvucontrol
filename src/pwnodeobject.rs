@@ -16,6 +16,12 @@ pub struct AudioFormat {
     pub positions: [u32; 64],
 }
 
+enum PropertyChanged {
+    Volume,
+    Mute,
+    ChannelVolumes
+}
+
 mod imp {
     use glib::subclass::Signal;
     use glib::SignalHandlerId;
@@ -31,7 +37,7 @@ mod imp {
 
     use wireplumber as wp;
 
-    use super::AudioFormat;
+    use super::{AudioFormat, PropertyChanged};
 
     // Object holding the state
     #[derive(Default, Properties)]
@@ -82,9 +88,14 @@ mod imp {
         fn set_property(&self, id: usize, value: &Value, pspec: &ParamSpec) {
             self.derived_set_property(id, value, pspec);
             match pspec.name() {
-                "volume" | "mute" => {
+                "volume" => {
                     if self.block.get() == false {
-                        self.obj().send_volume();
+                        self.obj().send_volume(PropertyChanged::Volume);
+                    }
+                },
+                "mute" => {
+                    if self.block.get() == false {
+                        self.obj().send_volume(PropertyChanged::Mute);
                     }
                 },
                 _ => {},
@@ -94,7 +105,7 @@ mod imp {
         fn notify(&self, pspec: &ParamSpec) {
             if pspec.name() == "channel-volumes" {
                 if self.block.get() == false {
-                    self.obj().send_volume();
+                    self.obj().send_volume(PropertyChanged::ChannelVolumes);
                 }
             }
         }
@@ -138,7 +149,7 @@ glib::wrapper! {
 }
 
 impl PwNodeObject {
-    pub fn new(node: &wp::pw::Node) -> Self {
+    pub(crate) fn new(node: &wp::pw::Node) -> Self {
         let nodetype = match node.get_pw_property("media.class").as_deref() {
             Some("Stream/Output/Audio") => NodeType::Output,
             Some("Stream/Input/Audio") => NodeType::Input,
@@ -292,6 +303,7 @@ impl PwNodeObject {
 
     pub(crate) fn update_channel_volumes(&self) {
         let node = self.imp().wpnode.get().expect("node");
+        let device_id = node.device_id().map_or(None, |x|x);
 
         let params = node
             .enum_params_sync("Props", None)
@@ -326,13 +338,17 @@ impl PwNodeObject {
                         return;
                     }
                     self.set_channel_volumes_vec(&volumes);
-                    // let avgvol: f32 = volumes.iter().sum::<f32>() / volumes.len() as f32;
-                    // self.set_volume(avgvol);
+                    if device_id.is_some() {
+                        let maxvol: f32 = *volumes.iter().max_by(|a, b| a.total_cmp(b)).expect("Max");
+                        self.set_volume(maxvol);
+                    }
                 }
 
-                if let Some(val) = pod.find_spa_property(&volume_key) {
-                    if let Some(volume) = val.float() {
-                        self.set_volume(volume);
+                if device_id.is_none() {
+                    if let Some(val) = pod.find_spa_property(&volume_key) {
+                        if let Some(volume) = val.float() {
+                            self.set_volume(volume);
+                        }
                     }
                 }
 
@@ -345,32 +361,60 @@ impl PwNodeObject {
         }
     }
 
-
-
-    pub fn send_volume(&self) {
+    fn make_volume_pod(volume: f32) -> Option<wp::spa::SpaPod> {
         let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
-
         podbuilder.add_property("volume");
-        podbuilder.add_float(self.volume());
+        podbuilder.add_float(volume);
+        podbuilder.end()
+    }
 
-        podbuilder.add_property("mute");
-        podbuilder.add_boolean(self.mute());
-
-        let channelspod = wp::spa::SpaPodBuilder::new_array();
-        for v in self.channel_volumes_vec().iter() {
-            channelspod.add_float(*v);
-        }
-        if let Some(newpod) = channelspod.end() {
-            podbuilder.add_property("channelVolumes");
-            podbuilder.add_pod(&newpod);
-        }
-
+    fn send_volume(&self, what: PropertyChanged) {
+        let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
         let node = self.imp().wpnode.get().expect("WpNode set");
+
+        let device_id = node.device_id().map_or(None, |x|x);
+
+        match what {
+            PropertyChanged::Volume => {
+                // Device nodes don't really support the volume property.
+                if device_id.is_none() {
+                    podbuilder.add_property("volume");
+                    podbuilder.add_float(self.volume());
+                } else {
+
+                    // Just set all channels to the same volume
+                    let channelspod = wp::spa::SpaPodBuilder::new_array();
+                    for v in self.channel_volumes_vec().iter() {
+                        channelspod.add_float(self.volume());
+                    }
+                    if let Some(newpod) = channelspod.end() {
+                        podbuilder.add_property("channelVolumes");
+                        podbuilder.add_pod(&newpod);
+                    }
+    
+
+                }
+            },
+            PropertyChanged::Mute => {
+                podbuilder.add_property("mute");
+                podbuilder.add_boolean(self.mute());
+            },
+            PropertyChanged::ChannelVolumes => {
+                let channelspod = wp::spa::SpaPodBuilder::new_array();
+                for v in self.channel_volumes_vec().iter() {
+                    channelspod.add_float(*v);
+                }
+                if let Some(newpod) = channelspod.end() {
+                    podbuilder.add_property("channelVolumes");
+                    podbuilder.add_pod(&newpod);
+                }
+            },
+        }
 
         if let Some(pod) = podbuilder.end() {
 
             // Check if this is a device node
-            if let Ok(Some(id)) = node.device_id() {
+            if let Some(id) = device_id {
                 if let Ok(dev) = node.pw_property::<i32>("card.profile.device") {
 
                     if let Some(device) = &Self::lookup_device_from_id(id) {
