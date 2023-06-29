@@ -40,7 +40,7 @@ mod imp {
 
     use super::*;
     use once_cell::unsync::OnceCell;
-    use wp::{pw::ProxyExt, plugin::*};
+    use wp::{pw::{ProxyExt, PipewireObjectExt, PipewireObjectExt2}, plugin::*};
 
     #[derive(Default)]
     pub struct PwvucontrolApplication {
@@ -142,12 +142,27 @@ mod imp {
                     let interest = wp::registry::ObjectInterest::new_type(
                         wp::pw::Node::static_type(),
                     );
-                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Device', 'Audio/Sink')").expect("variant");
+                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Sink')").expect("variant");
                     interest.add_constraint(
                         wp::registry::ConstraintType::PwGlobalProperty,
                         "media.class",
                         wp::registry::ConstraintVerb::InList,
                         Some(&variant));
+    
+                    interest
+                }
+            );
+
+            wp_om.add_interest_full(
+                {
+                    let interest = wp::registry::ObjectInterest::new_type(
+                        wp::pw::Device::static_type(),
+                    );
+                    interest.add_constraint(
+                        wp::registry::ConstraintType::PwGlobalProperty,
+                        "media.class",
+                        wp::registry::ConstraintVerb::Equals,
+                        Some(&"Audio/Device".to_variant()));
     
                     interest
                 }
@@ -171,6 +186,10 @@ mod imp {
                         let window = imp.window.get().unwrap();
                         let model = &window.imp().nodemodel;
                         model.append(&pwobj);
+                    } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
+                        let n: String = device.pw_property("device.name").unwrap();
+                        wp::log::info!("Got device {} {n}", device.bound_id());
+                        
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
                     }
