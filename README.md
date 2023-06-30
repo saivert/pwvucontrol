@@ -4,7 +4,7 @@
 
 This is an attempt are making a volume control applet for Pipewire.
 
-As of 30th june 2023 most of the development is going to happen in [wireplumber-rs](/saivert/pwvucontrol/tree/wireplumber-rs) branch to check out viability of that binding for libwireplumber.
+As of 30th june 2023 most of the development is going to happen in [wireplumber-rs](../../tree/wireplumber-rs) branch to check out viability of that binding for libwireplumber.
 
 Current implemented features as of 2023-06-08:
 
