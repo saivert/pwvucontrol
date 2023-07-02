@@ -20,22 +20,18 @@
 
 use gtk::{
     gio,
-    glib,
     prelude::*,
     subclass::prelude::*,
 };
-
+use glib::{self, clone};
 use adw::subclass::prelude::*;
 
 use crate::application::PwvucontrolApplication;
 
-
 mod imp {
-    use gtk::glib::clone;
+    use super::*;
 
     use crate::{volumebox::PwVolumeBox, pwnodemodel::PwNodeModel, pwnodeobject::PwNodeObject};
-
-    use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]

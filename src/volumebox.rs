@@ -18,28 +18,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-use gtk::{
-    glib,
-    prelude::*,
-};
+use crate::pwnodeobject::PwNodeObject;
 
-
+use glib::{self, clone, ParamSpec, Properties, Value};
+use gtk::{gio, prelude::*, subclass::prelude::*};
 
 use std::cell::RefCell;
-use glib::Properties;
 
-use crate::pwnodeobject::PwNodeObject;
+use wireplumber as wp;
 
 mod imp {
 
-    use crate::{channelbox::PwChannelBox, pwchannelobject::PwChannelObject};
-    use gtk::subclass::prelude::*;
-
-    use wireplumber as wp;
-
     use super::*;
-    use glib::{ParamSpec, Value, clone};
-    use gtk::gio;
+    use crate::{channelbox::PwChannelBox, pwchannelobject::PwChannelObject};
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
@@ -75,7 +66,6 @@ mod imp {
         pub outputdevice_dropdown: TemplateChild<gtk::DropDown>,
     }
 
-
     #[glib::object_subclass]
     impl ObjectSubclass for PwVolumeBox {
         const NAME: &'static str = "PwVolumeBox";
@@ -91,7 +81,6 @@ mod imp {
             obj.init_template();
         }
     }
-
 
     impl ObjectImpl for PwVolumeBox {
         fn properties() -> &'static [ParamSpec] {
@@ -126,8 +115,8 @@ mod imp {
             item.bind_property("volume", &self.volume_scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
-                .transform_to::<f32, f64, _>(|_, y|Some(y.cbrt() as f64))
-                .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
+                .transform_to::<f32, f64, _>(|_, y| Some(y.cbrt() as f64))
+                .transform_from::<f64, f32, _>(|_, y| Some((y * y * y) as f32))
                 .build();
 
             item.bind_property("formatstr", &self.format.get(), "label")
@@ -139,14 +128,13 @@ mod imp {
                 .bidirectional()
                 .build();
 
-
             let factory = gtk::SignalListItemFactory::new();
             factory.connect_setup(|_, item| {
                 let label = gtk::Label::new(None);
                 label.set_ellipsize(gtk::pango::EllipsizeMode::End);
                 item.property_expression("item")
-                                .chain_property::<gtk::StringObject>("string")
-                                .bind(&label, "label", gtk::Widget::NONE);
+                    .chain_property::<gtk::StringObject>("string")
+                    .bind(&label, "label", gtk::Widget::NONE);
                 item.set_child(Some(&label));
             });
 
@@ -195,24 +183,24 @@ mod imp {
                 }
             }));
 
-            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
-                widget.obj().grab_focus();
-            }));
+            self.revealer
+                .connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
+                    widget.obj().grab_focus();
+                }));
 
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
+            self.level_bar
+                .add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
+            self.level_bar
+                .add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
+            self.level_bar
+                .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
         }
-
-    
     }
     impl WidgetImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
 
     #[gtk::template_callbacks]
-    impl PwVolumeBox {
-    }
-
+    impl PwVolumeBox {}
 }
 
 glib::wrapper! {
@@ -227,5 +215,4 @@ impl PwVolumeBox {
             .property("row-data", &row_data)
             .build()
     }
-
 }

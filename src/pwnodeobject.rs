@@ -1,5 +1,4 @@
-use glib::{clone, subclass::prelude::*, Object, ObjectExt, ToVariant, StaticType, Cast};
-use gtk::glib;
+use glib::{self, clone, subclass::prelude::*, Object, ObjectExt, ToVariant, StaticType, Cast};
 
 use wireplumber as wp;
 use wp::pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt};

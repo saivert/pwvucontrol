@@ -1,19 +1,14 @@
-use gtk::subclass::prelude::*;
-
 use crate::pwnodeobject::PwNodeObject;
-use gtk::{gio, glib, prelude::*};
+use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 
 mod imp {
-    use gtk::{gio::{subclass::prelude::*, self}, glib, prelude::*};
+    use super::*;
     
     use std::cell::RefCell;
     
     // Use `im-rc::Vector` here as it has much better insert/delete performance than a plain `Vec`.
     use im_rc::Vector;
 
-    use crate::pwnodeobject::PwNodeObject;
-
-    
     #[derive(Debug, Default)]
     pub struct PwNodeModel(pub(super) RefCell<Vector<PwNodeObject>>);
     

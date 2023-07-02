@@ -1,21 +1,18 @@
-use gtk::glib;
-
 use crate::pwnodeobject::PwNodeObject;
+
+use std::cell::{Cell, RefCell};
+
+use gtk::{
+    glib::{self, ParamSpec, Properties, Value},
+    prelude::*,
+    subclass::prelude::*
+};
 
 use wireplumber as wp;
 
 mod imp {
-    use gtk::subclass::prelude::*;
-    use std::cell::{Cell, RefCell};
 
-    use gtk::{
-        glib::{self, ParamSpec, Properties, Value},
-        prelude::*,
-    };
-
-    use crate::pwnodeobject::PwNodeObject;
-
-    use wireplumber as wp;
+    use super::*;
 
     // Object holding the state
     #[derive(Default, Properties)]
@@ -58,14 +55,20 @@ mod imp {
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            wp::log::info!("Got set_volume on channel object {} = {:?}", self.obj().name(), value.get::<f32>());
+            wp::log::info!(
+                "Got set_volume on channel object {} = {:?}",
+                self.obj().name(),
+                value.get::<f32>()
+            );
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
             if self.block_volume_send.get() == false {
                 if let Some(nodeobj) = self.row_data.borrow().as_ref() {
                     if nodeobj.channellock() {
-                        let vec: Vec<f32> = (0..nodeobj.channel_volumes_vec().len()).map(|_| volume).collect();
+                        let vec: Vec<f32> = (0..nodeobj.channel_volumes_vec().len())
+                            .map(|_| volume)
+                            .collect();
                         nodeobj.set_channel_volumes_vec(&vec);
                     } else {
                         nodeobj.set_channel_volume(index, volume);
@@ -82,10 +85,14 @@ glib::wrapper! {
 
 impl PwChannelObject {
     pub(crate) fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
-        let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
+        let t_audiochannel =
+            wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
         let channel = row_data.format().unwrap().positions[index as usize];
-        let channelname = t_audiochannel.values().find(|x| x.number() == channel).and_then(|x|x.short_name()).unwrap();
-
+        let channelname = t_audiochannel
+            .values()
+            .find(|x| x.number() == channel)
+            .and_then(|x| x.short_name())
+            .unwrap();
 
         glib::Object::builder()
             .property("index", index)
