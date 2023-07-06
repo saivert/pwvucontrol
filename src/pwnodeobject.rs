@@ -329,10 +329,6 @@ impl PwNodeObject {
                         wp::log::warning!("Got 0 channel volumes, ignoring...");
                         return;
                     }
-                    if *volumes.first().unwrap() == 0f32 {
-                        wp::log::warning!("Got 0 as first volume, ignoring...");
-                        return;
-                    }
                     self.set_channel_volumes_vec(&volumes);
                     if device_id.is_some() {
                         let maxvol: f32 = *volumes.iter().max_by(|a, b| a.total_cmp(b)).expect("Max");
