@@ -28,6 +28,7 @@
 use adw::subclass::prelude::*;
 
 use wireplumber as wp;
+use wp::plugin::PluginFeatures;
 
 use crate::config::VERSION;
 use crate::PwvucontrolWindow;
@@ -129,30 +130,6 @@ mod imp {
             wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");
             wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None).expect("loadig mixer-api plugin");
 
-            let plugin_names = vec!["mixer-api", "default-nodes-api"];
-
-            glib::MainContext::default().spawn_local(clone!(@weak self as app, @weak wp_core as core, @weak wp_om as om => async move {
-                for plugin_name in plugin_names {
-                    if let Some(plugin) = Plugin::find(&core, plugin_name) {
-                        let result = plugin.activate_future(PluginFeatures::ENABLED)
-                        .await;
-                        if result.is_err() {
-                            wp::log::critical!("Cannot activate plugin {plugin_name}");
-                        } else {
-                            wp::log::info!("Activated plugin {plugin_name}");
-                            let count = app.count.get() + 1;
-                            app.count.set(count);
-                            dbg!(count);
-                            if count == 2 {
-                                core.install_object_manager(&om);
-                            }
-                        }
-                    } else {
-                        wp::log::critical!("Cannot find plugin {plugin_name}");
-                        app.obj().quit();
-                    }
-                }
-            }));
 
             wp_om.add_interest_full(
                 {
@@ -225,6 +202,27 @@ mod imp {
                 }
             }));
 
+            let plugin_names = vec!["mixer-api", "default-nodes-api"];
+            glib::MainContext::default().spawn_local(clone!(@weak self as app, @weak wp_core as core, @weak wp_om as om => async move {
+                for plugin_name in plugin_names {
+                    if let Some(plugin) = Plugin::find(&core, plugin_name) {
+                        let result = plugin.activate_future(PluginFeatures::ENABLED).await;
+                        if result.is_err() {
+                            wp::log::critical!("Cannot activate plugin {plugin_name}");
+                        } else {
+                            wp::log::info!("Activated plugin {plugin_name}");
+                            let count = app.count.get() + 1;
+                            app.count.set(count);
+                            if count == 2 {
+                                core.install_object_manager(&om);
+                            }
+                        }
+                    } else {
+                        wp::log::critical!("Cannot find plugin {plugin_name}");
+                        app.obj().quit();
+                    }
+                }
+            }));
 
             self.wp_core
                 .set(wp_core)
