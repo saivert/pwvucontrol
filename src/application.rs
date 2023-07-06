@@ -107,6 +107,23 @@ mod imp {
             let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), Some(props));
             let wp_om = wp::registry::ObjectManager::new();
 
+            wp_core.connect_local("connected", false, |_obj| {
+                // let app = PwvucontrolApplication::default();
+                // let win = app.window.get().expect("window");
+                let win = PwvucontrolWindow::default();
+                win.set_view(PwvucontrolWindowView::Connected);
+                None
+            });
+
+            wp_core.connect_local("disconnected", false, |_obj| {
+                // let app = PwvucontrolApplication::default();
+                // let win = app.window.get().expect("window");
+                let win = PwvucontrolWindow::default();
+                win.set_view(PwvucontrolWindowView::Disconnected);
+                None
+            });
+
+
             wp_core.connect();
 
             wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");

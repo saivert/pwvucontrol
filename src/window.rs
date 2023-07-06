@@ -28,6 +28,10 @@ use adw::subclass::prelude::*;
 
 use crate::application::PwvucontrolApplication;
 
+pub(crate) enum PwvucontrolWindowView {
+    Connected,
+    Disconnected
+}
 mod imp {
     use super::*;
 
@@ -46,6 +50,10 @@ mod imp {
         pub recordlist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub outputlist: TemplateChild<gtk::ListBox>,
+        #[template_child]
+        pub viewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub reconnectbtn: TemplateChild<gtk::Button>,
 
         pub nodemodel: PwNodeModel,
     }
@@ -134,6 +142,14 @@ mod imp {
                 }),
             );
 
+            self.reconnectbtn.connect_clicked(|x| {
+                let app = PwvucontrolApplication::default();
+                if let Some(core) = app.imp().wp_core.get() {
+                    core.connect();
+                }
+            });
+
+
         }
     }
     impl WidgetImpl for PwvucontrolWindow {}
@@ -157,6 +173,15 @@ impl PwvucontrolWindow {
         glib::Object::builder()
         .property("application", application)
         .build()
+    }
+
+    pub(crate) fn set_view(&self, view: PwvucontrolWindowView) {
+        let imp = self.imp();
+        match view {
+            PwvucontrolWindowView::Connected => imp.viewstack.set_visible_child_name("connected"),
+            PwvucontrolWindowView::Disconnected => imp.viewstack.set_visible_child_name("disconnected"),
+        }
+        
     }
 
 }
