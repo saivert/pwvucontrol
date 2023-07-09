@@ -4,7 +4,8 @@
     "runtime-version" : "43",
     "sdk" : "org.gnome.Sdk",
     "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.rust-stable"
+        "org.freedesktop.Sdk.Extension.rust-stable",
+        "org.freedesktop.Sdk.Extension.llvm16"
     ],
     "command" : "pwvucontrol",
     "finish-args" : [
@@ -12,10 +13,12 @@
         "--share=ipc",
         "--socket=fallback-x11",
         "--device=dri",
-        "--socket=wayland"
+        "--socket=wayland",
+        "--filesystem=xdg-run/pipewire-0"
     ],
     "build-options" : {
-        "append-path" : "/usr/lib/sdk/rust-stable/bin",
+        "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm16/bin",
+        "prepend-ld-library-path": "/usr/lib/sdk/llvm16/lib",
         "build-args" : [
             "--share=network"
         ],
@@ -43,7 +46,8 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/saivert/Projects"
+                    "branch": "main",
+                    "url" : "https://github.com/saivert/pwvucontrol.git"
                 }
             ]
         }
