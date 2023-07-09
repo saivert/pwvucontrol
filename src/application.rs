@@ -28,20 +28,20 @@
 use adw::subclass::prelude::*;
 
 use wireplumber as wp;
-use wp::plugin::PluginFeatures;
+use wp::{plugin::PluginFeatures, pw::MetadataExt, registry::{ObjectManager, Interest, Constraint, ConstraintType}};
 
 use crate::config::VERSION;
 use crate::PwvucontrolWindow;
 
 mod imp {
-    use std::{str::FromStr, cell::Cell};
+    use std::{str::FromStr, cell::{Cell, RefCell}};
 
 
-    use crate::pwnodeobject::PwNodeObject;
+    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView};
 
     use super::*;
     use once_cell::unsync::OnceCell;
-    use wp::{pw::{ProxyExt, PipewireObjectExt2}, plugin::*};
+    use wp::{pw::{ProxyExt, PipewireObjectExt2, GlobalProxyExt}, plugin::*};
 
     #[derive(Default)]
     pub struct PwvucontrolApplication {
@@ -49,6 +49,11 @@ mod imp {
         pub wp_core: OnceCell<wp::core::Core>,
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
         pub count: Cell<u32>,
+
+        pub devicemodel: gio::ListStore,
+
+        pub metadata_om: OnceCell<wp::registry::ObjectManager>,
+        pub metadata: RefCell<Option<wp::pw::Metadata>>,
 
     }
 
@@ -82,6 +87,7 @@ mod imp {
             // Ask the window manager/compositor to present the window
             window.present();
             self.setup_wp_connection();
+            self.setup_metadata_om();
         }
 
         fn startup(&self) {
@@ -106,7 +112,7 @@ mod imp {
             let props = wp::pw::Properties::new_string("media.category=Manager");
 
             let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), Some(props));
-            let wp_om = wp::registry::ObjectManager::new();
+            let wp_om = ObjectManager::new();
 
             wp_core.connect_local("connected", false, |_obj| {
                 // let app = PwvucontrolApplication::default();
@@ -183,6 +189,8 @@ mod imp {
                     } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                         let n: String = device.pw_property("device.name").unwrap();
                         wp::log::info!("Got device {} {n}", device.bound_id());
+
+                        imp.devicemodel.append(device);
                         
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
@@ -197,8 +205,12 @@ mod imp {
                     let model = &window.imp().nodemodel;
                     model.remove(node.bound_id());
 
+                } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
+                    if let Some(pos) = imp.devicemodel.find(device) {
+                        imp.devicemodel.remove(pos);
+                    }
                 } else {
-                    unreachable!("Object must be one of the above");
+                    wp::log::info!("Object must be one of the above, but is {:?} instead", object.type_());
                 }
             }));
 
@@ -231,6 +243,40 @@ mod imp {
                 .set(wp_om)
                 .expect("wp_object_manager should only be set once during application activation");
    
+        }
+
+        fn setup_metadata_om(&self) {
+            let metadata_om = ObjectManager::new();
+
+            let wp_core = self.wp_core.get().expect("wp_core to be set");
+
+            metadata_om.add_interest([
+                Constraint::compare(ConstraintType::PwGlobalProperty, "metadata.name", "default", true),
+            ].iter().collect::<Interest<wp::pw::Metadata>>());
+
+            metadata_om.request_object_features(
+                wp::pw::GlobalProxy::static_type(),
+                wp::core::ObjectFeatures::ALL,
+            );
+
+            metadata_om.connect_object_added(
+                clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+                    if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
+                        wp::log::info!("added metadata object: {:?}", metadataobj.bound_id());
+                        imp.metadata.replace(Some(metadataobj.clone()));
+                        for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
+                            let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
+                            wp::log::info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
+                        }
+                    } else {
+                        unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+                    }
+                }),
+            );
+
+
+            wp_core.install_object_manager(&metadata_om);
+            self.metadata_om.set(metadata_om).expect("metadata object manager set already");
         }
 
     }

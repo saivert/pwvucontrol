@@ -1,12 +1,11 @@
 use glib::{self, clone, subclass::prelude::*, Object, ObjectExt, ToVariant, StaticType, Cast};
 
 use wireplumber as wp;
-use wp::pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt};
+use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
 
-use crate::{NodeType, application::PwvucontrolApplication};
+use crate::{NodeType, application::PwvucontrolApplication, window::PwvucontrolWindow};
 
 mod mixerapi;
-
 #[derive(Copy, Clone, Debug)]
 pub struct AudioFormat {
     pub channels: i32,
@@ -22,19 +21,16 @@ enum PropertyChanged {
 }
 
 mod imp {
-    use glib::subclass::Signal;
-    use gtk::subclass::prelude::*;
-    use std::cell::{Cell, RefCell};
+    use super::*;
 
-    use gtk::{
-        glib::{self, ParamSpec, Properties, Value},
-        prelude::*,
+    use std::cell::{Cell, RefCell};
+    use glib::{
+        ParamSpec,
+        Properties,
+        Value,
+        subclass::Signal
     };
     use once_cell::sync::{Lazy, OnceCell};
-
-    use wireplumber as wp;
-
-    use super::{AudioFormat, PropertyChanged};
 
     // Object holding the state
     #[derive(Default, Properties)]
@@ -47,7 +43,7 @@ mod imp {
         #[property(get, set)]
         formatstr: RefCell<Option<String>>,
         #[property(get, set)]
-        serial: Cell<u32>,
+        boundid: Cell<u32>,
         #[property(get, set)]
         volume: Cell<f32>,
         #[property(get, set)]
@@ -154,7 +150,7 @@ impl PwNodeObject {
         };
 
         let obj: PwNodeObject = Object::builder()
-            .property("serial", node.bound_id())
+            .property("boundid", node.bound_id())
             .property("nodetype", nodetype)
             .build();
 
@@ -204,10 +200,21 @@ impl PwNodeObject {
             .get()
             .expect("Node widget should always have a wp_node");
         let props = wp_node.global_properties().expect("Node has no properties");
-        let name_gstr = props
-            .get("node.nick")
-            .or_else(|| props.get("node.description"))
-            .or_else(|| props.get("node.name"));
+
+        let name_gstr = match self.nodetype() {
+            NodeType::Sink => {
+                props
+                .get("node.description")
+                .or_else(|| props.get("node.nick"))
+                .or_else(|| props.get("node.name"))
+            },
+            _ => {
+                props
+                .get("node.nick")
+                .or_else(|| props.get("node.description"))
+                .or_else(|| props.get("node.name"))
+            }
+        };
 
         let name = name_gstr
             .as_ref()
@@ -354,7 +361,7 @@ impl PwNodeObject {
     }
 
     fn send_volume(&self, what: PropertyChanged) {
-        let podbuilder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
+        let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
         let node = self.imp().wpnode.get().expect("WpNode set");
 
         let device_id = node.device_id().map_or(None, |x|x);
@@ -368,7 +375,7 @@ impl PwNodeObject {
                 } else {
 
                     // Just set all channels to the same volume
-                    let channelspod = wp::spa::SpaPodBuilder::new_array();
+                    let channelspod = SpaPodBuilder::new_array();
                     for _ in self.channel_volumes_vec().iter() {
                         channelspod.add_float(self.volume());
                     }
@@ -385,7 +392,7 @@ impl PwNodeObject {
                 podbuilder.add_boolean(self.mute());
             },
             PropertyChanged::ChannelVolumes => {
-                let channelspod = wp::spa::SpaPodBuilder::new_array();
+                let channelspod = SpaPodBuilder::new_array();
                 for v in self.channel_volumes_vec().iter() {
                     channelspod.add_float(*v);
                 }
@@ -404,13 +411,14 @@ impl PwNodeObject {
 
                     if let Some(device) = &Self::lookup_device_from_id(id) {
                         if let Some(idx) = Self::find_route_index(device, dev) {
-                            let builder = wp::spa::SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
+                            let builder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
                             builder.add_property("index");
                             builder.add_int(idx);
                             builder.add_property("device");
                             builder.add_int(dev);
                             builder.add_property("props");
                             builder.add_pod(&pod);
+
                             if let Some(newpod) = builder.end() {
                                 device.set_param("Route", 0, newpod);
                             }
@@ -512,5 +520,57 @@ impl PwNodeObject {
 
     pub(crate) fn format(&self) -> Option<AudioFormat> {
         self.imp().format.get()
+    }
+
+    pub(crate) fn set_default_target(&self, target_node: &PwNodeObject) {
+        let app = PwvucontrolApplication::default();
+        if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+            metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
+            metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some(&target_node.serial().to_string()));
+        } else {
+            wp::log::warning!("Cannot get metadata object");
+        };
+    }
+
+    pub(crate) fn default_target(&self) -> Option<PwNodeObject> {
+        let app = PwvucontrolApplication::default();
+        let win = PwvucontrolWindow::default();
+        let om = app.imp().wp_object_manager.get().unwrap();
+        if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+            if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
+                if target_serial != "-1" {
+                    if let Some(sinknode) = om.lookup([
+                        Constraint::compare(ConstraintType::PwProperty, "object.serial", target_serial.as_str(), true),
+                    ].iter().collect::<Interest<wp::pw::Node>>()) {
+                        return win.imp().nodemodel.get_node(sinknode.bound_id()).ok();
+                    };
+                }
+            }
+        } else {
+            wp::log::warning!("Cannot get metadata object");
+        };
+        None
+    }
+
+
+    pub(crate) fn serial(&self) -> u32 {
+        let node = self.imp().wpnode.get().expect("node");
+        let serial: i32 = node.pw_property("object.serial").expect("object.serial");
+
+        serial as u32
+    }
+}
+
+trait MetadataExtFix: 'static {
+    fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString>;
+}
+
+impl <O: glib::IsA<wp::pw::Metadata>> MetadataExtFix for O {
+    fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString> {
+        use glib::translate::ToGlibPtr;
+        unsafe {
+            let mut type_ = std::ptr::null();
+            glib::translate::from_glib_none(wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0, subject, glib::translate::ToGlibPtr::to_glib_none(&key).0, &mut type_))
+        }
     }
 }

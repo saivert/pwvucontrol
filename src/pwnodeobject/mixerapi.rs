@@ -34,7 +34,7 @@ impl super::PwNodeObject {
                 // let mixerapi: wp::plugin::Plugin = x[0].get().expect("MixerApi in changed event");
                 let id: u32 = x[1].get().expect("Id in in changed event");
                 wp::log::info!("From mixer-api changed event: {id}");
-                if id == obj.serial() {
+                if id == obj.boundid() {
                     obj.update_volume_using_mixerapi();
                 }
                 None

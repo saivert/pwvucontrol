@@ -30,7 +30,10 @@ use wireplumber as wp;
 mod imp {
 
     use super::*;
-    use crate::{channelbox::PwChannelBox, pwchannelobject::PwChannelObject};
+    use crate::{
+        application::PwvucontrolApplication, channelbox::PwChannelBox,
+        pwchannelobject::PwChannelObject, window::PwvucontrolWindow, NodeType,
+    };
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
@@ -128,17 +131,98 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            let factory = gtk::SignalListItemFactory::new();
-            factory.connect_setup(|_, item| {
-                let label = gtk::Label::new(None);
-                label.set_ellipsize(gtk::pango::EllipsizeMode::End);
-                item.property_expression("item")
-                    .chain_property::<gtk::StringObject>("string")
-                    .bind(&label, "label", gtk::Widget::NONE);
-                item.set_child(Some(&label));
-            });
+            if matches!(item.nodetype(), /* NodeType::Input | */ NodeType::Output) { //TODO: Implement support for Audio/Source switching for NodeType::Input
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_setup(|_, item| {
+                    let label = gtk::Label::new(None);
+                    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
 
-            self.outputdevice_dropdown.set_factory(Some(&factory));
+                    item.property_expression("item")
+                        .chain_property::<PwNodeObject>("name")
+                        .bind(&label, "label", gtk::Widget::NONE);
+
+                    item.set_child(Some(&label));
+                });
+
+                self.outputdevice_dropdown.set_factory(Some(&factory));
+
+
+                let listfactory = gtk::SignalListItemFactory::new();
+                listfactory.connect_setup(|_, item| {
+                    let label = gtk::Label::new(None);
+                    label.set_xalign(0.0);
+
+                    item.property_expression("item")
+                        .chain_property::<PwNodeObject>("name")
+                        .bind(&label, "label", gtk::Widget::NONE);
+
+                    item.set_child(Some(&label));
+                });
+
+                self.outputdevice_dropdown.set_list_factory(Some(&listfactory));
+
+
+                // let app = PwvucontrolApplication::default();
+                // self.outputdevice_dropdown.set_model(Some(&app.imp().devicemodel.clone()));
+                let win = PwvucontrolWindow::default();
+                let model = &win.imp().nodemodel;
+
+                let filter = gtk::CustomFilter::new(|x| {
+                    if let Some(o) = x.downcast_ref::<PwNodeObject>() {
+                        return o.nodetype() == crate::NodeType::Sink;
+                    }
+                    false
+                });
+                let ref filterlistmodel =
+                    gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+
+                self.outputdevice_dropdown.set_enable_search(true);
+                self.outputdevice_dropdown.set_expression(
+                    Some(gtk::PropertyExpression::new(PwNodeObject::static_type(), gtk::Expression::NONE, "name"))
+                );
+
+                self.outputdevice_dropdown.set_model(Some(filterlistmodel));
+
+                fn find_position_with_boundid_match(model: &impl IsA<gio::ListModel>, id: u32) -> Option<u32> {
+                    model.iter::<glib::Object>().enumerate().find_map(|(x, y)|{
+                        if let Ok(d) = y {
+                            if let Some(o) = d.downcast_ref::<PwNodeObject>() {
+                                if o.boundid() == id {
+                                    return Some(x as u32);
+                                }
+                            }
+                        }
+                        None
+                    })
+                } 
+
+                if let Some(deftarget) = item.default_target() {
+                    let pos = find_position_with_boundid_match(filterlistmodel, deftarget.boundid());
+                    self.outputdevice_dropdown.set_selected(pos.unwrap_or(gtk::ffi::GTK_INVALID_LIST_POSITION));
+                } else {
+                    let app = PwvucontrolApplication::default();
+                    let core = app.imp().wp_core.get().expect("Core");
+                    let defaultnodesapi = wp::plugin::Plugin::find(&core, "default-nodes-api").expect("Get mixer-api");
+                    let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+                    if id != u32::MAX {
+                        let pos = find_position_with_boundid_match(filterlistmodel, id);;
+                        self.outputdevice_dropdown.set_selected(pos.unwrap_or(gtk::ffi::GTK_INVALID_LIST_POSITION));
+                    }
+                }
+
+
+
+                self.outputdevice_dropdown.connect_notify_local(Some("selected-item"), clone!(@weak item as nodeobj => move |dropdown, _| {
+                    if let Some(item) = dropdown.selected_item() {
+                        if let Some(item) = item.downcast_ref::<PwNodeObject>() {
+                            nodeobj.set_default_target(item);
+                        }
+                    }
+                }));
+
+            } else {
+                self.outputdevice_dropdown.hide();
+            }
 
             log::info!("binding model");
 
@@ -200,7 +284,12 @@ mod imp {
     impl ListBoxRowImpl for PwVolumeBox {}
 
     #[gtk::template_callbacks]
-    impl PwVolumeBox {}
+    impl PwVolumeBox {
+        #[template_callback]
+        fn invert_bool(&self, value: bool) -> bool {
+            !value
+        }
+    }
 }
 
 glib::wrapper! {

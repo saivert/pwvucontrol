@@ -67,7 +67,7 @@ impl PwNodeModel {
         let imp = self.imp();
         let mut vector = imp.0.borrow_mut();
         for (i,v) in (0..).zip(vector.iter()) {
-            if id == v.serial() {
+            if id == v.boundid() {
                 vector.remove(i as usize);
                 // Emits a signal that 1 item was removed, 0 added at the position index
                 self.items_changed(i, 1, 0);
@@ -75,6 +75,15 @@ impl PwNodeModel {
             }
         }
         
+    }
+
+    pub fn get_node(&self, id: u32) -> Result<PwNodeObject, ()> {
+        let imp = self.imp();
+        let vector = imp.0.borrow();
+        if let Some(v) = vector.iter().find(|p|id == p.boundid()) {
+            return Ok(v.clone());
+        }
+        Err(())
     }
 
 }
