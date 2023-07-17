@@ -2,12 +2,15 @@ use std::collections::HashMap;
 
 use crate::application::PwvucontrolApplication;
 
-use glib::{subclass::types::ObjectSubclassIsExt, clone, ObjectExt, ToVariant};
+use glib::{clone, subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant};
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 
-impl super::PwNodeObject {
-    pub fn get_mixer_api(&self) {
+use super::*;
+
+impl PwNodeObject {
+
+    pub(crate) fn get_mixer_api(&self) {
         let imp = self.imp();
 
         let app = PwvucontrolApplication::default();
@@ -35,14 +38,16 @@ impl super::PwNodeObject {
                 let id: u32 = x[1].get().expect("Id in in changed event");
                 wp::log::info!("From mixer-api changed event: {id}");
                 if id == obj.boundid() {
+                    obj.imp().block.set(true);
                     obj.update_volume_using_mixerapi();
+                    obj.imp().block.set(false);
                 }
                 None
             }),
         );
     }
 
-    pub fn send_volume_using_mixerapi(&self) {
+    pub(crate) fn send_volume_using_mixerapi(&self, what: PropertyChanged) {
         let imp = self.imp();
         let node = imp.wpnode.get().expect("node in send_volume");
         let mixerapi = self
@@ -59,8 +64,38 @@ impl super::PwNodeObject {
         }
 
         let variant = glib::VariantDict::new(None);
-        variant.insert("volume", self.volume() as f64);
-        variant.insert("mute", self.mute());
+        match what {
+            PropertyChanged::Mute => {
+                variant.insert("mute", self.mute());
+            }
+            PropertyChanged::Volume => {
+                variant.insert("volume", self.volume() as f64);
+            }
+            PropertyChanged::ChannelVolumes => {
+                let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel")
+                    .expect("audio channel type");
+
+                if let Some(format) = self.format() {
+                    let positions = format.positions;
+
+                    let channel_volumes = self.channel_volumes_vec();
+                    let mut channel_volumes_map: HashMap<String, glib::Variant> =
+                        HashMap::with_capacity(channel_volumes.len());
+                    for (i, v) in channel_volumes.iter().enumerate() {
+                        let mut map: HashMap<String, glib::Variant> = HashMap::with_capacity(2);
+                        let channel_name = t_audiochannel
+                            .find_value(positions[i])
+                            .expect("channel name")
+                            .short_name();
+                        map.insert("channel".to_string(), channel_name.to_variant());
+                        map.insert("volume".to_string(), (*v as f64).to_variant());
+                        channel_volumes_map.insert(i.to_string(), map.to_variant());
+                    }
+
+                    variant.insert("channelVolumes", channel_volumes_map.to_variant());
+                }
+            }
+        }
 
         let result =
             mixerapi.emit_by_name::<bool>("set-volume", &[&bound_id, &variant.to_variant()]);
@@ -69,7 +104,7 @@ impl super::PwNodeObject {
         }
     }
 
-    pub fn update_volume_using_mixerapi(&self) {
+    pub(crate) fn update_volume_using_mixerapi(&self) {
         let mixerapi = self
             .imp()
             .mixerapi
@@ -90,6 +125,7 @@ impl super::PwNodeObject {
             let result: Option<HashMap<String, glib::Variant>> =
                 map.get("channelVolumes").and_then(|x| x.get());
             if let Some(channel_volumes) = result {
+                let mut newvec = vec![0f32; channel_volumes.len()];
                 for (index_str, v) in channel_volumes.iter() {
                     let index: u32 = index_str.parse().expect("erroneous index");
                     let map: HashMap<String, glib::Variant> = v.get().unwrap();
@@ -100,16 +136,15 @@ impl super::PwNodeObject {
 
                     if let (Some(c), Some(v)) = (channel, volume) {
                         wp::log::info!("Index: {index}, Number: {} = {}", c.number(), v);
-                        self.set_channel_volume(index, v as f32); // TODO: get index via channel map, index of vardict must not be relied upon
+                        newvec[index as usize] = v as f32;
                     } else {
                         wp::log::critical!("Got invalid data via mixer-api");
                     }
                 }
+                self.set_channel_volumes_vec(&newvec);
             } else {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
-
-            self.imp().block.set(true);
 
             let volume: Option<f64> = map.get("volume").and_then(|x| x.get());
             if let Some(v) = volume {
@@ -122,7 +157,6 @@ impl super::PwNodeObject {
                 self.set_mute(m);
                 wp::log::info!("Setting mute to {m:?}");
             }
-            self.imp().block.set(false);
         }
     }
 }
