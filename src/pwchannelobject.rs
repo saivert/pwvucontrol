@@ -66,10 +66,7 @@ mod imp {
             if self.block_volume_send.get() == false {
                 if let Some(nodeobj) = self.row_data.borrow().as_ref() {
                     if nodeobj.channellock() {
-                        let vec: Vec<f32> = (0..nodeobj.channel_volumes_vec().len())
-                            .map(|_| volume)
-                            .collect();
-                        nodeobj.set_channel_volumes_vec(&vec);
+                        nodeobj.set_channel_volumes_vec(&vec![volume; nodeobj.channel_volumes_vec().len()]);
                     } else {
                         nodeobj.set_channel_volume(index, volume);
                     }

@@ -142,7 +142,7 @@ mod imp {
                 }),
             );
 
-            self.reconnectbtn.connect_clicked(|x| {
+            self.reconnectbtn.connect_clicked(|_| {
                 let app = PwvucontrolApplication::default();
                 if let Some(core) = app.imp().wp_core.get() {
                     core.connect();

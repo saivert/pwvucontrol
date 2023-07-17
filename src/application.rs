@@ -41,7 +41,7 @@ mod imp {
 
     use super::*;
     use once_cell::unsync::OnceCell;
-    use wp::{pw::{ProxyExt, PipewireObjectExt2, GlobalProxyExt}, plugin::*};
+    use wp::{pw::{ProxyExt, PipewireObjectExt2}, plugin::*};
 
     #[derive(Default)]
     pub struct PwvucontrolApplication {

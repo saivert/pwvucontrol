@@ -205,7 +205,7 @@ mod imp {
                     let defaultnodesapi = wp::plugin::Plugin::find(&core, "default-nodes-api").expect("Get mixer-api");
                     let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
                     if id != u32::MAX {
-                        let pos = find_position_with_boundid_match(filterlistmodel, id);;
+                        let pos = find_position_with_boundid_match(filterlistmodel, id);
                         self.outputdevice_dropdown.set_selected(pos.unwrap_or(gtk::ffi::GTK_INVALID_LIST_POSITION));
                     }
                 }
