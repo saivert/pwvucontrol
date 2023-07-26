@@ -45,6 +45,8 @@ pub mod imp {
         #[property(get, set)]
         boundid: Cell<u32>,
         #[property(get, set)]
+        mainvolume: Cell<f32>,
+        #[property(get, set)]
         volume: Cell<f32>,
         #[property(get, set)]
         mute: Cell<bool>,
@@ -84,12 +86,19 @@ pub mod imp {
             match pspec.name() {
                 "volume" => {
                     if self.block.get() == false {
-                        self.obj().send_volume(PropertyChanged::Volume);
+                        // self.obj().send_volume(PropertyChanged::Volume);
+                        self.obj().send_volume_using_mixerapi(PropertyChanged::Volume);
                     }
                 },
                 "mute" => {
                     if self.block.get() == false {
-                        self.obj().send_volume(PropertyChanged::Mute);
+                        // self.obj().send_volume(PropertyChanged::Mute);
+                        self.obj().send_volume_using_mixerapi(PropertyChanged::Mute);
+                    }
+                },
+                "mainvolume" => {
+                    if self.block.get() == false {
+                        self.obj().send_mainvolume();
                     }
                 },
                 _ => {},
@@ -99,7 +108,8 @@ pub mod imp {
         fn notify(&self, pspec: &ParamSpec) {
             if pspec.name() == "channel-volumes" {
                 if self.block.get() == false {
-                    self.obj().send_volume(PropertyChanged::ChannelVolumes);
+                    // self.obj().send_volume(PropertyChanged::ChannelVolumes);
+                    self.obj().send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
                 }
             }
         }
@@ -310,6 +320,28 @@ impl PwNodeObject {
         }));
     }
 
+    pub(crate) fn update_mainvolume(&self) {
+        let node = self.imp().wpnode.get().expect("node");
+
+        let params = node
+            .enum_params_sync("Props", None)
+            .expect("getting params");
+
+        let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
+        let volume_key = keys.find_value_from_short_name("volume").expect("volume key");
+
+        for a in params {
+            let pod: wp::spa::SpaPod = a.get().unwrap();
+            if pod.is_object() {
+                if let Some(val) = pod.find_spa_property(&volume_key) {
+                    if let Some(volume) = val.float() {
+                        self.set_mainvolume(volume);
+                    }
+                }
+            }
+        }
+    }
+
     pub(crate) fn update_channel_volumes(&self) {
         let node = self.imp().wpnode.get().expect("node");
         let device_id = node.device_id().map_or(None, |x|x);
@@ -359,6 +391,19 @@ impl PwNodeObject {
                 }
             }
         }
+    }
+
+    fn send_mainvolume(&self) {
+        let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
+        let node = self.imp().wpnode.get().expect("WpNode set");
+
+        podbuilder.add_property("volume");
+        podbuilder.add_float(self.mainvolume());
+
+        if let Some(pod) = podbuilder.end() {
+            node.set_param("Props", 0, pod);
+        }
+
     }
 
     fn send_volume(&self, what: PropertyChanged) {

@@ -9,7 +9,6 @@ use wp::pw::ProxyExt;
 use super::*;
 
 impl PwNodeObject {
-
     pub(crate) fn get_mixer_api(&self) {
         let imp = self.imp();
 
@@ -50,8 +49,7 @@ impl PwNodeObject {
     pub(crate) fn send_volume_using_mixerapi(&self, what: PropertyChanged) {
         let imp = self.imp();
         let node = imp.wpnode.get().expect("node in send_volume");
-        let mixerapi = self
-            .imp()
+        let mixerapi = imp
             .mixerapi
             .get()
             .expect("Mixer api must be set on PwNodeObject");
@@ -69,30 +67,26 @@ impl PwNodeObject {
                 variant.insert("mute", self.mute());
             }
             PropertyChanged::Volume => {
-                variant.insert("volume", self.volume() as f64);
+                let mut channel_volumes = self.channel_volumes_vec();
+                let max = self.volume();
+                let t = *channel_volumes
+                    .iter()
+                    .max_by(|a, b| a.total_cmp(b))
+                    .expect("Max");
+                if t > 0.0 {
+                    for v in channel_volumes.iter_mut() {
+                        *v = *v * max / t;
+                    }
+                } else {
+                    for v in channel_volumes.iter_mut() {
+                        *v = max;
+                    }
+                }
+                self.set_channel_volumes_vec(&channel_volumes);
             }
             PropertyChanged::ChannelVolumes => {
-                let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel")
-                    .expect("audio channel type");
-
-                if let Some(format) = self.format() {
-                    let positions = format.positions;
-
-                    let channel_volumes = self.channel_volumes_vec();
-                    let mut channel_volumes_map: HashMap<String, glib::Variant> =
-                        HashMap::with_capacity(channel_volumes.len());
-                    for (i, v) in channel_volumes.iter().enumerate() {
-                        let mut map: HashMap<String, glib::Variant> = HashMap::with_capacity(2);
-                        let channel_name = t_audiochannel
-                            .find_value(positions[i])
-                            .expect("channel name")
-                            .short_name();
-                        map.insert("channel".to_string(), channel_name.to_variant());
-                        map.insert("volume".to_string(), (*v as f64).to_variant());
-                        channel_volumes_map.insert(i.to_string(), map.to_variant());
-                    }
-
-                    variant.insert("channelVolumes", channel_volumes_map.to_variant());
+                if let Some(cv) = self.make_channel_volumes_variant(&self.channel_volumes_vec()) {
+                    variant.insert("channelVolumes", cv);
                 }
             }
         }
@@ -102,6 +96,31 @@ impl PwNodeObject {
         if result == false {
             wp::log::warning!("Cannot set volume on {bound_id}");
         }
+    }
+
+    fn make_channel_volumes_variant(&self, channel_volumes: &Vec<f32>) -> Option<glib::Variant> {
+        let t_audiochannel =
+            wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
+
+        if let Some(format) = self.format() {
+            let positions = format.positions;
+
+            let mut channel_volumes_map: HashMap<String, glib::Variant> =
+                HashMap::with_capacity(channel_volumes.len());
+            for (i, v) in channel_volumes.iter().enumerate() {
+                let mut map: HashMap<String, glib::Variant> = HashMap::with_capacity(2);
+                let channel_name = t_audiochannel
+                    .find_value(positions[i])
+                    .expect("channel name")
+                    .short_name();
+                map.insert("channel".to_string(), channel_name.to_variant());
+                map.insert("volume".to_string(), (*v as f64).to_variant());
+                channel_volumes_map.insert(i.to_string(), map.to_variant());
+            }
+
+            return Some(channel_volumes_map.to_variant());
+        }
+        None
     }
 
     pub(crate) fn update_volume_using_mixerapi(&self) {
@@ -146,10 +165,16 @@ impl PwNodeObject {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
 
-            let volume: Option<f64> = map.get("volume").and_then(|x| x.get());
-            if let Some(v) = volume {
-                self.set_volume(v as f32);
-                wp::log::info!("Setting volume to {v}");
+            // Wireplumber's mixerapi always sets volume to first channel volume
+            // instead we will use the max channel
+            let maxvol: Option<f32> = self
+                .channel_volumes_vec()
+                .iter()
+                .max_by(|a, b| a.total_cmp(b))
+                .map(|x|*x);                
+            
+            if let Some(maxvol) = maxvol {
+                self.set_volume(maxvol);
             }
 
             let mute: Option<bool> = map.get("mute").and_then(|x| x.get());

@@ -67,6 +67,8 @@ mod imp {
         pub channellock: TemplateChild<gtk::ToggleButton>,
         #[template_child]
         pub outputdevice_dropdown: TemplateChild<gtk::DropDown>,
+        #[template_child]
+        pub mainvolumescale: TemplateChild<gtk::Scale>,
     }
 
     #[glib::object_subclass]
@@ -131,6 +133,13 @@ mod imp {
                 .bidirectional()
                 .build();
 
+            item.bind_property("mainvolume", &self.mainvolumescale.adjustment(), "value")
+                .sync_create()
+                .bidirectional()
+                .transform_to::<f32, f64, _>(|_, y| Some(y.cbrt() as f64))
+                .transform_from::<f64, f32, _>(|_, y| Some((y * y * y) as f32))
+                .build();
+
             if matches!(item.nodetype(), /* NodeType::Input | */ NodeType::Output) { //TODO: Implement support for Audio/Source switching for NodeType::Input
                 let factory = gtk::SignalListItemFactory::new();
                 factory.connect_setup(|_, item| {
@@ -162,8 +171,6 @@ mod imp {
                 self.outputdevice_dropdown.set_list_factory(Some(&listfactory));
 
 
-                // let app = PwvucontrolApplication::default();
-                // self.outputdevice_dropdown.set_model(Some(&app.imp().devicemodel.clone()));
                 let win = PwvucontrolWindow::default();
                 let model = &win.imp().nodemodel;
 
@@ -299,7 +306,7 @@ glib::wrapper! {
 }
 
 impl PwVolumeBox {
-    pub(crate) fn new(row_data: &PwNodeObject) -> Self {
+    pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("row-data", &row_data)
             .build()
