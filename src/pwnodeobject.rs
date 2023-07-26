@@ -1,4 +1,4 @@
-use glib::{self, clone, subclass::prelude::*, Object, ObjectExt, Cast};
+use glib::{self, clone, subclass::prelude::*, Object, ObjectExt};
 
 use wireplumber as wp;
 use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
@@ -52,7 +52,7 @@ pub mod imp {
         mute: Cell<bool>,
         #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         pub(super) channel_volumes: RefCell<Vec<f32>>,
-        #[property(get, set, builder(crate::NodeType::Undefined))]
+        #[property(get, set, construct_only, builder(crate::NodeType::Undefined))]
         nodetype: Cell<crate::NodeType>,
 
         pub(super) format: Cell<Option<AudioFormat>>,
@@ -124,6 +124,8 @@ pub mod imp {
 
 
         fn constructed(&self) {
+            self.parent_constructed();
+
             let obj = self.obj();
 
             let node = self.wpnode.get().expect("Node set on PwNodeObject");
