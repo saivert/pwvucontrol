@@ -375,16 +375,17 @@ impl PwNodeObject {
                     podbuilder.add_float(self.volume());
                 } else {
 
-                    // Just set all channels to the same volume
+                    // Scale volumes according to current channel volumes
                     let channelspod = SpaPodBuilder::new_array();
-                    for _ in self.channel_volumes_vec().iter() {
-                        channelspod.add_float(self.volume());
+                    let max = self.volume();
+                    let t = *self.channel_volumes_vec().iter().max_by(|a, b| a.total_cmp(b)).expect("Max");
+                    for v in self.channel_volumes_vec().iter() {
+                        channelspod.add_float(*v * max / t);
                     }
                     if let Some(newpod) = channelspod.end() {
                         podbuilder.add_property("channelVolumes");
                         podbuilder.add_pod(&newpod);
                     }
-    
 
                 }
             },
