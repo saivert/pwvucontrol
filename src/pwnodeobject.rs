@@ -1,4 +1,4 @@
-use glib::{self, clone, subclass::prelude::*, Object, ObjectExt, ToVariant, StaticType, Cast};
+use glib::{self, clone, subclass::prelude::*, Object, ObjectExt, Cast};
 
 use wireplumber as wp;
 use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
@@ -14,13 +14,13 @@ pub struct AudioFormat {
     pub positions: [u32; 64],
 }
 
-enum PropertyChanged {
+pub(crate) enum PropertyChanged {
     Volume,
     Mute,
     ChannelVolumes
 }
 
-mod imp {
+pub mod imp {
     use super::*;
 
     use std::cell::{Cell, RefCell};
@@ -411,8 +411,8 @@ impl PwNodeObject {
             if let Some(id) = device_id {
                 if let Ok(dev) = node.pw_property::<i32>("card.profile.device") {
 
-                    if let Some(device) = &Self::lookup_device_from_id(id) {
-                        if let Some(idx) = Self::find_route_index(device, dev) {
+                    if let Some(device) = Self::lookup_device_from_id(id) {
+                        if let Some(idx) = Self::find_route_index(&device, dev) {
                             let builder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
                             builder.add_property("index");
                             builder.add_int(idx);
@@ -440,9 +440,25 @@ impl PwNodeObject {
         }
     }
 
+
     fn lookup_device_from_id(id: u32) -> Option<wp::pw::Device> {
         let app = PwvucontrolApplication::default();
-        let om = app.imp().wp_object_manager.get().expect("Object manager set on application object");
+        if let Some(r) = app.imp().devicemodel.into_iter().find(|x|{
+            if let Ok(x) = x {
+                let d: &wp::pw::Device = x.downcast_ref().expect("device");
+                if d.bound_id() == id {
+                    return true;
+                }
+            }
+            false
+        }) {
+            if let Ok(d) = r {
+                let device = d.dynamic_cast::<wp::pw::Device>();
+                return device.ok();
+            }
+        }
+
+/*         let om = app.imp().wp_object_manager.get().expect("Object manager set on application object");
         let interest = wp::registry::ObjectInterest::new_type(
             wp::pw::Device::static_type(),
         );
@@ -456,27 +472,20 @@ impl PwNodeObject {
         if let Some(obj) = om.lookup_full(interest) {
             return obj.dynamic_cast::<wp::pw::Device>().ok();
             
-        }
+        } */
 
         None
     }
 
     fn find_route_index(obj: &wp::pw::Device, dev: i32) -> Option<i32> {
         if let Some(iter) = obj.enum_params_sync("Route", None) {
+            let keys =
+            wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
+            let index_key = keys.find_value_from_short_name("index").expect("index key");
+            let device_key = keys.find_value_from_short_name("device").expect("device key");
+
             for a in iter {
                 let pod: wp::spa::SpaPod = a.get().unwrap();
-
-                let keys =
-                    wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
-                let index_key = keys
-                    .find_value_from_short_name("index")
-                    .expect("index key");
-                let device_key = keys
-                    .find_value_from_short_name("device")
-                    .expect("device key");
-                // let props_key = keys
-                //     .find_value_from_short_name("props")
-                //     .expect("props key");
 
                 let r_dev: Option<i32> = pod.spa_property(&device_key);
                 let r_index: Option<i32> = pod.spa_property(&index_key);
@@ -572,7 +581,7 @@ impl <O: glib::IsA<wp::pw::Metadata>> MetadataExtFix for O {
         use glib::translate::ToGlibPtr;
         unsafe {
             let mut type_ = std::ptr::null();
-            glib::translate::from_glib_none(wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0, subject, glib::translate::ToGlibPtr::to_glib_none(&key).0, &mut type_))
+            glib::translate::from_glib_none(wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0, subject, ToGlibPtr::to_glib_none(&key).0, &mut type_))
         }
     }
 }
