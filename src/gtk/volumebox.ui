@@ -182,8 +182,8 @@
                                             <object class="GtkToggleButton" id="channellock">
                                                 <property name="hexpand">0</property>
                                                 <property name="valign">center</property>
-                                                <property name="tooltip-text" translatable="yes">Lock
-                                                    channels</property>
+                                                <property name="tooltip-text"
+                                                    translatable="yes">Lock channels</property>
                                                 <property name="icon-name">lock-small-symbolic</property>
                                             </object>
                                         </child>
