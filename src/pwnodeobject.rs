@@ -58,7 +58,9 @@ mod imp {
         #[property(get, set)]
         pub(super) channellock: Cell<bool>,
 
+        #[property(get, set, construct_only)]
         pub(super) wpnode: OnceCell<wp::pw::Node>,
+
         pub(super) mixerapi: OnceCell<wp::plugin::Plugin>,
 
         pub(super) block: Cell<bool>,
@@ -112,6 +114,47 @@ mod imp {
 
             SIGNALS.as_ref()
         }
+
+
+        fn constructed(&self) {
+            let obj = self.obj();
+
+            let node = self.wpnode.get().expect("Node set on PwNodeObject");
+
+            node.connect_notify_local(
+                Some("global-properties"),
+                clone!(@weak obj => move  |_, _| {
+                    obj.label_set_name()
+                }),
+            );
+
+            node.connect_notify_local(
+                Some("properties"),
+                clone!(@weak obj => move  |_, _| {
+                    obj.label_set_description();
+                }),
+            );
+
+            node.connect_params_changed(clone!(@weak obj => move |_node,what| {
+                wp::log::info!("params-changed! {what}");
+                obj.imp().block.set(true);
+                match what {
+                    "Props" => obj.update_mainvolume(),
+                    "Format" => obj.update_format(),
+                    _ => {},
+                }
+                obj.imp().block.set(false);
+            }));
+
+            obj.label_set_description();
+            obj.update_mainvolume();
+            obj.update_format();
+            obj.label_set_name();
+
+            obj.get_mixer_api();
+            obj.update_volume_using_mixerapi();
+
+        }
     }
 
     impl PwNodeObject {
@@ -149,48 +192,11 @@ impl PwNodeObject {
             _ => NodeType::Undefined,
         };
 
-        let obj: PwNodeObject = Object::builder()
+        Object::builder()
             .property("boundid", node.bound_id())
+            .property("wpnode", node)
             .property("nodetype", nodetype)
-            .build();
-
-        obj.imp()
-            .wpnode
-            .set(node.clone())
-            .expect("Can only set PwNodeObject's wpnode once");
-
-        node.connect_notify_local(
-            Some("global-properties"),
-            clone!(@weak obj => move  |_, _| {
-                obj.label_set_name()
-            }),
-        );
-
-        node.connect_notify_local(
-            Some("properties"),
-            clone!(@weak obj => move  |_, _| {
-                obj.label_set_description();
-            }),
-        );
-
-        node.connect_params_changed(clone!(@weak obj => move |_node,what| {
-            wp::log::info!("params-changed! {what}");
-            obj.imp().block.set(true);
-            match what {
-                "Props" => obj.update_channel_volumes(),
-                "Format" => obj.update_format(),
-                _ => {},
-            }
-            obj.imp().block.set(false);
-        }));
-
-        obj.label_set_description();
-        obj.update_channel_volumes();
-        obj.update_format();
-        obj.label_set_name();
-        // obj.update_volume_using_mixerapi();
-
-        obj
+            .build()
     }
 
     fn label_set_name(&self) {
