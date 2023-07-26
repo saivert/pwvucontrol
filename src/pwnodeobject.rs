@@ -86,13 +86,11 @@ pub mod imp {
             match pspec.name() {
                 "volume" => {
                     if self.block.get() == false {
-                        // self.obj().send_volume(PropertyChanged::Volume);
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Volume);
                     }
                 },
                 "mute" => {
                     if self.block.get() == false {
-                        // self.obj().send_volume(PropertyChanged::Mute);
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Mute);
                     }
                 },
@@ -108,7 +106,6 @@ pub mod imp {
         fn notify(&self, pspec: &ParamSpec) {
             if pspec.name() == "channel-volumes" {
                 if self.block.get() == false {
-                    // self.obj().send_volume(PropertyChanged::ChannelVolumes);
                     self.obj().send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
                 }
             }
@@ -341,58 +338,7 @@ impl PwNodeObject {
             }
         }
     }
-
-    pub(crate) fn update_channel_volumes(&self) {
-        let node = self.imp().wpnode.get().expect("node");
-        let device_id = node.device_id().map_or(None, |x|x);
-
-        let params = node
-            .enum_params_sync("Props", None)
-            .expect("getting params");
-
-        let keys =
-        wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
-        let channelvolumes_key = keys.find_value_from_short_name("channelVolumes").expect("channelVolumes key");
-        let volume_key = keys.find_value_from_short_name("volume").expect("volume key");
-        let mute_key = keys.find_value_from_short_name("mute").expect("mute key");
-
-        for a in params {
-            let pod: wp::spa::SpaPod = a.get().unwrap();
-            if pod.is_object() {
-
-                if let Some(val) = pod.find_spa_property(&channelvolumes_key) {
-                    let mut volumes: Vec<f32> = Vec::new();
-                    for a in val.array_iterator() {
-                        volumes.push(a);
-                    }
-                    if volumes.len() == 0 {
-                        wp::log::warning!("Got 0 channel volumes, ignoring...");
-                        return;
-                    }
-                    self.set_channel_volumes_vec(&volumes);
-                    if device_id.is_some() {
-                        let maxvol: f32 = *volumes.iter().max_by(|a, b| a.total_cmp(b)).expect("Max");
-                        self.set_volume(maxvol);
-                    }
-                }
-
-                if device_id.is_none() {
-                    if let Some(val) = pod.find_spa_property(&volume_key) {
-                        if let Some(volume) = val.float() {
-                            self.set_volume(volume);
-                        }
-                    }
-                }
-
-                if let Some(val) = pod.find_spa_property(&mute_key) {
-                    if let Some(mute) = val.boolean() {
-                        self.set_mute(mute);
-                    }
-                }
-            }
-        }
-    }
-
+    
     fn send_mainvolume(&self) {
         let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
         let node = self.imp().wpnode.get().expect("WpNode set");
@@ -404,147 +350,6 @@ impl PwNodeObject {
             node.set_param("Props", 0, pod);
         }
 
-    }
-
-    fn send_volume(&self, what: PropertyChanged) {
-        let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
-        let node = self.imp().wpnode.get().expect("WpNode set");
-
-        let device_id = node.device_id().map_or(None, |x|x);
-
-        match what {
-            PropertyChanged::Volume => {
-                // Device nodes don't really support the volume property.
-                if device_id.is_none() {
-                    podbuilder.add_property("volume");
-                    podbuilder.add_float(self.volume());
-                } else {
-
-                    // Scale volumes according to current channel volumes
-                    let channelspod = SpaPodBuilder::new_array();
-                    let max = self.volume();
-                    let t = *self.channel_volumes_vec().iter().max_by(|a, b| a.total_cmp(b)).expect("Max");
-                    for v in self.channel_volumes_vec().iter() {
-                        channelspod.add_float(*v * max / t);
-                    }
-                    if let Some(newpod) = channelspod.end() {
-                        podbuilder.add_property("channelVolumes");
-                        podbuilder.add_pod(&newpod);
-                    }
-
-                }
-            },
-            PropertyChanged::Mute => {
-                podbuilder.add_property("mute");
-                podbuilder.add_boolean(self.mute());
-            },
-            PropertyChanged::ChannelVolumes => {
-                let channelspod = SpaPodBuilder::new_array();
-                for v in self.channel_volumes_vec().iter() {
-                    channelspod.add_float(*v);
-                }
-                if let Some(newpod) = channelspod.end() {
-                    podbuilder.add_property("channelVolumes");
-                    podbuilder.add_pod(&newpod);
-                }
-            },
-        }
-
-        if let Some(pod) = podbuilder.end() {
-
-            // Check if this is a device node
-            if let Some(id) = device_id {
-                if let Ok(dev) = node.pw_property::<i32>("card.profile.device") {
-
-                    if let Some(device) = Self::lookup_device_from_id(id) {
-                        if let Some(idx) = Self::find_route_index(&device, dev) {
-                            let builder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
-                            builder.add_property("index");
-                            builder.add_int(idx);
-                            builder.add_property("device");
-                            builder.add_int(dev);
-                            builder.add_property("props");
-                            builder.add_pod(&pod);
-
-                            if let Some(newpod) = builder.end() {
-                                device.set_param("Route", 0, newpod);
-                            }
-                        } else {
-                            wp::log::warning!("Cannot find route index");
-                        }
-                    } else {
-                        wp::log::warning!("Cannot lookup device from id");
-                    }
-                } else {
-                    wp::log::warning!("Cannot get card.profile.device");
-                }
-            } else {
-                node.set_param("Props", 0, pod);
-            }
-
-        }
-    }
-
-
-    fn lookup_device_from_id(id: u32) -> Option<wp::pw::Device> {
-        let app = PwvucontrolApplication::default();
-        if let Some(r) = app.imp().devicemodel.into_iter().find(|x|{
-            if let Ok(x) = x {
-                let d: &wp::pw::Device = x.downcast_ref().expect("device");
-                if d.bound_id() == id {
-                    return true;
-                }
-            }
-            false
-        }) {
-            if let Ok(d) = r {
-                let device = d.dynamic_cast::<wp::pw::Device>();
-                return device.ok();
-            }
-        }
-
-/*         let om = app.imp().wp_object_manager.get().expect("Object manager set on application object");
-        let interest = wp::registry::ObjectInterest::new_type(
-            wp::pw::Device::static_type(),
-        );
-        interest.add_constraint(
-            wp::registry::ConstraintType::GProperty,
-            "bound-id",
-            wp::registry::ConstraintVerb::Equals,
-            Some(&id.to_variant()),
-        );
-
-        if let Some(obj) = om.lookup_full(interest) {
-            return obj.dynamic_cast::<wp::pw::Device>().ok();
-            
-        } */
-
-        None
-    }
-
-    fn find_route_index(obj: &wp::pw::Device, dev: i32) -> Option<i32> {
-        if let Some(iter) = obj.enum_params_sync("Route", None) {
-            let keys =
-            wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
-            let index_key = keys.find_value_from_short_name("index").expect("index key");
-            let device_key = keys.find_value_from_short_name("device").expect("device key");
-
-            for a in iter {
-                let pod: wp::spa::SpaPod = a.get().unwrap();
-
-                let r_dev: Option<i32> = pod.spa_property(&device_key);
-                let r_index: Option<i32> = pod.spa_property(&index_key);
-
-                if let (Some(r_dev), Some(r_idx)) = (r_dev, r_index) {
-                    if dev == r_dev {
-                        return Some(r_idx);
-                    }
-                } else {
-                    continue;
-                }
-            }
-        }
-        None
     }
 
     pub(crate) fn channel_volumes_vec(&self) -> Vec<f32> {
