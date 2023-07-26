@@ -17,14 +17,6 @@ impl PwNodeObject {
 
         let mixerapi = wp::plugin::Plugin::find(&core, "mixer-api").expect("Get mixer-api");
 
-        // If we need to set cubic scale...
-        // let t = glib::Type::from_name("WpMixerApiVolumeScale").unwrap();
-        // let v = glib::Value::from_type(t);
-        // unsafe {
-        //     glib::gobject_ffi::g_value_set_enum(v.as_ptr(), 1);
-        // }
-        // mixerapi.set_property("scale", v);
-
         imp.mixerapi
             .set(mixerapi)
             .expect("mixerapi only set once in PwNodeObject");
@@ -33,7 +25,6 @@ impl PwNodeObject {
             "changed",
             true,
             clone!(@weak self as obj => @default-return None, move |x| {
-                // let mixerapi: wp::plugin::Plugin = x[0].get().expect("MixerApi in changed event");
                 let id: u32 = x[1].get().expect("Id in in changed event");
                 wp::log::info!("From mixer-api changed event: {id}");
                 if id == obj.boundid() {
