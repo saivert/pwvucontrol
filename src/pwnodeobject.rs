@@ -253,17 +253,17 @@ impl PwNodeObject {
 
         node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(@weak self as widget, @weak node => move |res| {
             if let Ok(Some(iter)) = res {
+                let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Format").expect("id table");
+                let channels_key = keys.find_value_from_short_name("channels").expect("channels key");
+                let rate_key = keys.find_value_from_short_name("rate").expect("channels key");
+                let format_key = keys.find_value_from_short_name("format").expect("format key");
+                let position_key = keys.find_value_from_short_name("position").expect("position key");
+
                 for a in iter {
                     let pod: wp::spa::SpaPod = a.get().unwrap();
                     if !pod.is_object() {
                         continue;
                     }
-
-                    let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Format").expect("id table");
-                    let channels_key = keys.find_value_from_short_name("channels").expect("channels key");
-                    let rate_key = keys.find_value_from_short_name("rate").expect("channels key");
-                    let format_key = keys.find_value_from_short_name("format").expect("format key");
-                    let position_key = keys.find_value_from_short_name("position").expect("position key");
 
                     fn get_pod_maybe_choice(pod: wp::spa::SpaPod) -> wp::spa::SpaPod {
                         if pod.is_choice() {
@@ -318,20 +318,15 @@ impl PwNodeObject {
             .enum_params_sync("Props", None)
             .expect("getting params");
 
+        let keys =
+        wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
+        let channelvolumes_key = keys.find_value_from_short_name("channelVolumes").expect("channelVolumes key");
+        let volume_key = keys.find_value_from_short_name("volume").expect("volume key");
+        let mute_key = keys.find_value_from_short_name("mute").expect("mute key");
+
         for a in params {
             let pod: wp::spa::SpaPod = a.get().unwrap();
             if pod.is_object() {
-                let keys =
-                    wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
-                let channelvolumes_key = keys
-                    .find_value_from_short_name("channelVolumes")
-                    .expect("channelVolumes key");
-                let volume_key = keys
-                    .find_value_from_short_name("volume")
-                    .expect("volume key");
-                let mute_key = keys
-                    .find_value_from_short_name("mute")
-                    .expect("mute key");
 
                 if let Some(val) = pod.find_spa_property(&channelvolumes_key) {
                     let mut volumes: Vec<f32> = Vec::new();
