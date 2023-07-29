@@ -70,6 +70,15 @@ mod imp {
         }
 
         fn constructed(&self) {
+            fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
+                Some(i.cbrt() as f64)
+            }
+
+            fn cubic_to_linear(_binding: &glib::Binding, i: f64) -> Option<f32> {
+                Some((i * i * i) as f32)
+            }
+
+
             self.parent_constructed();
 
             let item = self.row_data.borrow();
@@ -78,8 +87,8 @@ mod imp {
             item.bind_property("volume", &self.scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
-                .transform_to::<f32, f64, _>(|_, y|Some(y.cbrt() as f64))
-                .transform_from::<f64, f32, _>(|_, y|Some((y*y*y) as f32))
+                .transform_to(linear_to_cubic)
+                .transform_from(cubic_to_linear)
                 .build();
 
             item.bind_property("name", &self.label.get(), "label")
