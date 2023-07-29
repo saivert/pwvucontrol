@@ -69,6 +69,7 @@ impl PwNodeModel {
         for (i,v) in (0..).zip(vector.iter()) {
             if id == v.boundid() {
                 vector.remove(i as usize);
+                drop(vector);
                 // Emits a signal that 1 item was removed, 0 added at the position index
                 self.items_changed(i, 1, 0);
                 break;
