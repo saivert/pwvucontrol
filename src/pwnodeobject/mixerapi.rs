@@ -26,7 +26,6 @@ impl PwNodeObject {
             true,
             clone!(@weak self as obj => @default-return None, move |x| {
                 let id: u32 = x[1].get().expect("Id in in changed event");
-                wp::log::info!("From mixer-api changed event: {id}");
                 if id == obj.boundid() {
                     obj.imp().block.set(true);
                     obj.update_volume_using_mixerapi();
