@@ -28,6 +28,8 @@ use adw::subclass::prelude::*;
 
 use crate::application::PwvucontrolApplication;
 
+use wireplumber as wp;
+
 pub(crate) enum PwvucontrolWindowView {
     Connected,
     Disconnected
@@ -37,7 +39,7 @@ mod imp {
 
     use crate::{volumebox::PwVolumeBox, pwnodemodel::PwNodeModel, pwnodeobject::PwNodeObject};
 
-    #[derive(Debug, Default, gtk::CompositeTemplate)]
+    #[derive(Debug, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]
     pub struct PwvucontrolWindow {
         #[template_child]
@@ -56,6 +58,7 @@ mod imp {
         pub reconnectbtn: TemplateChild<gtk::Button>,
 
         pub nodemodel: PwNodeModel,
+        pub settings: gio::Settings,
     }
 
     #[glib::object_subclass]
@@ -63,6 +66,20 @@ mod imp {
         const NAME: &'static str = "PwvucontrolWindow";
         type Type = super::PwvucontrolWindow;
         type ParentType = adw::ApplicationWindow;
+
+        fn new() -> Self {
+            Self {
+                header_bar: TemplateChild::default(),
+                stack: TemplateChild::default(),
+                playbacklist: TemplateChild::default(),
+                recordlist: TemplateChild::default(),
+                outputlist: TemplateChild::default(),
+                viewstack: TemplateChild::default(),
+                reconnectbtn: TemplateChild::default(),
+                nodemodel: Default::default(),
+                settings: gio::Settings::new("com.saivert.pwvucontrol")
+            }
+        }
 
         fn class_init(klass: &mut Self::Class) {
             PwVolumeBox::ensure_type();
@@ -149,11 +166,20 @@ mod imp {
                 }
             });
 
+            self.obj().load_window_state();
 
         }
     }
     impl WidgetImpl for PwvucontrolWindow {}
-    impl WindowImpl for PwvucontrolWindow {}
+    impl WindowImpl for PwvucontrolWindow {
+        // save window state on delete event
+        fn close_request(&self) -> gtk::Inhibit {
+            if let Err(err) = self.obj().save_window_size() {
+                wp::log::warning!("Failed to save window state, {}", &err);
+            }
+            self.parent_close_request()
+        }
+    }
     impl ApplicationWindowImpl for PwvucontrolWindow {}
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
 
@@ -184,6 +210,33 @@ impl PwvucontrolWindow {
         
     }
 
+    fn save_window_size(&self) -> Result<(), glib::BoolError> {
+        let settings = &self.imp().settings;
+
+        let size = self.default_size();
+
+        settings.set_int("window-width", size.0)?;
+        settings.set_int("window-height", size.1)?;
+
+        settings.set_boolean("is-maximized", self.is_maximized())?;
+
+        Ok(())
+    }
+
+    fn load_window_state(&self) {
+        let settings = &self.imp().settings;
+
+        let width = settings.int("window-width");
+        let height = settings.int("window-height");
+        let is_maximized = settings.boolean("is-maximized");
+
+        self.set_default_size(width, height);
+
+        if is_maximized {
+            self.maximize();
+        }
+
+    }
 }
 
 impl Default for PwvucontrolWindow {
