@@ -36,4 +36,18 @@ if compile_schemas.found()
        args: ['--strict', '--dry-run', meson.current_source_dir()])
 endif
 
+dev_schema = custom_target(
+  'dev-schema',
+  build_by_default: true,
+  build_always_stale: true,
+  input: 'com.saivert.pwvucontrol.gschema.xml',
+  output: 'gschemas.compiled',
+  console: true,
+  install: false,
+  command: [
+    'env', compile_schemas,
+    '--strict', meson.current_source_dir(),
+  ]
+)
+
 subdir('icons')
