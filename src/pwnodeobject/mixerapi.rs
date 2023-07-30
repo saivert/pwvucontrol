@@ -144,7 +144,7 @@ impl PwNodeObject {
                     let channel = t_audiochannel.find_value_from_short_name(&channelname);
 
                     if let (Some(c), Some(v)) = (channel, volume) {
-                        wp::log::info!("Index: {index}, Number: {} = {}", c.number(), v);
+                        wp::log::debug!("Index: {index}, Number: {} = {}", c.number(), v);
                         newvec[index as usize] = v as f32;
                     } else {
                         wp::log::critical!("Got invalid data via mixer-api");
@@ -170,7 +170,7 @@ impl PwNodeObject {
             let mute: Option<bool> = map.get("mute").and_then(|x| x.get());
             if let Some(m) = mute {
                 self.set_mute(m);
-                wp::log::info!("Setting mute to {m:?}");
+                wp::log::debug!("Setting mute to {m:?}");
             }
         }
     }

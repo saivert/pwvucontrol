@@ -55,7 +55,7 @@ mod imp {
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            wp::log::info!(
+            wp::log::debug!(
                 "Got set_volume on channel object {} = {:?}",
                 self.obj().name(),
                 value.get::<f32>()
