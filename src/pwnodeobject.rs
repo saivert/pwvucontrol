@@ -117,7 +117,9 @@ pub mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: Lazy<Vec<Signal>> =
-                Lazy::new(|| vec![Signal::builder("format").build()]);
+                Lazy::new(|| vec![
+                    Signal::builder("format").build(),
+                ]);
 
             SIGNALS.as_ref()
         }
@@ -144,8 +146,8 @@ pub mod imp {
                 }),
             );
 
-            node.connect_params_changed(clone!(@weak obj => move |_node,what| {
-                wp::log::info!("params-changed! {what}");
+            node.connect_params_changed(clone!(@weak obj => move |node,what| {
+                wp::log::debug!("params-changed! {what} id: {}", node.bound_id());
                 obj.imp().block.set(true);
                 match what {
                     "Props" => obj.update_mainvolume(),

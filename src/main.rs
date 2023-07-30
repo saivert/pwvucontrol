@@ -26,6 +26,7 @@ mod channelbox;
 mod pwnodeobject;
 mod pwnodemodel;
 mod pwchannelobject;
+mod levelprovider;
 
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;

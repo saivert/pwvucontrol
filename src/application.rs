@@ -181,6 +181,14 @@ mod imp {
             wp_om.connect_object_added(
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                        if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
+                            return;
+                        }
+                        if let Ok(medianame) = node.pw_property::<String>("media.name") {
+                            if medianame == "Peak detect" {
+                                return;
+                            }
+                        }
                         wp::log::info!("added: {:?}", node.name());
                         let pwobj = PwNodeObject::new(node);
                         let window = imp.window.get().unwrap();
