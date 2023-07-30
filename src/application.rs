@@ -37,7 +37,7 @@ mod imp {
     use std::{str::FromStr, cell::{Cell, RefCell}};
 
 
-    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView};
+    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView, pwnodemodel::PwNodeModel};
 
     use super::*;
     use once_cell::unsync::OnceCell;
@@ -50,6 +50,7 @@ mod imp {
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
         pub count: Cell<u32>,
 
+        pub nodemodel: PwNodeModel,
         pub devicemodel: gio::ListStore,
 
         pub metadata_om: OnceCell<wp::registry::ObjectManager>,
@@ -191,8 +192,7 @@ mod imp {
                         }
                         wp::log::info!("added: {:?}", node.name());
                         let pwobj = PwNodeObject::new(node);
-                        let window = imp.window.get().unwrap();
-                        let model = &window.imp().nodemodel;
+                        let model = &imp.nodemodel;
                         model.append(&pwobj);
                     } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                         let n: String = device.pw_property("device.name").unwrap();
@@ -209,8 +209,7 @@ mod imp {
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
-                    let window = imp.window.get().unwrap();
-                    let model = &window.imp().nodemodel;
+                    let model = &imp.nodemodel;
                     model.remove(node.bound_id());
 
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {

@@ -37,7 +37,7 @@ pub(crate) enum PwvucontrolWindowView {
 mod imp {
     use super::*;
 
-    use crate::{volumebox::PwVolumeBox, pwnodemodel::PwNodeModel, pwnodeobject::PwNodeObject};
+    use crate::{volumebox::PwVolumeBox, pwnodeobject::PwNodeObject};
 
     #[derive(Debug, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]
@@ -57,7 +57,6 @@ mod imp {
         #[template_child]
         pub reconnectbtn: TemplateChild<gtk::Button>,
 
-        pub nodemodel: PwNodeModel,
         pub settings: gio::Settings,
     }
 
@@ -76,7 +75,6 @@ mod imp {
                 outputlist: TemplateChild::default(),
                 viewstack: TemplateChild::default(),
                 reconnectbtn: TemplateChild::default(),
-                nodemodel: Default::default(),
                 settings: gio::Settings::new("com.saivert.pwvucontrol")
             }
         }
@@ -99,7 +97,9 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            let model = &self.nodemodel;
+            let app = PwvucontrolApplication::default();
+
+            let model = &app.imp().nodemodel;
             let window = self;
 
             let filter = gtk::CustomFilter::new(|x| {

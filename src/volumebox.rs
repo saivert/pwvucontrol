@@ -37,7 +37,7 @@ mod imp {
     use super::*;
     use crate::{
         channelbox::PwChannelBox, levelprovider::LevelbarProvider,
-        pwchannelobject::PwChannelObject, window::PwvucontrolWindow, NodeType,
+        pwchannelobject::PwChannelObject, NodeType,
     };
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
@@ -193,8 +193,8 @@ mod imp {
                 self.outputdevice_dropdown
                     .set_list_factory(Some(&listfactory));
 
-                let win = PwvucontrolWindow::default();
-                let model = &win.imp().nodemodel;
+                let app = PwvucontrolApplication::default();
+                let model = &app.imp().nodemodel;
 
                 let filter = gtk::CustomFilter::new(|x| {
                     if let Some(o) = x.downcast_ref::<PwNodeObject>() {

@@ -3,7 +3,7 @@ use glib::{self, clone, subclass::prelude::*, Object, ObjectExt};
 use wireplumber as wp;
 use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
 
-use crate::{NodeType, application::PwvucontrolApplication, window::PwvucontrolWindow};
+use crate::{NodeType, application::PwvucontrolApplication};
 
 mod mixerapi;
 #[derive(Copy, Clone, Debug)]
@@ -399,7 +399,6 @@ impl PwNodeObject {
 
     pub(crate) fn default_target(&self) -> Option<PwNodeObject> {
         let app = PwvucontrolApplication::default();
-        let win = PwvucontrolWindow::default();
         let om = app.imp().wp_object_manager.get().unwrap();
         if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
             if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
@@ -407,7 +406,7 @@ impl PwNodeObject {
                     if let Some(sinknode) = om.lookup([
                         Constraint::compare(ConstraintType::PwProperty, "object.serial", target_serial.as_str(), true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
-                        return win.imp().nodemodel.get_node(sinknode.bound_id()).ok();
+                        return app.imp().nodemodel.get_node(sinknode.bound_id()).ok();
                     };
                 }
             }
