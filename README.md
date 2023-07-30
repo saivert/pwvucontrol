@@ -4,7 +4,7 @@
 
 This is an attempt are making a volume control applet for Pipewire.
 
-Current implemented features as of 2023-06-08:
+Current implemented features as of 2023-07-30:
 
 - Volume control (using pipewire's main volume parameter, not channel volumes)
 - Mute
