@@ -48,7 +48,6 @@ mod imp {
         pub(super) window: OnceCell<PwvucontrolWindow>,
         pub wp_core: OnceCell<wp::core::Core>,
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
-        pub count: Cell<u32>,
 
         pub nodemodel: PwNodeModel,
         pub devicemodel: gio::ListStore,
@@ -223,6 +222,7 @@ mod imp {
 
             let plugin_names = vec!["mixer-api", "default-nodes-api"];
             glib::MainContext::default().spawn_local(clone!(@weak self as app, @weak wp_core as core, @weak wp_om as om => async move {
+                let mut count = 0;
                 for plugin_name in plugin_names {
                     if let Some(plugin) = Plugin::find(&core, plugin_name) {
                         let result = plugin.activate_future(PluginFeatures::ENABLED).await;
@@ -230,8 +230,7 @@ mod imp {
                             wp::log::critical!("Cannot activate plugin {plugin_name}");
                         } else {
                             wp::log::info!("Activated plugin {plugin_name}");
-                            let count = app.count.get() + 1;
-                            app.count.set(count);
+                            count += 1;
                             if count == 2 {
                                 core.install_object_manager(&om);
                             }
