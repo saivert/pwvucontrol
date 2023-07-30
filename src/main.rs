@@ -79,7 +79,5 @@ fn main() -> gtk::glib::ExitCode {
 
     let app = PwvucontrolApplication::new();
 
-    let exitcode = app.run();
-
-    exitcode
+    app.run()
 }

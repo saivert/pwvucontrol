@@ -34,8 +34,7 @@ use crate::config::VERSION;
 use crate::PwvucontrolWindow;
 
 mod imp {
-    use std::{str::FromStr, cell::{Cell, RefCell}};
-
+    use std::{str::FromStr, cell::RefCell};
 
     use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView, pwnodemodel::PwNodeModel};
 
@@ -220,8 +219,8 @@ mod imp {
                 }
             }));
 
-            let plugin_names = vec!["mixer-api", "default-nodes-api"];
             glib::MainContext::default().spawn_local(clone!(@weak self as app, @weak wp_core as core, @weak wp_om as om => async move {
+                let plugin_names = vec!["mixer-api", "default-nodes-api"];
                 let mut count = 0;
                 for plugin_name in plugin_names {
                     if let Some(plugin) = Plugin::find(&core, plugin_name) {
@@ -298,8 +297,8 @@ impl PwvucontrolApplication {
     pub(super) fn new() -> Self {
         glib::Object::builder()
             .property("application-id", "com.saivert.pwvucontrol")
-            .property("flags", &gio::ApplicationFlags::empty())
-            .property("resource-base-path", &"/com/saivert/pwvucontrol")
+            .property("flags", gio::ApplicationFlags::empty())
+            .property("resource-base-path", "/com/saivert/pwvucontrol")
             .build()
     }
 

@@ -61,10 +61,8 @@ impl LevelbarProvider {
                         let df: &mut [f32] = bytemuck::cast_slice_mut(d);
                         let mut max = df[0].clamp(0.0, 1.0);
                         const DECAY_STEP: f32 = 0.4;
-                        if *last_peak >= DECAY_STEP {
-                            if max < *last_peak - DECAY_STEP {
-                                max = *last_peak - DECAY_STEP;
-                            }
+                        if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
+                            max = *last_peak - DECAY_STEP;
                         }
                         *last_peak = max;
 

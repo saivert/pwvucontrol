@@ -108,7 +108,7 @@ mod imp {
                 }
                 false
             });
-            let ref filterlistmodel = gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
             self.playbacklist.bind_model(
                 Some(filterlistmodel),
@@ -127,7 +127,7 @@ mod imp {
                 }
                 false
             });
-            let ref filterlistmodel = gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
             self.recordlist.bind_model(
                 Some(filterlistmodel),
@@ -146,7 +146,7 @@ mod imp {
                 }
                 false
             });
-            let ref filterlistmodel = gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
             self.outputlist.bind_model(
                 Some(filterlistmodel),

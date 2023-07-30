@@ -85,17 +85,17 @@ pub mod imp {
             self.derived_set_property(id, value, pspec);
             match pspec.name() {
                 "volume" => {
-                    if self.block.get() == false {
+                    if !self.block.get() {
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Volume);
                     }
                 },
                 "mute" => {
-                    if self.block.get() == false {
+                    if !self.block.get() {
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Mute);
                     }
                 },
                 "mainvolume" => {
-                    if self.block.get() == false {
+                    if !self.block.get() {
                         self.obj().send_mainvolume();
                     }
                 },
@@ -104,10 +104,8 @@ pub mod imp {
         }
 
         fn notify(&self, pspec: &ParamSpec) {
-            if pspec.name() == "channel-volumes" {
-                if self.block.get() == false {
-                    self.obj().send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
-                }
+            if pspec.name() == "channel-volumes" && !self.block.get() {
+                self.obj().send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
             }
         }
 
@@ -360,8 +358,8 @@ impl PwNodeObject {
         self.imp().channel_volumes.borrow().clone()
     }
 
-    pub(crate) fn set_channel_volumes_vec(&self, values: &Vec<f32>) {
-        *(self.imp().channel_volumes.borrow_mut()) = values.clone();
+    pub(crate) fn set_channel_volumes_vec(&self, values: &[f32]) {
+        *(self.imp().channel_volumes.borrow_mut()) = values.to_owned();
         self.notify_channel_volumes();
     }
 

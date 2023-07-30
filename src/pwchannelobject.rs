@@ -63,7 +63,7 @@ mod imp {
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
-            if self.block_volume_send.get() == false {
+            if !self.block_volume_send.get() {
                 if let Some(nodeobj) = self.row_data.borrow().as_ref() {
                     if nodeobj.channellock() {
                         nodeobj.set_channel_volumes_vec(&vec![volume; nodeobj.channel_volumes_vec().len()]);

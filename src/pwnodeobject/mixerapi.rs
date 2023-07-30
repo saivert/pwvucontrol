@@ -15,7 +15,7 @@ impl PwNodeObject {
         let app = PwvucontrolApplication::default();
         let core = app.imp().wp_core.get().expect("Core setup");
 
-        let mixerapi = wp::plugin::Plugin::find(&core, "mixer-api").expect("Get mixer-api");
+        let mixerapi = wp::plugin::Plugin::find(core, "mixer-api").expect("Get mixer-api");
 
         imp.mixerapi
             .set(mixerapi)
@@ -83,7 +83,7 @@ impl PwNodeObject {
 
         let result =
             mixerapi.emit_by_name::<bool>("set-volume", &[&bound_id, &variant.to_variant()]);
-        if result == false {
+        if !result {
             wp::log::warning!("Cannot set volume on {bound_id}");
         }
     }
@@ -161,7 +161,7 @@ impl PwNodeObject {
                 .channel_volumes_vec()
                 .iter()
                 .max_by(|a, b| a.total_cmp(b))
-                .map(|x|*x);                
+                .copied();                
             
             if let Some(maxvol) = maxvol {
                 self.set_volume(maxvol);

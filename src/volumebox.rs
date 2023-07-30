@@ -202,8 +202,8 @@ mod imp {
                     }
                     false
                 });
-                let ref filterlistmodel =
-                    gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+                let filterlistmodel =
+                    &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
                 self.outputdevice_dropdown.set_enable_search(true);
                 self.outputdevice_dropdown
@@ -367,7 +367,7 @@ glib::wrapper! {
 impl PwVolumeBox {
     pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
-            .property("row-data", &row_data)
+            .property("row-data", row_data)
             .build()
     }
 
@@ -412,7 +412,7 @@ impl PwVolumeBox {
             let app = PwvucontrolApplication::default();
             let core = app.imp().wp_core.get().expect("Core");
             let defaultnodesapi =
-                wp::plugin::Plugin::find(&core, "default-nodes-api").expect("Get mixer-api");
+                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
             let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
             if id != u32::MAX {
                 if let Some(pos) = find_position_with_boundid_match(&filterlistmodel, id) {
