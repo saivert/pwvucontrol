@@ -324,20 +324,13 @@ mod imp {
                     .set(provider)
                     .expect("Provider not set already");
 
-                glib::MainContext::default().spawn_local(clone!(@weak self as obj => async move {
-                    loop {
-                        glib::timeout_future(std::time::Duration::from_millis(25)).await;
+                self.timeoutid.set(Some(glib::timeout_add_local(
+                    std::time::Duration::from_millis(25),
+                    clone!(@to-owned self as obj => @default-panic, move || {
                         obj.level_bar.set_value(obj.level.get() as f64);
-                    }
-                }));
-
-                // self.timeoutid.set(Some(glib::timeout_add_local(
-                //     std::time::Duration::from_millis(25),
-                //     clone!(@weak self as obj => @default-return Continue(false), move || {
-                //         obj.level_bar.set_value(obj.level.get() as f64);
-                //         Continue(true)
-                //     }),
-                // )));
+                        Continue(true)
+                    }),
+                )));
             }
         }
 
@@ -410,7 +403,7 @@ impl PwVolumeBox {
             if let Some(pos) =
                 find_position_with_boundid_match(&filterlistmodel, deftarget.boundid())
             {
-                wp::log::info!("switching to preferred target");
+                wp::log::info!("switching to preferred target {} {}", deftarget.boundid(), deftarget.serial());
                 imp.outputdevice_dropdown_block_signal.set(true);
                 imp.outputdevice_dropdown.set_selected(pos);
                 imp.outputdevice_dropdown_block_signal.set(false);
