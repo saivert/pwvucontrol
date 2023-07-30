@@ -1,7 +1,5 @@
 use std::{time::Duration, fmt::Debug};
 
-use wireplumber::log;
-
 use pipewire::{prelude::*, properties, stream::{*, self}, Core, Context, Loop};
 use glib::{self, Continue, clone};
 use std::os::fd::AsRawFd;
@@ -14,7 +12,6 @@ pub(crate) struct LevelbarProvider {
     core: Core,
     stream: Stream<f32>,
     listener: StreamListener<f32>,
-    peak: f32,
 
 }
 
@@ -54,7 +51,7 @@ impl LevelbarProvider {
         let mut stream: Stream<f32> = Stream::new(&core, "peakdetect", props)?;
 
         let listener = stream.add_local_listener()
-        .process(clone!(@weak volumebox => move |stream, last_peak| {
+        .process(clone!(@weak volumebox => @default-panic, move |stream, last_peak| {
             match stream.dequeue_buffer() {
                 None => println!("No buffer received"),
                 Some(mut buffer) => {
@@ -62,10 +59,7 @@ impl LevelbarProvider {
 
                     if let Some(d) = datas[0].data() {
                         let df: &mut [f32] = bytemuck::cast_slice_mut(d);
-                        let mut max = 0f32;
-                        for i in df {
-                            max = max.max(i.abs());
-                        }
+                        let mut max = df[0].clamp(0.0, 1.0);
                         const DECAY_STEP: f32 = 0.4;
                         if *last_peak >= DECAY_STEP {
                             if max < *last_peak - DECAY_STEP {
@@ -87,7 +81,6 @@ impl LevelbarProvider {
             core,
             stream,
             listener,
-            peak: 0f32,
         })
     }
 
@@ -106,9 +99,6 @@ impl LevelbarProvider {
         Ok(())
     }
 
-    pub fn peak(&self) -> f32 {
-        self.peak
-    }
 }
 
 impl Drop for LevelbarProvider {
