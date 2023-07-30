@@ -10,10 +10,9 @@ Current implemented features as of 2023-06-08:
 - Mute
 - Media name display
 - Proper volume control of device nodes (using current route lookup)
+- Peak level meter
+- Output device (Sink) drop down for playback streams
 
-Not implemented yet:
-
-- Default sink dropdown (only mock UI)
 
 ## wireplumber-rs branch
 
