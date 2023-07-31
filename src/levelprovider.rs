@@ -61,9 +61,6 @@ impl LevelbarProvider {
                         let chan = &d[0..std::mem::size_of::<f32>()];
                         let mut max = f32::from_le_bytes(chan.try_into().unwrap()).clamp(0.0, 1.0);
 
-                        // let df: &mut [f32] = bytemuck::cast_slice_mut(d);
-                        // let mut max = df[0].clamp(0.0, 1.0);
-
                         const DECAY_STEP: f32 = 0.4;
                         if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
                             max = *last_peak - DECAY_STEP;

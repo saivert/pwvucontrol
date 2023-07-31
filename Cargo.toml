@@ -15,7 +15,6 @@ wireplumber = { git = "https://github.com/saivert/wireplumber.rs.git", branch = 
 futures = "0.3"
 anyhow = "1.0"
 pipewire = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "format_parsing_test", features = ["v0_3_44"]}
-bytemuck = "1.13.1"
 
 [dependencies.adw]
 package = "libadwaita"
