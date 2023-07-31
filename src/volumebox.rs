@@ -316,10 +316,7 @@ mod imp {
             self.level_bar
                 .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
 
-            if let Ok(provider) = LevelbarProvider::new(&self.obj()) {
-                provider
-                    .connect(item.boundid())
-                    .expect("levelprovider connect");
+            if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider
                     .set(provider)
                     .expect("Provider not set already");

@@ -1,14 +1,14 @@
 use std::{time::Duration, fmt::Debug};
 
-use pipewire::{prelude::*, properties, stream::{*, self}, Core, Context, Loop, MainLoop};
-use glib::{self, Continue, clone, SourceId};
+use pipewire::{prelude::*, properties, stream::{*, self}, Context, Loop};
+use glib::{self, Continue, clone};
 use std::os::fd::AsRawFd;
 
 use crate::volumebox::PwVolumeBox;
 
 pub(crate) struct LevelbarProvider {
     loop_: Loop,
-    context: Option<Context<pipewire::Loop>>,
+    context: Context<pipewire::Loop>,
     stream: Option<Stream<f32>>,
     listener: StreamListener<f32>,
 }
@@ -20,7 +20,7 @@ impl Debug for LevelbarProvider {
 }
 
 impl LevelbarProvider {
-    pub fn new(volumebox: &PwVolumeBox) -> Result<Self, anyhow::Error> {
+    pub fn new(volumebox: &PwVolumeBox, id: u32) -> Result<Self, anyhow::Error> {
         let loop_ = Loop::new()?;
         let context = Context::new(&loop_)?;
         let core = context.connect(None)?;
@@ -77,36 +77,29 @@ impl LevelbarProvider {
         }))
         .register()?;
 
-        Ok(Self {
-            loop_,
-            context: Some(context),
-            stream: Some(stream),
-            listener,
-        })
-    }
-
-    pub fn connect(&self, id: u32) -> Result<(), anyhow::Error> {
         let mut buffer = [0;1024];
         let fmtpod = create_audio_format_pod(&mut buffer);
 
-        if let Some(stream) = &self.stream {
-            stream.connect(
-                pipewire::spa::Direction::Input,
-                Some(id),
-                stream::StreamFlags::AUTOCONNECT
-                | stream::StreamFlags::MAP_BUFFERS
-                | stream::StreamFlags::RT_PROCESS,
-                &mut [fmtpod])?;
-        }
+        stream.connect(
+            pipewire::spa::Direction::Input,
+            Some(id),
+            stream::StreamFlags::AUTOCONNECT
+            | stream::StreamFlags::MAP_BUFFERS
+            | stream::StreamFlags::RT_PROCESS,
+            &mut [fmtpod])?;
 
-        Ok(())
+        Ok(Self {
+            loop_,
+            context,
+            stream: Some(stream),
+            listener,
+        })
     }
 
 }
 
 impl Drop for LevelbarProvider {
     fn drop(&mut self) {
-        wireplumber::log::info!("Dropping LevelbarProvider");
         if let Some(stream) = self.stream.take() {
             stream.disconnect().unwrap();
         }
