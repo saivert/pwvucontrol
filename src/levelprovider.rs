@@ -1,18 +1,16 @@
 use std::{time::Duration, fmt::Debug};
 
-use pipewire::{prelude::*, properties, stream::{*, self}, Core, Context, Loop};
-use glib::{self, Continue, clone};
+use pipewire::{prelude::*, properties, stream::{*, self}, Core, Context, Loop, MainLoop};
+use glib::{self, Continue, clone, SourceId};
 use std::os::fd::AsRawFd;
 
 use crate::volumebox::PwVolumeBox;
 
 pub(crate) struct LevelbarProvider {
     loop_: Loop,
-    context: Context<pipewire::Loop>,
-    core: Core,
-    stream: Stream<f32>,
+    context: Option<Context<pipewire::Loop>>,
+    stream: Option<Stream<f32>>,
     listener: StreamListener<f32>,
-
 }
 
 impl Debug for LevelbarProvider {
@@ -27,7 +25,9 @@ impl LevelbarProvider {
         let context = Context::new(&loop_)?;
         let core = context.connect(None)?;
 
-        glib::source::unix_fd_add_local(loop_.fd().as_raw_fd(), glib::IOCondition::all(), {
+        let fd = loop_.fd();
+
+        glib::source::unix_fd_add_local(fd.as_raw_fd(), glib::IOCondition::all(), {
             let loop_ = loop_.clone();
             move |_, _| {
                 loop_.iterate(Duration::ZERO);
@@ -58,8 +58,12 @@ impl LevelbarProvider {
                     let datas = buffer.datas_mut();
 
                     if let Some(d) = datas[0].data() {
-                        let df: &mut [f32] = bytemuck::cast_slice_mut(d);
-                        let mut max = df[0].clamp(0.0, 1.0);
+                        let chan = &d[0..std::mem::size_of::<f32>()];
+                        let mut max = f32::from_le_bytes(chan.try_into().unwrap()).clamp(0.0, 1.0);
+
+                        // let df: &mut [f32] = bytemuck::cast_slice_mut(d);
+                        // let mut max = df[0].clamp(0.0, 1.0);
+
                         const DECAY_STEP: f32 = 0.4;
                         if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
                             max = *last_peak - DECAY_STEP;
@@ -75,9 +79,8 @@ impl LevelbarProvider {
 
         Ok(Self {
             loop_,
-            context,
-            core,
-            stream,
+            context: Some(context),
+            stream: Some(stream),
             listener,
         })
     }
@@ -86,13 +89,15 @@ impl LevelbarProvider {
         let mut buffer = [0;1024];
         let fmtpod = create_audio_format_pod(&mut buffer);
 
-        self.stream.connect(
-            pipewire::spa::Direction::Input,
-            Some(id),
-            stream::StreamFlags::AUTOCONNECT
-            | stream::StreamFlags::MAP_BUFFERS
-            | stream::StreamFlags::RT_PROCESS,
-            &mut [fmtpod])?;
+        if let Some(stream) = &self.stream {
+            stream.connect(
+                pipewire::spa::Direction::Input,
+                Some(id),
+                stream::StreamFlags::AUTOCONNECT
+                | stream::StreamFlags::MAP_BUFFERS
+                | stream::StreamFlags::RT_PROCESS,
+                &mut [fmtpod])?;
+        }
 
         Ok(())
     }
@@ -101,7 +106,10 @@ impl LevelbarProvider {
 
 impl Drop for LevelbarProvider {
     fn drop(&mut self) {
-
+        wireplumber::log::info!("Dropping LevelbarProvider");
+        if let Some(stream) = self.stream.take() {
+            stream.disconnect().unwrap();
+        }
     }
 }
 

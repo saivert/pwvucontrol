@@ -326,7 +326,7 @@ mod imp {
 
                 self.timeoutid.set(Some(glib::timeout_add_local(
                     std::time::Duration::from_millis(25),
-                    clone!(@to-owned self as obj => @default-panic, move || {
+                    clone!(@weak self as obj => @default-panic, move || {
                         obj.level_bar.set_value(obj.level.get() as f64);
                         Continue(true)
                     }),
