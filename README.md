@@ -8,10 +8,9 @@ This is an attempt are making a volume control applet for Pipewire.
 
 Current implemented features as of 2023-07-30:
 
-- Volume control (using pipewire's main volume parameter, not channel volumes)
+- Volume control
 - Mute
 - Media name display
-- Proper volume control of device nodes (using current route lookup)
 - Peak level meter
 - Output device (Sink) drop down for playback streams
 
@@ -25,7 +24,7 @@ This is the wireplumber-rs branch which means it is a complete rewrite using wir
 # Help needed
 I need a nice icon!
 
-Help with making it run as a flatpak.
+Help with making it run as a flatpak. Update Aug 1 2023: It runs now but I need help getting it on Flathub.
 
 Help with making code robust.
 
