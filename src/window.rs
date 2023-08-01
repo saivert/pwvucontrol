@@ -27,6 +27,7 @@ use glib::{self, clone};
 use adw::subclass::prelude::*;
 
 use crate::application::PwvucontrolApplication;
+use crate::config::{APP_ID, PROFILE};
 
 use wireplumber as wp;
 
@@ -75,7 +76,7 @@ mod imp {
                 outputlist: TemplateChild::default(),
                 viewstack: TemplateChild::default(),
                 reconnectbtn: TemplateChild::default(),
-                settings: gio::Settings::new("com.saivert.pwvucontrol")
+                settings: gio::Settings::new(APP_ID)
             }
         }
 
@@ -96,6 +97,12 @@ mod imp {
     impl ObjectImpl for PwvucontrolWindow {
         fn constructed(&self) {
             self.parent_constructed();
+
+            // Devel Profile
+            if PROFILE == "Devel" {
+                self.obj().add_css_class("devel");
+            }
+
 
             let app = PwvucontrolApplication::default();
 
