@@ -1,7 +1,7 @@
-data/com.saivert.pwvucontrol.desktop.in
-data/com.saivert.pwvucontrol.appdata.xml.in
-data/com.saivert.pwvucontrol.gschema.xml
-src/window.ui
-src/gtk/help-overlay.ui
-src/gtk/channelbox.ui
-src/gtk/volumebox.ui
+data/com.saivert.pwvucontrol.desktop.in.in
+data/com.saivert.pwvucontrol.metainfo.xml.in.in
+data/com.saivert.pwvucontrol.gschema.xml.in
+data/resources/ui/window.ui
+data/resources/ui/help-overlay.ui
+data/resources/ui/channelbox.ui
+data/resources/ui/volumebox.ui

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="pwvucontrol">
-	<schema id="com.saivert.pwvucontrol" path="/com/saivert/pwvucontrol/">
+	<schema path="/com/saivert/pwvucontrol/" id="@app-id@" gettext-domain="@gettext-package@">
         <key name="window-width" type="i">
             <default>820</default>
             <summary>Default window width</summary>

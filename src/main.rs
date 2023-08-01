@@ -18,8 +18,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+ mod config {
+    #![allow(dead_code)]
+
+    include!(concat!(env!("CODEGEN_BUILD_DIR"), "/config.rs"));
+}
+
 mod application;
-mod config;
 mod window;
 mod volumebox;
 mod channelbox;
@@ -31,7 +36,7 @@ mod levelprovider;
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;
 
-use config::{GETTEXT_PACKAGE, LOCALEDIR, PKGDATADIR};
+use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, textdomain};
 use gtk::gio;
 use gtk::prelude::*;
@@ -71,8 +76,8 @@ fn main() -> gtk::glib::ExitCode {
     gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
     gtk::glib::set_application_name("Pwvucontrol");
 
-    let resources = gio::Resource::load("pwvucontrol.gresource")
-        .or(gio::Resource::load(PKGDATADIR.to_owned() + "/pwvucontrol.gresource")).expect("Could not load resources");
+    let resources = gio::Resource::load("../data/resources/resources.gresource")
+        .or(gio::Resource::load(RESOURCES_FILE)).expect("Could not load resources");
 
     // Load resources
     gio::resources_register(&resources);

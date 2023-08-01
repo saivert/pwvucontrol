@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=pwvucontrol
 Exec=pwvucontrol
-Icon=com.saivert.pwvucontrol
+Icon=@icon@
 Terminal=false
 Type=Application
 Categories=GTK;
