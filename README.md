@@ -1,5 +1,7 @@
 # pwvucontrol
 
+[Download flatpak bundle](https://saivert.com/files/pwvucontrol.flatpak) (built from git Aug. 1 2023)
+
 ## General info
 
 This is an attempt are making a volume control applet for Pipewire.
