@@ -1,7 +1,7 @@
 {
     "app-id" : "com.saivert.pwvucontrol",
     "runtime" : "org.gnome.Platform",
-    "runtime-version" : "43",
+    "runtime-version" : "44",
     "sdk" : "org.gnome.Sdk",
     "sdk-extensions" : [
         "org.freedesktop.Sdk.Extension.rust-stable",
@@ -40,13 +40,25 @@
     ],
     "modules" : [
         {
+            "name" : "wireplumber",
+            "builddir" : true,
+            "buildsystem" : "meson",
+            "sources" : [
+                {
+                    "type" : "git",
+                    "tag": "0.4.14",
+                    "url" : "https://gitlab.freedesktop.org/pipewire/wireplumber.git"
+                }
+            ]
+        },
+        {
             "name" : "pwvucontrol",
             "builddir" : true,
             "buildsystem" : "meson",
             "sources" : [
                 {
                     "type" : "git",
-                    "branch": "main",
+                    "branch": "wireplumber-rs",
                     "url" : "https://github.com/saivert/pwvucontrol.git"
                 }
             ]
