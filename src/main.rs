@@ -18,26 +18,26 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
- mod config {
+mod config {
     #![allow(dead_code)]
 
     include!(concat!(env!("CODEGEN_BUILD_DIR"), "/config.rs"));
 }
 
 mod application;
-mod window;
-mod volumebox;
 mod channelbox;
-mod pwnodeobject;
-mod pwnodemodel;
-mod pwchannelobject;
 mod levelprovider;
+mod pwchannelobject;
+mod pwnodemodel;
+mod pwnodeobject;
+mod volumebox;
+mod window;
 
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;
 
 use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
-use gettextrs::{bind_textdomain_codeset, bindtextdomain, textdomain};
+use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};
 use gtk::gio;
 use gtk::prelude::*;
 
@@ -49,7 +49,7 @@ pub enum NodeType {
     Input,
     Output,
     Sink,
-    Source
+    Source,
 }
 
 /* static GLIB_LOGGER: glib::GlibLogger = glib::GlibLogger::new(
@@ -64,11 +64,14 @@ fn init_glib_logger() {
     log::set_max_level(log::LevelFilter::Debug);
 } */
 
-
 fn main() -> gtk::glib::ExitCode {
     // init_glib_logger();
     // Set up gettext translations
-    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR).expect("Unable to bind the text domain");
+    bindtextdomain(
+        GETTEXT_PACKAGE,
+        std::env::var_os("PWVUCONTROL_LOCALEDIR").unwrap_or(LOCALEDIR.into()),
+    )
+    .expect("Unable to bind the text domain");
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8")
         .expect("Unable to set the text domain encoding");
     textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
@@ -77,7 +80,8 @@ fn main() -> gtk::glib::ExitCode {
     gtk::glib::set_application_name("Pwvucontrol");
 
     let resources = gio::Resource::load("../data/resources/resources.gresource")
-        .or(gio::Resource::load(RESOURCES_FILE)).expect("Could not load resources");
+        .or(gio::Resource::load(RESOURCES_FILE))
+        .expect(&gettext("Could not load resources"));
 
     // Load resources
     gio::resources_register(&resources);
