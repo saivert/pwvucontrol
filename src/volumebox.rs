@@ -143,6 +143,10 @@ mod imp {
                 .transform_from(cubic_to_linear)
                 .build();
 
+            self.volume_scale.set_format_value_func(|_scale, value| {
+                format!("{:>16}", format!("{:.0}% ({:.2} dB)", value*100.0, (value*value*value).log10()*20.0)) 
+            });
+
             item.bind_property("formatstr", &self.format.get(), "label")
                 .sync_create()
                 .build();
