@@ -30,7 +30,7 @@ use adw::subclass::prelude::*;
 use wireplumber as wp;
 use wp::{plugin::PluginFeatures, pw::MetadataExt, registry::{ObjectManager, Interest, Constraint, ConstraintType}};
 
-use crate::config::VERSION;
+use crate::config::{VERSION, APP_ID};
 use crate::PwvucontrolWindow;
 
 mod imp {
@@ -296,7 +296,7 @@ glib::wrapper! {
 impl PwvucontrolApplication {
     pub(super) fn new() -> Self {
         glib::Object::builder()
-            .property("application-id", "com.saivert.pwvucontrol")
+            .property("application-id", APP_ID)
             .property("flags", gio::ApplicationFlags::empty())
             .property("resource-base-path", "/com/saivert/pwvucontrol")
             .build()
