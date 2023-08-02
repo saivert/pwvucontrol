@@ -52,18 +52,6 @@ pub enum NodeType {
     Source,
 }
 
-/* static GLIB_LOGGER: glib::GlibLogger = glib::GlibLogger::new(
-    glib::GlibLoggerFormat::Structured,
-    glib::GlibLoggerDomain::CrateTarget,
-);
-
-fn init_glib_logger() {
-    log::set_logger(&GLIB_LOGGER).expect("Failed to set logger");
-
-    // Glib does not have a "Trace" log level, so only print messages "Debug" or higher priority.
-    log::set_max_level(log::LevelFilter::Debug);
-} */
-
 fn main() -> gtk::glib::ExitCode {
     // init_glib_logger();
     // Set up gettext translations
