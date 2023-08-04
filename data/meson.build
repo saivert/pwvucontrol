@@ -1,39 +1,90 @@
-desktop_file = i18n.merge_file(
-        input: 'com.saivert.pwvucontrol.desktop.in',
-       output: 'com.saivert.pwvucontrol.desktop',
-         type: 'desktop',
-       po_dir: '../po',
-      install: true,
-  install_dir: join_paths(get_option('datadir'), 'applications')
-)
-
-desktop_utils = find_program('desktop-file-validate', required: false)
-if desktop_utils.found()
-  test('Validate desktop file', desktop_utils, args: [desktop_file])
-endif
-
-appstream_file = i18n.merge_file(
-        input: 'com.saivert.pwvucontrol.appdata.xml.in',
-       output: 'com.saivert.pwvucontrol.appdata.xml',
-       po_dir: '../po',
-      install: true,
-  install_dir: join_paths(get_option('datadir'), 'appdata')
-)
-
-appstream_util = find_program('appstream-util', required: false)
-if appstream_util.found()
-  test('Validate appstream file', appstream_util, args: ['validate', appstream_file])
-endif
-
-install_data('com.saivert.pwvucontrol.gschema.xml',
-  install_dir: join_paths(get_option('datadir'), 'glib-2.0/schemas')
-)
-
-compile_schemas = find_program('glib-compile-schemas', required: false)
-if compile_schemas.found()
-  test('Validate schema file',
-       compile_schemas,
-       args: ['--strict', '--dry-run', meson.current_source_dir()])
-endif
-
 subdir('icons')
+subdir('resources')
+# Desktop file
+desktop_conf = configuration_data()
+desktop_conf.set('icon', application_id)
+desktop_file = i18n.merge_file(
+  type: 'desktop',
+  input: configure_file(
+    input: '@0@.desktop.in.in'.format(base_id),
+    output: '@BASENAME@',
+    configuration: desktop_conf
+  ),
+  output: '@0@.desktop'.format(application_id),
+  po_dir: podir,
+  install: true,
+  install_dir: datadir / 'applications'
+)
+# Validate Desktop file
+if desktop_file_validate.found()
+  test(
+    'validate-desktop',
+    desktop_file_validate,
+    args: [
+      desktop_file.full_path()
+    ],
+    depends: desktop_file,
+  )
+endif
+
+# Appdata
+appdata_conf = configuration_data()
+appdata_conf.set('app-id', application_id)
+appdata_conf.set('gettext-package', gettext_package)
+appdata_file = i18n.merge_file(
+  input: configure_file(
+    input: '@0@.metainfo.xml.in.in'.format(base_id),
+    output: '@BASENAME@',
+    configuration: appdata_conf
+  ),
+  output: '@0@.metainfo.xml'.format(application_id),
+  po_dir: podir,
+  install: true,
+  install_dir: datadir / 'metainfo'
+)
+# Validate Appdata
+if appstream_util.found()
+  test(
+    'validate-appdata', appstream_util,
+    args: [
+      'validate', '--nonet', appdata_file.full_path()
+    ],
+    depends: appdata_file,
+  )
+endif
+
+# GSchema
+gschema_conf = configuration_data()
+gschema_conf.set('app-id', application_id)
+gschema_conf.set('gettext-package', gettext_package)
+configure_file(
+  input: '@0@.gschema.xml.in'.format(base_id),
+  output: '@0@.gschema.xml'.format(application_id),
+  configuration: gschema_conf,
+  install: true,
+  install_dir: datadir / 'glib-2.0' / 'schemas'
+)
+
+# Validata GSchema
+if glib_compile_schemas.found()
+  test(
+    'validate-gschema', glib_compile_schemas,
+    args: [
+      '--strict', '--dry-run', meson.current_build_dir()
+    ],
+  )
+endif
+
+# For development always generate a local GSchema
+dev_schema = custom_target(
+  'dev-schema',
+  build_by_default: true,
+  build_always_stale: true,
+  output: 'gschemas.compiled',
+  console: true,
+  install: false,
+  command: [
+    'env', glib_compile_schemas,
+    '--strict', meson.current_build_dir(),
+  ]
+)

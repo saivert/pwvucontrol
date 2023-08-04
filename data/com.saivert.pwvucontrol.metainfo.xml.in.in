@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Nicolai Syvertsen 2023 <saivert@saivert.com> -->
+<component type="desktop-application">
+  <id>@app-id@</id>
+  <metadata_license>CC0</metadata_license>
+  <!-- Insert your license of choice here -->
+  <!-- <project_license>MIT</project_license> -->
+  <name>pwvucontrol</name>
+  <summary>Volume control for pipewire</summary>
+  <description>
+    <p>A native volume control app made with GTK + Rust.</p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://saivert.com/files/pwvucontrol%202023-07-26%2019-16-08.png</image>
+      <caption>Main window</caption>
+    </screenshot>
+  </screenshots>
+  <url type="homepage">https://github.com/saivert/pwvucontrol</url>
+  <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
+  <content_rating type="oars-1.0" />
+  <releases>
+    <release version="0.1.0" date="2023-08-01" />
+  </releases>
+  <kudos>
+     <!--
+       GNOME Software kudos:
+       https://gitlab.gnome.org/GNOME/gnome-software/-/blob/main/doc/kudos.md
+     -->
+     <kudo>ModernToolkit</kudo>
+     <kudo>HiDpiIcon</kudo>
+  </kudos>
+  <developer_name>Nicolai Syvertsen</developer_name>
+  <update_contact>saivert@saivert.com</update_contact>
+  <translation type="gettext">@gettext-package@</translation>
+  <launchable type="desktop-id">@app-id@.desktop</launchable>
+</component>

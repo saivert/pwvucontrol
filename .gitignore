@@ -1,3 +1,7 @@
 /builddir
 /target
 /.vscode
+/.flatpak-builder
+/myrepo
+/pwvucontrol.flatpak
+/scratch.txt

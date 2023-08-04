@@ -1,4 +1,4 @@
-use pipewire::spa::sys::*;
+use wireplumber::pipewire::spa::sys::*;
 
 pub fn format_to_string(format: u32) -> &'static str {
     match format {

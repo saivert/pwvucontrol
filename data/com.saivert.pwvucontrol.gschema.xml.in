@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="pwvucontrol">
+	<schema path="/com/saivert/pwvucontrol/" id="@app-id@" gettext-domain="@gettext-package@">
+        <key name="window-width" type="i">
+            <default>820</default>
+            <summary>Default window width</summary>
+            <description>Default window width</description>
+        </key>
+        <key name="window-height" type="i">
+            <default>640</default>
+            <summary>Default window height</summary>
+            <description>Default window height</description>
+        </key>
+        <key name="is-maximized" type="b">
+            <default>false</default>
+            <summary>Default window maximized behaviour</summary>
+            <description></description>
+        </key>
+	</schema>
+</schemalist>
