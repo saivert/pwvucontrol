@@ -4,6 +4,8 @@
 
 [Download flatpak bundle](https://saivert.com/files/pwvucontrol.flatpak) (built from git Aug. 1 2023)
 
+There is a flatpak-builder manifest in the build-aux directory. I'm planning on getting it on flathub but I need help crossing the finish line here.
+
 ## General info
 
 This is an attempt are making a volume control applet for Pipewire.
