@@ -2,26 +2,7 @@
 
 ## General info
 
-This is an attempt are making a volume control applet for Pipewire.
+This is the old development branch using only pipewire-rs bindings for introspecting/controlling pipewire.
 
-As of 30th june 2023 most of the development is going to happen in [wireplumber-rs](../../tree/wireplumber-rs) branch to check out viability of that binding for libwireplumber.
+It is a more low-level API which means you have to do your own object tracking. pipewire-rs was also lacking several things which is why work was started on migrating to wireplumber-rs for the API.
 
-Current implemented features as of 2023-06-08:
-
-- Volume control (using pipewire's main volume parameter, not channel volumes)
-- Mute
-- Media name display
-
-Not implemented yet:
-
-- Default sink dropdown (only mock UI)
-
-
-## What it looks like
-
-![Screenshot](../assets/screenshot.png)
-
-## Help needed
-I need a nice icon!
-
-UI ideas and mockups welcome!
