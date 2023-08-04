@@ -97,9 +97,12 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.79"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50d30906286121d95be3d479533b458f87493b30a4b5f79a607db8f5d11aa91f"
+checksum = "6c6b2562119bf28c3439f7f02db99faf0aa1a8cdfe5772a2ee155d32227239f0"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "cexpr"
@@ -112,9 +115,9 @@ dependencies = [
 
 [[package]]
 name = "cfg-expr"
-version = "0.15.3"
+version = "0.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "215c0072ecc28f92eeb0eea38ba63ddfcb65c2828c46311d646f1a3ff5f9841c"
+checksum = "b40ccee03b5175c18cde8f37e7d2a33bcef6f8ec8f7cc0d81090d1bb380949c9"
 dependencies = [
  "smallvec",
  "target-lexicon",
@@ -223,7 +226,7 @@ checksum = "89ca545a94061b6365f2c7355b4b32bd20df3ff95f02da9329b34ccc3bd6ee72"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -638,7 +641,7 @@ checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 [[package]]
 name = "libspa"
 version = "0.6.0"
-source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=format_parsing_test#5eea3a4544c475280aa0aca97b8ab4d17ce30c99"
+source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=misc_fixes#2f02e4a58bee4f9e10d68b7839f9e7f3e36fa539"
 dependencies = [
  "bitflags 2.3.3",
  "cc",
@@ -654,7 +657,7 @@ dependencies = [
 [[package]]
 name = "libspa-sys"
 version = "0.6.0"
-source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=format_parsing_test#5eea3a4544c475280aa0aca97b8ab4d17ce30c99"
+source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=misc_fixes#2f02e4a58bee4f9e10d68b7839f9e7f3e36fa539"
 dependencies = [
  "bindgen",
  "cc",
@@ -825,7 +828,7 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 [[package]]
 name = "pipewire"
 version = "0.6.0"
-source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=format_parsing_test#5eea3a4544c475280aa0aca97b8ab4d17ce30c99"
+source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=misc_fixes#2f02e4a58bee4f9e10d68b7839f9e7f3e36fa539"
 dependencies = [
  "anyhow",
  "bitflags 2.3.3",
@@ -841,7 +844,7 @@ dependencies = [
 [[package]]
 name = "pipewire-sys"
 version = "0.6.0"
-source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=format_parsing_test#5eea3a4544c475280aa0aca97b8ab4d17ce30c99"
+source = "git+https://gitlab.freedesktop.org/saivert/pipewire-rs?branch=misc_fixes#2f02e4a58bee4f9e10d68b7839f9e7f3e36fa539"
 dependencies = [
  "bindgen",
  "libspa-sys",
@@ -952,9 +955,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.3.3"
+version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39354c10dd07468c2e73926b23bb9c2caca74c5501e38a35da70406f1d923310"
+checksum = "b7b6d6190b7594385f61bd3911cd1be99dfddcfc365a4160cc2ab5bff4aed294"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -990,9 +993,9 @@ checksum = "b0293b4b29daaf487284529cc2f5675b8e57c61f70167ba415a463651fd6a918"
 
 [[package]]
 name = "serde"
-version = "1.0.175"
+version = "1.0.181"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d25439cd7397d044e2748a6fe2432b5e85db703d6d097bd014b3c0ad1ebff0b"
+checksum = "6d3e73c93c3240c0bda063c239298e633114c69a888c3e37ca8bb33f343e9890"
 
 [[package]]
 name = "serde_spanned"
@@ -1053,9 +1056,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.27"
+version = "2.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b60f673f44a8255b9c8c657daf66a596d435f2da81a555b06dc644d080ba45e0"
+checksum = "04361975b3f5e348b2189d8dc55bc942f278b2d482a6a0365de5bdd62d351567"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1077,9 +1080,9 @@ dependencies = [
 
 [[package]]
 name = "target-lexicon"
-version = "0.12.10"
+version = "0.12.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d2faeef5759ab89935255b1a4cd98e0baf99d1085e37d36599c625dac49ae8e"
+checksum = "9d0e916b1148c8e263850e1ebcbd046f333e0683c724876bb0da63ea4373dc8a"
 
 [[package]]
 name = "temp-dir"
@@ -1104,7 +1107,7 @@ checksum = "090198534930841fab3a5d1bb637cde49e339654e606195f8d9c76eeb081dc96"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.27",
+ "syn 2.0.28",
 ]
 
 [[package]]
@@ -1195,9 +1198,9 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "winnow"
-version = "0.5.1"
+version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25b5872fa2e10bd067ae946f927e726d7d603eaeb6e02fa6a350e0722d2b8c11"
+checksum = "f46aab759304e4d7b2075a9aecba26228bb073ee8c50db796b2c72c676b5d807"
 dependencies = [
  "memchr",
 ]
@@ -1205,7 +1208,7 @@ dependencies = [
 [[package]]
 name = "wireplumber"
 version = "0.1.0"
-source = "git+https://github.com/saivert/wireplumber.rs.git?branch=use_pipewire_from_git#9dfc16abda3ec6b4366e7eb670c13c1d59f48e3f"
+source = "git+https://github.com/saivert/wireplumber.rs.git?branch=use_pipewire_from_git#b33377e2e811b436585b16ff6333d5fa97e55135"
 dependencies = [
  "bitflags 1.3.2",
  "gio",
@@ -1221,7 +1224,7 @@ dependencies = [
 [[package]]
 name = "wireplumber-sys"
 version = "0.1.0"
-source = "git+https://github.com/saivert/wireplumber.rs.git?branch=use_pipewire_from_git#9dfc16abda3ec6b4366e7eb670c13c1d59f48e3f"
+source = "git+https://github.com/saivert/wireplumber.rs.git?branch=use_pipewire_from_git#b33377e2e811b436585b16ff6333d5fa97e55135"
 dependencies = [
  "gio-sys",
  "glib-sys",
