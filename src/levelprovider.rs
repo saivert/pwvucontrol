@@ -9,7 +9,7 @@ use crate::volumebox::PwVolumeBox;
 pub(crate) struct LevelbarProvider {
     loop_: Loop,
     context: Context<pipewire::Loop>,
-    stream: Option<Stream<f32>>,
+    stream: Option<Stream>,
     listener: StreamListener<f32>,
 }
 
@@ -48,9 +48,9 @@ impl LevelbarProvider {
             "stream.monitor" => "true"
         };
 
-        let mut stream: Stream<f32> = Stream::new(&core, "peakdetect", props)?;
+        let stream: Stream = Stream::new(&core, "peakdetect", props)?;
 
-        let listener = stream.add_local_listener()
+        let listener = stream.add_local_listener::<f32>()
         .process(clone!(@weak volumebox => @default-panic, move |stream, last_peak| {
             match stream.dequeue_buffer() {
                 None => println!("No buffer received"),
