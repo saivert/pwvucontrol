@@ -20,7 +20,7 @@
 
 use crate::{application::PwvucontrolApplication, pwnodeobject::PwNodeObject};
 
-use glib::{self, clone, ParamSpec, Properties, Value};
+use glib::{self, clone, ParamSpec, Properties, Value, ControlFlow};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 
 use std::cell::RefCell;
@@ -47,7 +47,8 @@ mod imp {
         #[property(get, set, construct_only)]
         pub(super) row_data: RefCell<Option<PwNodeObject>>,
 
-        channelmodel: gio::ListStore,
+        #[property(get, set, construct_only)]
+        channelmodel: OnceCell<gio::ListStore>,
 
         pub(super) outputdevice_dropdown_block_signal: Cell<bool>,
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
@@ -170,6 +171,7 @@ mod imp {
                 //TODO: Implement support for Audio/Source switching for NodeType::Input
                 let factory = gtk::SignalListItemFactory::new();
                 factory.connect_setup(|_, item| {
+                    let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                     let label = gtk::Label::new(None);
                     label.set_ellipsize(gtk::pango::EllipsizeMode::End);
 
@@ -184,6 +186,7 @@ mod imp {
 
                 let listfactory = gtk::SignalListItemFactory::new();
                 listfactory.connect_setup(|_, item| {
+                    let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                     let label = gtk::Label::new(None);
                     label.set_xalign(0.0);
 
@@ -260,11 +263,12 @@ mod imp {
                     }),
                 );
             } else {
-                self.outputdevice_dropdown.hide();
+                self.outputdevice_dropdown.set_visible(false);
             }
+            let channelmodel = self.obj().channelmodel();
 
             self.channel_listbox.bind_model(
-                Some(&self.channelmodel),
+                Some(&channelmodel),
                 clone!(@weak self as widget => @default-panic, move |item| {
                     PwChannelBox::new(
                         item.clone().downcast_ref::<PwChannelObject>()
@@ -275,16 +279,16 @@ mod imp {
             );
 
             item.connect_local("format", false, 
-            clone!(@weak self as widget, @weak item as nodeobj => @default-panic, move |_| {
+            clone!(@weak channelmodel, @weak item as nodeobj => @default-panic, move |_| {
                 let values = nodeobj.channel_volumes_vec();
-                let oldlen = widget.channelmodel.n_items();
+                let oldlen = channelmodel.n_items();
 
                 wp::log::debug!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
 
                 if values.len() as u32 != oldlen {
-                    widget.channelmodel.remove_all();
+                    channelmodel.remove_all();
                     for (i,v) in values.iter().enumerate() {
-                        widget.channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
+                        channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
                     }
 
                     return None;
@@ -292,10 +296,10 @@ mod imp {
                 None
             }));
 
-            item.connect_channel_volumes_notify(clone!(@weak self as widget => move |nodeobj| {
+            item.connect_channel_volumes_notify(clone!(@weak channelmodel => move |nodeobj| {
                 let values = nodeobj.channel_volumes_vec();
                 for (i,v) in values.iter().enumerate() {
-                    if let Some(item) = widget.channelmodel.item(i as u32) {
+                    if let Some(item) = channelmodel.item(i as u32) {
                         let channelobj = item.downcast_ref::<PwChannelObject>()
                             .expect("RowData is of wrong type");
                         channelobj.imp().block_volume_send.set(true);
@@ -329,7 +333,7 @@ mod imp {
                     std::time::Duration::from_millis(25),
                     clone!(@weak self as obj => @default-panic, move || {
                         obj.level_bar.set_value(obj.level.get() as f64);
-                        Continue(true)
+                        ControlFlow::Continue
                     }),
                 )));
             }
@@ -369,6 +373,7 @@ impl PwVolumeBox {
     pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("row-data", row_data)
+            .property("channelmodel", gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>())
             .build()
     }
 

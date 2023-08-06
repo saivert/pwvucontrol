@@ -1,7 +1,7 @@
 use std::{time::Duration, fmt::Debug};
 
 use pipewire::{prelude::*, properties, stream::{*, self}, Context, Loop};
-use glib::{self, Continue, clone};
+use glib::{self, ControlFlow, clone};
 use std::os::fd::AsRawFd;
 
 use crate::volumebox::PwVolumeBox;
@@ -32,7 +32,7 @@ impl LevelbarProvider {
             move |_, _| {
                 loop_.iterate(Duration::ZERO);
 
-                Continue(true)
+                ControlFlow::Continue
             }
         });
 

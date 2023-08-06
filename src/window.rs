@@ -180,7 +180,8 @@ mod imp {
     impl WidgetImpl for PwvucontrolWindow {}
     impl WindowImpl for PwvucontrolWindow {
         // save window state on delete event
-        fn close_request(&self) -> gtk::Inhibit {
+
+        fn close_request(&self) -> glib::Propagation {
             if let Err(err) = self.obj().save_window_size() {
                 wp::log::warning!("Failed to save window state, {}", &err);
             }

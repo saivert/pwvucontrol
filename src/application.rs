@@ -49,7 +49,7 @@ mod imp {
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
         pub nodemodel: PwNodeModel,
-        pub devicemodel: gio::ListStore,
+        pub devicemodel: OnceCell<gio::ListStore>,
 
         pub metadata_om: OnceCell<wp::registry::ObjectManager>,
         pub metadata: RefCell<Option<wp::pw::Metadata>>,
@@ -69,6 +69,7 @@ mod imp {
             let obj = self.obj();
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
+            self.devicemodel.set(gio::ListStore::new::<wp::pw::Device>()).expect("devicemodel not set");
         }
     }
 
@@ -179,6 +180,7 @@ mod imp {
 
             wp_om.connect_object_added(
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+                    let devicemodel = imp.devicemodel.get().expect("devicemodel");
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                         if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
                             return;
@@ -196,7 +198,7 @@ mod imp {
                         let n: String = device.pw_property("device.name").unwrap();
                         wp::log::info!("Got device {} {n}", device.bound_id());
 
-                        imp.devicemodel.append(device);
+                        devicemodel.append(device);
                         
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
@@ -205,14 +207,15 @@ mod imp {
             );
 
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
+                let devicemodel = imp.devicemodel.get().expect("devicemodel");
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
                     let model = &imp.nodemodel;
                     model.remove(node.bound_id());
 
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
-                    if let Some(pos) = imp.devicemodel.find(device) {
-                        imp.devicemodel.remove(pos);
+                    if let Some(pos) = devicemodel.find(device) {
+                        devicemodel.remove(pos);
                     }
                 } else {
                     wp::log::info!("Object must be one of the above, but is {:?} instead", object.type_());
