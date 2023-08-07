@@ -1,16 +1,16 @@
 use std::{time::Duration, fmt::Debug};
 
-use pipewire::{prelude::*, properties, stream::{*, self}, Context, Loop};
+use pipewire::{properties, stream::{*, self}, Context, Loop};
 use glib::{self, ControlFlow, clone};
 use std::os::fd::AsRawFd;
 
 use crate::volumebox::PwVolumeBox;
 
 pub(crate) struct LevelbarProvider {
-    loop_: Loop,
-    context: Context<pipewire::Loop>,
+    _loop: Loop,
+    _context: Context<pipewire::Loop>,
     stream: Option<Stream>,
-    listener: StreamListener<f32>,
+    _listener: StreamListener<f32>,
 }
 
 impl Debug for LevelbarProvider {
@@ -86,10 +86,10 @@ impl LevelbarProvider {
             &mut [fmtpod])?;
 
         Ok(Self {
-            loop_,
-            context,
+            _loop: loop_,
+            _context: context,
             stream: Some(stream),
-            listener,
+            _listener: listener,
         })
     }
 
