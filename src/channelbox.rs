@@ -25,7 +25,7 @@ mod imp {
     use super::*;
     use std::cell::RefCell;
     use gtk::{prelude::*, subclass::prelude::*};
-    use glib::{ParamSpec, Value, Properties};
+    use glib::Properties;
     
     #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]
@@ -58,16 +58,8 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for PwChannelBox {
-        fn properties() -> &'static [ParamSpec] {
-            Self::derived_properties()
-        }
-        fn set_property(&self, id: usize, value: &Value, pspec: &ParamSpec) {
-            self.derived_set_property(id, value, pspec)
-        }
-        fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
-            self.derived_property(id, pspec)
-        }
 
         fn constructed(&self) {
             fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {

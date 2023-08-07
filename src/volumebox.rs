@@ -20,7 +20,7 @@
 
 use crate::{application::PwvucontrolApplication, pwnodeobject::PwNodeObject};
 
-use glib::{self, clone, ParamSpec, Properties, Value, ControlFlow};
+use glib::{self, clone, ControlFlow, Properties, Value};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 
 use std::cell::RefCell;
@@ -99,17 +99,8 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for PwVolumeBox {
-        fn properties() -> &'static [ParamSpec] {
-            Self::derived_properties()
-        }
-        fn set_property(&self, id: usize, value: &Value, pspec: &ParamSpec) {
-            self.derived_set_property(id, value, pspec)
-        }
-        fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
-            self.derived_property(id, pspec)
-        }
-
         fn constructed(&self) {
             fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
                 Some(i.cbrt() as f64)
@@ -145,7 +136,14 @@ mod imp {
                 .build();
 
             self.volume_scale.set_format_value_func(|_scale, value| {
-                format!("{:>16}", format!("{:.0}% ({:.2} dB)", value*100.0, (value*value*value).log10()*20.0)) 
+                format!(
+                    "{:>16}",
+                    format!(
+                        "{:.0}% ({:.2} dB)",
+                        value * 100.0,
+                        (value * value * value).log10() * 20.0
+                    )
+                )
             });
 
             item.bind_property("formatstr", &self.format.get(), "label")
@@ -209,8 +207,7 @@ mod imp {
                     }
                     false
                 });
-                let filterlistmodel =
-                    &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+                let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
                 self.outputdevice_dropdown.set_enable_search(true);
                 self.outputdevice_dropdown
@@ -373,7 +370,10 @@ impl PwVolumeBox {
     pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("row-data", row_data)
-            .property("channelmodel", gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>())
+            .property(
+                "channelmodel",
+                gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>(),
+            )
             .build()
     }
 
@@ -409,7 +409,11 @@ impl PwVolumeBox {
             if let Some(pos) =
                 find_position_with_boundid_match(&filterlistmodel, deftarget.boundid())
             {
-                wp::log::info!("switching to preferred target {} {}", deftarget.boundid(), deftarget.serial());
+                wp::log::info!(
+                    "switching to preferred target {} {}",
+                    deftarget.boundid(),
+                    deftarget.serial()
+                );
                 imp.outputdevice_dropdown_block_signal.set(true);
                 imp.outputdevice_dropdown.set_selected(pos);
                 imp.outputdevice_dropdown_block_signal.set(false);

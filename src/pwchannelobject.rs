@@ -3,7 +3,7 @@ use crate::pwnodeobject::PwNodeObject;
 use std::cell::{Cell, RefCell};
 
 use gtk::{
-    glib::{self, ParamSpec, Properties, Value},
+    glib::{self, Properties, Value},
     prelude::*,
     subclass::prelude::*
 };
@@ -38,20 +38,8 @@ mod imp {
         type Type = super::PwChannelObject;
     }
 
-    // Trait shared by all GObjects
-    impl ObjectImpl for PwChannelObject {
-        fn properties() -> &'static [ParamSpec] {
-            Self::derived_properties()
-        }
-
-        fn set_property(&self, id: usize, value: &Value, pspec: &ParamSpec) {
-            self.derived_set_property(id, value, pspec)
-        }
-
-        fn property(&self, id: usize, pspec: &ParamSpec) -> Value {
-            self.derived_property(id, pspec)
-        }
-    }
+    #[glib::derived_properties]
+    impl ObjectImpl for PwChannelObject {}
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
