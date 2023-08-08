@@ -1,6 +1,6 @@
 use std::{time::Duration, fmt::Debug};
 
-use pipewire::{properties, stream::{*, self}, Context, Loop};
+use pipewire::{properties, stream::*, Context, Loop};
 use glib::{self, ControlFlow, clone};
 use std::os::fd::AsRawFd;
 
@@ -101,7 +101,7 @@ impl Drop for LevelbarProvider {
     }
 }
 
-fn create_audio_format_pod(buffer: &mut [u8]) -> *mut pipewire::spa::sys::spa_pod {
+fn create_audio_format_pod(buffer: &mut [u8]) -> &pipewire::spa::pod::Pod {
     unsafe {
 
         let mut b: pipewire::spa::sys::spa_pod_builder = std::mem::zeroed();
@@ -117,9 +117,11 @@ fn create_audio_format_pod(buffer: &mut [u8]) -> *mut pipewire::spa::sys::spa_po
 
         audioinfo.position[0] = pipewire::spa::sys::SPA_AUDIO_CHANNEL_MONO;
 
-        pipewire::spa::sys::spa_format_audio_raw_build(&mut b as *mut pipewire::spa::sys::spa_pod_builder,
+        let rawpod = pipewire::spa::sys::spa_format_audio_raw_build(&mut b as *mut pipewire::spa::sys::spa_pod_builder,
             pipewire::spa::sys::SPA_PARAM_EnumFormat,
-            &mut audioinfo as *mut pipewire::spa::sys::spa_audio_info_raw)
+            &mut audioinfo as *mut pipewire::spa::sys::spa_audio_info_raw);
+
+        pipewire::spa::pod::Pod::from_raw(rawpod)
     }
 }
 
