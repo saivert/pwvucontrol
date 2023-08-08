@@ -185,9 +185,14 @@ mod imp {
                         if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
                             return;
                         }
-                        if let Ok(medianame) = node.pw_property::<String>("media.name") {
-                            if medianame == "Peak detect" {
-                                return;
+                        if node.pw_property::<String>("media.class").unwrap_or_default() == "Stream/Input/Audio" {
+                            if let Ok(medianame) = node.pw_property::<String>("application.id") {
+                                let hidden_apps = ["org.PulseAudio.pavucontrol", "org.gnome.VolumeControl", "org.kde.kmixd"];
+                                for app in hidden_apps {
+                                    if app == medianame {
+                                        return;
+                                    }
+                                }
                             }
                         }
                         wp::log::info!("added: {:?}", node.name());
