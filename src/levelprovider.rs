@@ -37,9 +37,6 @@ impl LevelbarProvider {
         });
 
         let props = properties! {
-            "media.type" => "Audio",
-            "media.category" => "Capture",
-            "media.role" => "Music",
             "node.rate" => "1/25",
             "node.latency" => "1/25",
             "node.name" => "pwvucontrol-peak-detect",
@@ -80,9 +77,10 @@ impl LevelbarProvider {
         stream.connect(
             pipewire::spa::Direction::Input,
             Some(id),
-            stream::StreamFlags::AUTOCONNECT
-            | stream::StreamFlags::MAP_BUFFERS
-            | stream::StreamFlags::RT_PROCESS,
+            StreamFlags::AUTOCONNECT
+            | StreamFlags::MAP_BUFFERS
+            | StreamFlags::RT_PROCESS
+            | StreamFlags::DONT_RECONNECT,
             &mut [fmtpod])?;
 
         Ok(Self {
