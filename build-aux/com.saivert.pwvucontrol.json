@@ -63,7 +63,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "branch": "wireplumber-rs",
+                    "branch": "main",
                     "url" : "https://github.com/saivert/pwvucontrol.git"
                 }
             ]
