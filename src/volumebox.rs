@@ -20,7 +20,7 @@
 
 use crate::{application::PwvucontrolApplication, pwnodeobject::PwNodeObject};
 
-use glib::{self, clone, ControlFlow, Properties, Value};
+use glib::{self, clone, ControlFlow, Properties};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 
 use std::cell::RefCell;
