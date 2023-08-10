@@ -33,6 +33,8 @@ mod pwnodeobject;
 mod volumebox;
 mod window;
 
+use std::{ffi::{OsStr, OsString}, path::PathBuf};
+
 use self::application::PwvucontrolApplication;
 use self::window::PwvucontrolWindow;
 
@@ -52,12 +54,29 @@ pub enum NodeType {
     Source,
 }
 
+fn path_override_from_env<K>(var: K, default: K, append: Option<K>) -> OsString
+where
+    K: AsRef<OsStr> + Default,
+{
+    let append = append.unwrap_or_default();
+    if let Some(var) = std::env::var_os(var) {
+        let path = PathBuf::from(&var);
+        return path.join(append.as_ref()).into_os_string();
+    }
+
+    [default, append]
+        .iter()
+        .map(|x| x.as_ref())
+        .collect::<PathBuf>()
+        .into_os_string()
+}
+
 fn main() -> gtk::glib::ExitCode {
     // init_glib_logger();
     // Set up gettext translations
     bindtextdomain(
         GETTEXT_PACKAGE,
-        std::env::var_os("PWVUCONTROL_LOCALEDIR").unwrap_or(LOCALEDIR.into()),
+        path_override_from_env("PWVUCONTROL_LOCALEDIR", LOCALEDIR, None),
     )
     .expect("Unable to bind the text domain");
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8")
@@ -67,9 +86,13 @@ fn main() -> gtk::glib::ExitCode {
     gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
     gtk::glib::set_application_name("Pwvucontrol");
 
-    let resources = gio::Resource::load("../data/resources/resources.gresource")
-        .or(gio::Resource::load(RESOURCES_FILE))
-        .expect(&gettext("Could not load resources"));
+    let resources = gio::Resource::load(path_override_from_env(
+        "PWVUCONTROL_RESOURCEDIR",
+        "../data/resources",
+        Some("resources.gresource"),
+    ))
+    .or(gio::Resource::load(RESOURCES_FILE))
+    .expect(&gettext("Could not load resources"));
 
     // Load resources
     gio::resources_register(&resources);
