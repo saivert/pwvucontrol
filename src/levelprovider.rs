@@ -1,6 +1,6 @@
 use std::{time::Duration, fmt::Debug};
 
-use pipewire::{properties, stream::*, Context, Loop};
+use pipewire::{properties, stream::*, Context, Loop, spa};
 use glib::{self, ControlFlow, clone};
 use std::os::fd::AsRawFd;
 
@@ -71,7 +71,7 @@ impl LevelbarProvider {
         }))
         .register()?;
 
-        let mut buffer = [0;1024];
+        let mut buffer: Vec<u8> = Vec::new();
         let fmtpod = create_audio_format_pod(&mut buffer);
 
         stream.connect(
@@ -101,27 +101,23 @@ impl Drop for LevelbarProvider {
     }
 }
 
-fn create_audio_format_pod(buffer: &mut [u8]) -> &pipewire::spa::pod::Pod {
-    unsafe {
+fn create_audio_format_pod(buffer: &mut Vec<u8>) -> &spa::pod::Pod {
+    let mut audio_info = spa::param::audio::AudioInfoRaw::new();
+    audio_info.set_format(spa::param::audio::AudioFormat::F32LE);
+    audio_info.set_rate(25);
+    audio_info.set_channels(1);
 
-        let mut b: pipewire::spa::sys::spa_pod_builder = std::mem::zeroed();
-        b.data = buffer.as_mut_ptr() as *mut std::ffi::c_void;
-        b.size = buffer.len() as u32;
-        let mut audioinfo = pipewire::spa::sys::spa_audio_info_raw {
-            format: pipewire::spa::sys::SPA_AUDIO_FORMAT_F32_LE,
-            flags: 0,
-            rate: 25,
-            channels: 1,
-            position: [pipewire::spa::sys::SPA_AUDIO_CHANNEL_UNKNOWN; 64],
-        };
+    let values = spa::pod::serialize::PodSerializer::serialize(
+        std::io::Cursor::new(buffer),
+        &spa::pod::Value::Object(pipewire::spa::pod::Object {
+            type_: spa::sys::SPA_TYPE_OBJECT_Format,
+            id: spa::sys::SPA_PARAM_EnumFormat,
+            properties: audio_info.into(),
+        }),
+    )
+    .unwrap()
+    .0.into_inner();
 
-        audioinfo.position[0] = pipewire::spa::sys::SPA_AUDIO_CHANNEL_MONO;
-
-        let rawpod = pipewire::spa::sys::spa_format_audio_raw_build(&mut b as *mut pipewire::spa::sys::spa_pod_builder,
-            pipewire::spa::sys::SPA_PARAM_EnumFormat,
-            &mut audioinfo as *mut pipewire::spa::sys::spa_audio_info_raw);
-
-        pipewire::spa::pod::Pod::from_raw(rawpod)
-    }
+    spa::pod::Pod::from_bytes(values).unwrap()
 }
 
