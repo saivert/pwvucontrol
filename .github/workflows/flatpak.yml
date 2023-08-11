@@ -1,5 +1,4 @@
 name: CI
-author: saivert
 inputs:
   num-octocats:
     description: 'Number of Octocats'
