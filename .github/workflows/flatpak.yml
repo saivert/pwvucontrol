@@ -1,8 +1,16 @@
+name: CI
+author: saivert
+inputs:
+  num-octocats:
+    description: 'Number of Octocats'
+    required: false
+    default: '1'
 on:
   push:
     branches: [main]
   pull_request:
-name: CI
+permissions:
+  contents: write
 jobs:
   flatpak:
     name: "Flatpak"
@@ -17,3 +25,10 @@ jobs:
         bundle: pwvucontrol.flatpak
         manifest-path: build-aux/com.saivert.pwvucontrol.json
         cache-key: flatpak-builder-${{ github.sha }}
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: pwvucontrol.flatpak
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
