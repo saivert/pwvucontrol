@@ -10,19 +10,18 @@
                 <property name="orientation">vertical</property>
                 <property name="valign">center</property>
                 <property name="hexpand">False</property>
-                <style>
-                    <class name="header" />
-                </style>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="spacing">6</property>
+
                 <child>
 
                     <!--mainbox-->
                     <object class="GtkBox">
                         <property name="orientation">horizontal</property>
-                        <property name="spacing">0</property>
-
-                        <style>
-                            <class name="prefixes" />
-                        </style>
+                        <property name="spacing">6</property>
 
                         <child>
                             <object class="GtkImage" id="icon">
@@ -36,9 +35,6 @@
                                 <property name="valign">center</property>
                                 <property name="hexpand">1</property>
                                 <property name="halign">fill</property>
-                                <style>
-                                    <class name="title" />
-                                </style>
                                 <child>
                                     <object class="GtkLabel" id="title_label">
                                         <style>
@@ -129,6 +125,8 @@
                         <property name="orientation">vertical</property>
                         <property name="valign">center</property>
                         <property name="hexpand">1</property>
+                        <property name="spacing">6</property>
+
                         <child>
                             <object class="GtkScale" id="volume_scale">
                                 <property name="orientation">horizontal</property>
@@ -223,6 +221,9 @@
                                 <child>
                                     <object class="GtkListBox" id="channel_listbox">
                                         <property name="selection-mode">none</property>
+                                        <style>
+                                            <class name="boxed-list" />
+                                          </style>
                                     </object>
                                 </child>
                             </object>
