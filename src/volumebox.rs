@@ -33,7 +33,6 @@ mod imp {
 
     use glib::SignalHandlerId;
     use once_cell::sync::OnceCell;
-    use wp::pw::PipewireObjectExt2;
 
     use super::*;
     use crate::{
@@ -116,12 +115,7 @@ mod imp {
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
 
-            let icon_props = ["media.icon-name", "window.icon-name", "application.icon-name"];
-            for prop in icon_props {
-                if let Ok(appid) = item.wpnode().pw_property::<String>(prop) {
-                    self.icon.set_from_icon_name(Some(&appid));
-                }
-            }
+            self.icon.set_icon_name(Some(&item.iconname()));
 
             item.bind_property("name", &self.title_label.get(), "label")
                 .sync_create()

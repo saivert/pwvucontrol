@@ -50,6 +50,9 @@ pub mod imp {
         volume: Cell<f32>,
         #[property(get, set)]
         mute: Cell<bool>,
+        #[property(get, set)]
+        iconname: RefCell<String>,
+
         #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         pub(super) channel_volumes: RefCell<Vec<f32>>,
         #[property(get, set, construct_only, builder(crate::NodeType::Undefined))]
@@ -162,6 +165,7 @@ pub mod imp {
 
             obj.get_mixer_api();
             obj.update_volume_using_mixerapi();
+            obj.update_icon_name();
 
         }
     }
@@ -255,6 +259,26 @@ impl PwNodeObject {
             .unwrap_or_default();
 
         self.set_description(name);
+    }
+
+    fn update_icon_name(&self) {
+        match self.nodetype() {
+            NodeType::Input | NodeType::Output => {
+                self.set_iconname("library-music-symbolic");
+                let icon_props = ["media.icon-name", "window.icon-name", "application.icon-name"];
+                for prop in icon_props {
+                    if let Ok(appid) = self.wpnode().pw_property::<String>(prop) {
+                        self.set_iconname(appid);
+                    }
+                }
+            },
+            NodeType::Source | NodeType::Sink => {
+                self.set_iconname("soundcard-symbolic");
+            },
+            _ => {
+                self.set_iconname("library-music-symbolic");
+            }
+        }
     }
 
     pub(crate) fn update_format(&self) {
