@@ -103,6 +103,9 @@ mod imp {
                 self.obj().add_css_class("devel");
             }
 
+            self.obj().setup_scroll_blocker(self.playbacklist.get());
+            self.obj().setup_scroll_blocker(self.recordlist.get());
+            self.obj().setup_scroll_blocker(self.outputlist.get());
 
             let app = PwvucontrolApplication::default();
 
@@ -244,6 +247,34 @@ impl PwvucontrolWindow {
             self.maximize();
         }
 
+    }
+
+    /// This prevents child widgets from capturing scroll events
+    fn setup_scroll_blocker(&self, listbox: gtk::ListBox) {
+            let scrolledwindow = listbox.ancestor(gtk::ScrolledWindow::static_type()).and_then(|x|{
+                x.downcast::<gtk::ScrolledWindow>().ok()
+            }).expect("downcast to scrolled window");
+
+            let ecs = gtk::EventControllerScroll::new(gtk::EventControllerScrollFlags::BOTH_AXES);
+            ecs.set_propagation_phase(gtk::PropagationPhase::Capture);
+            ecs.set_propagation_limit(gtk::PropagationLimit::SameNative);
+
+            // Need to actually handle the scroll event in order to block propagation to the GtkScale widget
+            ecs.connect_local("scroll", false, clone!(@weak scrolledwindow => @default-return None, move |v| {
+                let y: f64 = v.get(2).unwrap().get().unwrap();
+
+                // No way to redirect this event to underlying widget so we need to reimplement the scroll handling
+                let adjustment = scrolledwindow.vadjustment();
+                
+                if (adjustment.upper() - adjustment.page_size()).abs() < f64::EPSILON {
+                    return Some(false.to_value());
+                }
+                
+                adjustment.set_value(adjustment.value() + y*adjustment.page_size().powf(2.0 / 3.0));
+                
+                Some(true.to_value())
+            }));
+            scrolledwindow.add_controller(ecs);
     }
 }
 
