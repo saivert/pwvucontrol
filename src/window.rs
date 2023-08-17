@@ -255,11 +255,11 @@ impl PwvucontrolWindow {
                 x.downcast::<gtk::ScrolledWindow>().ok()
             }).expect("downcast to scrolled window");
 
-            let ecs = gtk::EventControllerScroll::new(gtk::EventControllerScrollFlags::BOTH_AXES);
+            let ecs = gtk::EventControllerScroll::new(gtk::EventControllerScrollFlags::VERTICAL);
             ecs.set_propagation_phase(gtk::PropagationPhase::Capture);
             ecs.set_propagation_limit(gtk::PropagationLimit::SameNative);
 
-            // Need to actually handle the scroll event in order to block propagation to the GtkScale widget
+            // Need to actually handle the scroll event in order to block propagation
             ecs.connect_local("scroll", false, clone!(@weak scrolledwindow => @default-return None, move |v| {
                 let y: f64 = v.get(2).unwrap().get().unwrap();
 
