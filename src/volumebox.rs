@@ -315,7 +315,7 @@ mod imp {
             self.level_bar
                 .add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar
-                .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 0.0);
+                .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
 
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider

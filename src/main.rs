@@ -97,6 +97,21 @@ fn main() -> gtk::glib::ExitCode {
     // Load resources
     gio::resources_register(&resources);
 
+    let css = gtk::CssProvider::new();
+    css.load_from_data(
+        r#"
+    levelbar block.filled {
+        filter: blur(2px);
+    }
+    "#,
+    );
+
+    gtk::style_context_add_provider_for_display(
+        &gtk::gdk::Display::default().unwrap(),
+        &css,
+        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+    );
+
     let app = PwvucontrolApplication::new();
 
     app.run()
