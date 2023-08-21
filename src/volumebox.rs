@@ -33,6 +33,7 @@ mod imp {
 
     use glib::SignalHandlerId;
     use once_cell::sync::OnceCell;
+    use wp::pw::MetadataExt;
 
     use super::*;
     use crate::{
