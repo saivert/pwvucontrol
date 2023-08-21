@@ -169,8 +169,17 @@
                         <child>
                             <object class="GtkBox">
                                 <property name="orientation">vertical</property>
+                                <property name="spacing">6</property>
                                 <child>
                                     <object class="GtkCenterBox">
+
+                                        <child type="start">
+                                            <object class="GtkMenuButton">
+                                                <property name="label">Advanced</property>
+                                                <property name="popover">advancedvolumes</property>
+                                            </object>
+                                        </child>
+
                                         <child type="center">
                                             <object class="GtkLabel" id="format">
                                                 <property name="xalign">0.5</property>
@@ -189,41 +198,14 @@
                                         </child>
                                     </object>
                                 </child>
-                                <child>
-                                    <object class="GtkBox">
-                                        <property name="spacing">6</property>
-                                        <child>
-                                            <object class="GtkLabel">
-                                                <property name="width-chars">3</property>
-                                                <property name="xalign">1.0</property>
-                                                <property name="label" translatable="yes">Main</property>
-                                            </object>
-                                        </child>
-                                        <child>
-                                            <object class="GtkScale" id="mainvolumescale">
-                                                <property name="hexpand">True</property>
-                                                <property name="hexpand-set">True</property>
 
-                                                <property name="adjustment">
-                                                    <object class="GtkAdjustment">
-                                                        <property name="lower">0</property>
-                                                        <property name="upper">1</property>
-                                                        <property name="step-increment">0.01</property>
-                                                        <property name="page-increment">0.1</property>
-                                                        <property name="page-size">0</property>
-                                                    </object>
-                                                </property>
 
-                                            </object>
-                                        </child>
-                                    </object>
-                                </child>
                                 <child>
                                     <object class="GtkListBox" id="channel_listbox">
                                         <property name="selection-mode">none</property>
                                         <style>
                                             <class name="boxed-list" />
-                                          </style>
+                                        </style>
                                     </object>
                                 </child>
                             </object>
@@ -233,4 +215,73 @@
             </object>
         </child>
     </template>
+
+
+    <object class="GtkPopover" id="advancedvolumes">
+        <child>
+            <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="width-request">200</property>
+                <child>
+                    <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <property name="hexpand">1</property>
+                        
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="xalign">1.0</property>
+                                <property name="label" translatable="yes">Main</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkScale" id="mainvolumescale">
+                                <property name="hexpand">1</property>
+                                <property name="hexpand-set">1</property>
+
+                                <property name="adjustment">
+                                    <object class="GtkAdjustment">
+                                        <property name="lower">0</property>
+                                        <property name="upper">1</property>
+                                        <property name="step-increment">0.01</property>
+                                        <property name="page-increment">0.1</property>
+                                        <property name="page-size">0</property>
+                                    </object>
+                                </property>
+
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkBox">
+                        <property name="spacing">6</property>
+                        <property name="hexpand">1</property>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="xalign">1.0</property>
+                                <property name="label" translatable="yes">Monitor</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkScale" id="monitorvolumescale">
+                                <property name="hexpand">1</property>
+                                <property name="hexpand-set">1</property>
+
+                                <property name="adjustment">
+                                    <object class="GtkAdjustment">
+                                        <property name="lower">0</property>
+                                        <property name="upper">1</property>
+                                        <property name="step-increment">0.01</property>
+                                        <property name="page-increment">0.1</property>
+                                        <property name="page-size">0</property>
+                                    </object>
+                                </property>
+
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
 </interface>

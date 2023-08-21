@@ -82,6 +82,8 @@ mod imp {
         pub outputdevice_dropdown: TemplateChild<gtk::DropDown>,
         #[template_child]
         pub mainvolumescale: TemplateChild<gtk::Scale>,
+        #[template_child]
+        pub monitorvolumescale: TemplateChild<gtk::Scale>,
     }
 
     #[glib::object_subclass]
@@ -132,6 +134,13 @@ mod imp {
                 .build();
 
             item.bind_property("volume", &self.volume_scale.adjustment(), "value")
+                .sync_create()
+                .bidirectional()
+                .transform_to(linear_to_cubic)
+                .transform_from(cubic_to_linear)
+                .build();
+
+            item.bind_property("monitorvolume", &self.monitorvolumescale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to(linear_to_cubic)
@@ -386,7 +395,6 @@ impl PwVolumeBox {
             model.iter::<glib::Object>().enumerate().find_map(|(x, y)| {
                 if let Ok(d) = y {
                     if let Some(o) = d.downcast_ref::<PwNodeObject>() {
-                        dbg!(o.boundid());
                         if o.boundid() == id {
                             return Some(x as u32);
                         }

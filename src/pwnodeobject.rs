@@ -49,6 +49,8 @@ pub mod imp {
         #[property(get, set)]
         volume: Cell<f32>,
         #[property(get, set)]
+        monitorvolume: Cell<f32>,
+        #[property(get, set)]
         mute: Cell<bool>,
         #[property(get, set)]
         iconname: RefCell<String>,
@@ -102,6 +104,11 @@ pub mod imp {
                         self.obj().send_mainvolume();
                     }
                 },
+                "monitorvolume" => {
+                    if !self.block.get() {
+                        self.obj().send_monitorvolume();
+                    }
+                },
                 _ => {},
             }
         }
@@ -151,7 +158,7 @@ pub mod imp {
                 wp::log::debug!("params-changed! {what} id: {}", node.bound_id());
                 obj.imp().block.set(true);
                 match what {
-                    "Props" => obj.update_mainvolume(),
+                    "Props" => obj.update_props(),
                     "Format" => obj.update_format(),
                     _ => {},
                 }
@@ -159,7 +166,7 @@ pub mod imp {
             }));
 
             obj.label_set_description();
-            obj.update_mainvolume();
+            obj.update_props();
             obj.update_format();
             obj.label_set_name();
 
@@ -343,7 +350,7 @@ impl PwNodeObject {
         }));
     }
 
-    pub(crate) fn update_mainvolume(&self) {
+    pub(crate) fn update_props(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
         let params = node
@@ -352,6 +359,7 @@ impl PwNodeObject {
 
         let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
         let volume_key = keys.find_value_from_short_name("volume").expect("volume key");
+        let monitorvolumes_key = keys.find_value_from_short_name("monitorVolumes").expect("monitorVolumes key");
 
         for a in params {
             let pod: wp::spa::SpaPod = a.get().unwrap();
@@ -359,6 +367,13 @@ impl PwNodeObject {
                 if let Some(val) = pod.find_spa_property(&volume_key) {
                     if let Some(volume) = val.float() {
                         self.set_mainvolume(volume);
+                    }
+                }
+
+                if let Some(val) = pod.find_spa_property(&monitorvolumes_key) {
+                    if val.is_array() {
+                        let volume = val.array_iterator::<f32>().max_by(f32::total_cmp);
+                        self.set_monitorvolume(volume.unwrap_or_default());
                     }
                 }
             }
@@ -371,6 +386,27 @@ impl PwNodeObject {
 
         podbuilder.add_property("volume");
         podbuilder.add_float(self.mainvolume());
+
+        if let Some(pod) = podbuilder.end() {
+            node.set_param("Props", 0, pod);
+        }
+
+    }
+
+
+    fn send_monitorvolume(&self) {
+        let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
+        let node = self.imp().wpnode.get().expect("WpNode set");
+
+        let array = SpaPodBuilder::new_array();
+        let volume = self.monitorvolume();
+        for _ in 0..self.channel_volumes_vec().len() {
+            array.add_float(volume);
+        }
+        if let Some(arraypod) = array.end() {
+            podbuilder.add_property("monitorVolumes");
+            podbuilder.add_pod(&arraypod);
+        }
 
         if let Some(pod) = podbuilder.end() {
             node.set_param("Props", 0, pod);
