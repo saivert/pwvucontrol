@@ -139,7 +139,7 @@ mod imp {
 
             wp_om.add_interest_full(
                 {
-                    let interest = wp::registry::ObjectInterest::new_type(
+                    let interest = wp::registry::ObjectInterest::new(
                         wp::pw::Node::static_type(),
                     );
                     let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Sink')").expect("variant");
@@ -155,7 +155,7 @@ mod imp {
 
             wp_om.add_interest_full(
                 {
-                    let interest = wp::registry::ObjectInterest::new_type(
+                    let interest = wp::registry::ObjectInterest::new(
                         wp::pw::Device::static_type(),
                     );
                     interest.add_constraint(
