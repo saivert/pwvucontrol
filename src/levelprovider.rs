@@ -1,7 +1,7 @@
-use std::{time::Duration, fmt::Debug};
+use std::{fmt::Debug, time::Duration};
 
-use pipewire::{properties, stream::*, Context, Loop, spa};
-use glib::{self, ControlFlow, clone};
+use glib::{self, clone, ControlFlow};
+use pipewire::{properties, spa, stream::*, Context, Loop};
 use std::os::fd::AsRawFd;
 
 use crate::volumebox::PwVolumeBox;
@@ -78,10 +78,11 @@ impl LevelbarProvider {
             pipewire::spa::Direction::Input,
             Some(id),
             StreamFlags::AUTOCONNECT
-            | StreamFlags::MAP_BUFFERS
-            | StreamFlags::RT_PROCESS
-            | StreamFlags::DONT_RECONNECT,
-            &mut [fmtpod])?;
+                | StreamFlags::MAP_BUFFERS
+                | StreamFlags::RT_PROCESS
+                | StreamFlags::DONT_RECONNECT,
+            &mut [fmtpod],
+        )?;
 
         Ok(Self {
             _loop: loop_,
@@ -90,7 +91,6 @@ impl LevelbarProvider {
             _listener: listener,
         })
     }
-
 }
 
 impl Drop for LevelbarProvider {
@@ -106,6 +106,7 @@ fn create_audio_format_pod(buffer: &mut Vec<u8>) -> &spa::pod::Pod {
     audio_info.set_format(spa::param::audio::AudioFormat::F32LE);
     audio_info.set_rate(25);
     audio_info.set_channels(1);
+    audio_info.set_position([spa::sys::SPA_AUDIO_CHANNEL_MONO; 64]);
 
     let values = spa::pod::serialize::PodSerializer::serialize(
         std::io::Cursor::new(buffer),
@@ -116,8 +117,8 @@ fn create_audio_format_pod(buffer: &mut Vec<u8>) -> &spa::pod::Pod {
         }),
     )
     .unwrap()
-    .0.into_inner();
+    .0
+    .into_inner();
 
     spa::pod::Pod::from_bytes(values).unwrap()
 }
-
