@@ -240,13 +240,19 @@ mod imp {
                 let app = PwvucontrolApplication::default();
                 if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
                     let boundid = item.boundid();
-                    let sid = metadata.connect_changed(
-                        clone!(@weak self as widget => @default-panic, move |_obj,id,key,_type_,value| {
-                            if id == boundid && key == "target.object" {
-                                wp::log::info!("metadata changed handler id:{boundid} value:{value}!");
-                                widget.obj().update_output_device_dropdown();
+                    let sid = metadata.connect_local(
+                        "changed",
+                        true,
+                        clone!(@weak self as widget => @default-panic, move |value| {
+                            let id: u32 = value[1].get().expect("subject id");
+                            if id != boundid {
+                                return None;
                             }
-                        })
+                            wp::log::info!("metadata changed handler id:{}!", boundid);
+                            widget.obj().update_output_device_dropdown();
+
+                            None
+                        }),
                     );
                     self.metadata_changed_event.set(Some(sid));
                 }
