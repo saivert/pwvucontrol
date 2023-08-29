@@ -140,6 +140,9 @@ pub mod imp {
 
             let node = self.wpnode.get().expect("Node set on PwNodeObject");
 
+            self.nodetype.set(get_node_type_for_node(node));
+            self.boundid.set(node.bound_id());
+
             node.connect_notify_local(
                 Some("global-properties"),
                 clone!(@weak obj => move  |_, _| {
@@ -203,19 +206,19 @@ glib::wrapper! {
     pub struct PwNodeObject(ObjectSubclass<imp::PwNodeObject>);
 }
 
+pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
+    match node.get_pw_property("media.class").as_deref() {
+        Some("Stream/Output/Audio") => NodeType::Output,
+        Some("Stream/Input/Audio") => NodeType::Input,
+        Some("Audio/Sink") => NodeType::Sink,
+        _ => NodeType::Undefined,
+    }
+}
+
 impl PwNodeObject {
     pub(crate) fn new(node: &wp::pw::Node) -> Self {
-        let nodetype = match node.get_pw_property("media.class").as_deref() {
-            Some("Stream/Output/Audio") => NodeType::Output,
-            Some("Stream/Input/Audio") => NodeType::Input,
-            Some("Audio/Sink") => NodeType::Sink,
-            _ => NodeType::Undefined,
-        };
-
         Object::builder()
-            .property("boundid", node.bound_id())
             .property("wpnode", node)
-            .property("nodetype", nodetype)
             .build()
     }
 
