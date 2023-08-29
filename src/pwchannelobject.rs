@@ -26,9 +26,7 @@ mod imp {
         #[property(get, set)]
         index: Cell<u32>,
         #[property(get, set = Self::set_volume)]
-        volume: Cell<f32>,
-
-        pub block_volume_send: Cell<bool>,
+        pub(super) volume: Cell<f32>,
     }
 
     // The central trait for subclassing a GObject
@@ -51,13 +49,12 @@ mod imp {
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
-            if !self.block_volume_send.get() {
-                if let Some(nodeobj) = self.row_data.borrow().as_ref() {
-                    if nodeobj.channellock() {
-                        nodeobj.set_channel_volumes_vec(&vec![volume; nodeobj.channel_volumes_vec().len()]);
-                    } else {
-                        nodeobj.set_channel_volume(index, volume);
-                    }
+
+            if let Some(nodeobj) = self.row_data.borrow().as_ref() {
+                if nodeobj.channellock() {
+                    nodeobj.set_channel_volumes_vec(&vec![volume; nodeobj.channel_volumes_vec().len()]);
+                } else {
+                    nodeobj.set_channel_volume(index, volume);
                 }
             }
         }
@@ -86,4 +83,12 @@ impl PwChannelObject {
             .property("row-data", row_data)
             .build()
     }
+
+    pub fn set_volume_no_send(&self, volume: f32) {
+        let imp = self.imp();
+
+        imp.volume.set(volume);
+        self.notify_volume();
+    }
+
 }

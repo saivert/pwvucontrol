@@ -311,9 +311,7 @@ mod imp {
                     if let Some(item) = channelmodel.item(i as u32) {
                         let channelobj = item.downcast_ref::<PwChannelObject>()
                             .expect("RowData is of wrong type");
-                        channelobj.imp().block_volume_send.set(true);
-                        channelobj.set_volume(v);
-                        channelobj.imp().block_volume_send.set(false);
+                        channelobj.set_volume_no_send(*v);
                     }
                 }
             }));
