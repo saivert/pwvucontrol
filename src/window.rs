@@ -108,8 +108,9 @@ mod imp {
             self.obj().setup_scroll_blocker(self.outputlist.get());
 
             let app = PwvucontrolApplication::default();
-
-            let model = &app.imp().nodemodel;
+            let manager = app.manager().unwrap();
+            let model = &manager.imp().nodemodel;
+            let sinkmodel = &manager.imp().sinkmodel;
             let window = self;
 
             let filter = gtk::CustomFilter::new(|x| {
@@ -150,16 +151,8 @@ mod imp {
                 }),
             );
 
-            let filter = gtk::CustomFilter::new(|x| {
-                if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == crate::NodeType::Sink;
-                }
-                false
-            });
-            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
-
             self.outputlist.bind_model(
-                Some(filterlistmodel),
+                Some(sinkmodel),
                 clone!(@weak window => @default-panic, move |item| {
                     PwVolumeBox::new(
                         item.downcast_ref::<PwNodeObject>()
@@ -171,7 +164,8 @@ mod imp {
 
             self.reconnectbtn.connect_clicked(|_| {
                 let app = PwvucontrolApplication::default();
-                if let Some(core) = app.imp().wp_core.get() {
+                let manager = app.manager().unwrap();
+                if let Some(core) = manager.imp().wp_core.get() {
                     core.connect();
                 }
             });

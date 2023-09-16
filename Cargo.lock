@@ -1212,7 +1212,7 @@ dependencies = [
 [[package]]
 name = "wireplumber"
 version = "0.1.0"
-source = "git+https://github.com/arcnmx/wireplumber.rs.git?rev=0516ee90edc1eddfcf14669095afcbc3b4adf911#0516ee90edc1eddfcf14669095afcbc3b4adf911"
+source = "git+https://github.com/arcnmx/wireplumber.rs.git?rev=341b0c4e8d177f5f21c109cf88cca4f2dc1f853a#341b0c4e8d177f5f21c109cf88cca4f2dc1f853a"
 dependencies = [
  "bitflags 2.4.0",
  "gio",
@@ -1228,7 +1228,7 @@ dependencies = [
 [[package]]
 name = "wireplumber-sys"
 version = "0.1.0"
-source = "git+https://github.com/arcnmx/wireplumber.rs.git?rev=0516ee90edc1eddfcf14669095afcbc3b4adf911#0516ee90edc1eddfcf14669095afcbc3b4adf911"
+source = "git+https://github.com/arcnmx/wireplumber.rs.git?rev=341b0c4e8d177f5f21c109cf88cca4f2dc1f853a#341b0c4e8d177f5f21c109cf88cca4f2dc1f853a"
 dependencies = [
  "gio-sys",
  "glib-sys",

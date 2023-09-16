@@ -450,7 +450,10 @@ impl PwNodeObject {
 
     pub(crate) fn set_default_target(&self, target_node: &PwNodeObject) {
         let app = PwvucontrolApplication::default();
-        if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+        let manager = app.manager();
+        let manager = manager.as_ref().unwrap();
+
+        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
             metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some(&target_node.serial().to_string()));
         } else {
@@ -460,14 +463,17 @@ impl PwNodeObject {
 
     pub(crate) fn default_target(&self) -> Option<PwNodeObject> {
         let app = PwvucontrolApplication::default();
-        let om = app.imp().wp_object_manager.get().unwrap();
-        if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+        let manager = app.manager();
+        let manager = manager.as_ref().unwrap();
+
+        let om = manager.imp().wp_object_manager.get().unwrap();
+        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
             if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
                 if target_serial != "-1" {
                     if let Some(sinknode) = om.lookup([
                         Constraint::compare(ConstraintType::PwProperty, "object.serial", target_serial.as_str(), true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
-                        return app.imp().nodemodel.get_node(sinknode.bound_id()).ok();
+                        return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
                     };
                 }
             }

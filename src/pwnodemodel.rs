@@ -87,6 +87,17 @@ impl PwNodeModel {
         Err(())
     }
 
+    pub fn get_node_pos_from_id(&self, id: u32) -> Option<u32> {
+        let imp = self.imp();
+        let vector = imp.0.borrow();
+        for (i, v) in vector.iter().enumerate() {
+            if v.boundid() == id {
+                return Some(i as u32);
+            }
+        }
+        None
+    }
+
 }
 
 impl Default for PwNodeModel {

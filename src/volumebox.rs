@@ -31,9 +31,8 @@ mod imp {
 
     use std::cell::Cell;
 
-    use glib::SignalHandlerId;
+    use glib::{closure_local, SignalHandlerId};
     use once_cell::sync::OnceCell;
-    use wp::pw::MetadataExt;
 
     use super::*;
     use crate::{
@@ -56,6 +55,7 @@ mod imp {
         levelbarprovider: OnceCell<LevelbarProvider>,
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
+        pub(super) default_node: Cell<u32>,
 
         // Template widgets
         #[template_child]
@@ -140,6 +140,7 @@ mod imp {
                 .transform_from(cubic_to_linear)
                 .build();
 
+            #[rustfmt::skip]
             item.bind_property("monitorvolume", &self.monitorvolumescale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
@@ -211,15 +212,18 @@ mod imp {
                     .set_list_factory(Some(&listfactory));
 
                 let app = PwvucontrolApplication::default();
-                let model = &app.imp().nodemodel;
+                let manager = app.manager().unwrap();
+        
+                // let model = &app.imp().nodemodel;
+                let sinkmodel = &manager.imp().sinkmodel;
 
-                let filter = gtk::CustomFilter::new(|x| {
-                    if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                        return o.nodetype() == crate::NodeType::Sink;
-                    }
-                    false
-                });
-                let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
+                // let filter = gtk::CustomFilter::new(|x| {
+                //     if let Some(o) = x.downcast_ref::<PwNodeObject>() {
+                //         return o.nodetype() == crate::NodeType::Sink;
+                //     }
+                //     false
+                // });
+                // let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
                 self.outputdevice_dropdown.set_enable_search(true);
                 self.outputdevice_dropdown
@@ -229,33 +233,45 @@ mod imp {
                         "name",
                     )));
 
-                self.outputdevice_dropdown.set_model(Some(filterlistmodel));
+                self.outputdevice_dropdown.set_model(Some(sinkmodel));
 
-                self.obj().update_output_device_dropdown();
+                // self.obj().update_output_device_dropdown();
+                glib::idle_add_local_once(clone!(@weak self as widget => move || {
+                    widget.obj().update_output_device_dropdown();
+                }));
 
                 // filterlistmodel.connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
                 //     widget.obj().update_output_device_dropdown();
                 // }));
 
                 let app = PwvucontrolApplication::default();
-                if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+                let manager = app.manager().unwrap();
+                if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     let boundid = item.boundid();
-                    let sid = metadata.connect_local(
-                        "changed",
-                        true,
-                        clone!(@weak self as widget => @default-panic, move |value| {
-                            let id: u32 = value[1].get().expect("subject id");
-                            if id != boundid {
-                                return None;
-                            }
-                            wp::log::info!("metadata changed handler id:{}!", boundid);
-                            widget.obj().update_output_device_dropdown();
-
-                            None
-                        }),
-                    );
-                    self.metadata_changed_event.set(Some(sid));
+                    let widget = self.obj();
+                    let changed_closure = closure_local!(@watch widget =>
+                        move |_obj: &wp::pw::Metadata, id: u32, key: Option<String>, _type: Option<String>, _value: Option<String>| {
+                        let key = key.unwrap_or_default();
+                        if id == boundid && key.contains("target.") {
+                            wp::log::info!("metadata changed handler id: {boundid} {key:?} {_value:?}!");
+                            widget.update_output_device_dropdown();
+                        }
+                    });
+                    metadata.connect_closure("changed", false, changed_closure);
                 }
+
+                let core = manager.imp().wp_core.get().expect("Core");
+                let defaultnodesapi =
+                    wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
+                let widget = self.obj();
+                let defaultnodesapi_closure = closure_local!(@watch widget => move |defaultnodesapi: wp::plugin::Plugin| {
+                    let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+                    wp::info!("default-nodes-api changed: new id {id}");
+                    widget.imp().default_node.set(id);
+                    widget.update_output_device_dropdown();
+                });
+                defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
+                defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
 
                 self.outputdevice_dropdown.connect_notify_local(
                     Some("selected-item"),
@@ -286,6 +302,24 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
+
+            // let obj = self.obj();
+            // let c = closure_local!(@watch obj, @strong channelmodel/* , @strong item as nodeobj */ => move |nodeobj: &PwNodeObject|  {
+            //     // let nodeobj: &PwNodeObject = v.downcast_ref().expect("downcast to PwNodeObject");
+            //     let values = nodeobj.channel_volumes_vec();
+            //     let oldlen = channelmodel.n_items();
+
+            //     wp::log::info!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
+
+            //     if values.len() as u32 != oldlen {
+            //         channelmodel.remove_all();
+            //         for (i,v) in values.iter().enumerate() {
+            //             channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
+            //         }
+
+            //     }
+            // });
+            // item.connect_closure("format", false, c);
 
             item.connect_local("format", false, 
             clone!(@weak channelmodel, @weak item as nodeobj => @default-panic, move |_| {
@@ -349,7 +383,8 @@ mod imp {
         fn dispose(&self) {
             if let Some(sid) = self.metadata_changed_event.take() {
                 let app = PwvucontrolApplication::default();
-                if let Some(metadata) = app.imp().metadata.borrow().as_ref() {
+                let manager = app.manager().unwrap();
+                if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     metadata.disconnect(sid);
                 };
             };
@@ -392,34 +427,21 @@ impl PwVolumeBox {
     }
 
     pub(crate) fn update_output_device_dropdown(&self) {
-        fn find_position_with_boundid_match(
-            model: &impl IsA<gio::ListModel>,
-            id: u32,
-        ) -> Option<u32> {
-            model.iter::<glib::Object>().enumerate().find_map(|(x, y)| {
-                if let Ok(d) = y {
-                    if let Some(o) = d.downcast_ref::<PwNodeObject>() {
-                        if o.boundid() == id {
-                            return Some(x as u32);
-                        }
-                    }
-                }
-                None
-            })
-        }
+        let app = PwvucontrolApplication::default();
+        let manager = app.manager();
+        let manager = manager.unwrap();
+
+        let sinkmodel = &manager.imp().sinkmodel;
 
         let imp = self.imp();
 
         let item = imp.row_data.borrow();
         let item = item.as_ref().cloned().unwrap();
-        let filterlistmodel = imp.outputdevice_dropdown.model().expect("model");
 
         if let Some(deftarget) = item.default_target() {
-            if let Some(pos) =
-                find_position_with_boundid_match(&filterlistmodel, deftarget.boundid())
-            {
+            if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
                 wp::log::info!(
-                    "switching to preferred target {} {}",
+                    "switching to preferred target pos={pos} boundid={} serial={}",
                     deftarget.boundid(),
                     deftarget.serial()
                 );
@@ -428,17 +450,16 @@ impl PwVolumeBox {
                 imp.outputdevice_dropdown_block_signal.set(false);
             }
         } else {
-            let app = PwvucontrolApplication::default();
-            let core = app.imp().wp_core.get().expect("Core");
-            let defaultnodesapi =
-                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
-            let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+            let id = self.imp().default_node.get();
+            wp::log::info!("default_node is {id}");
             if id != u32::MAX {
-                if let Some(pos) = find_position_with_boundid_match(&filterlistmodel, id) {
+                if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
                     wp::log::info!("switching to default target");
-                    imp.outputdevice_dropdown_block_signal.set(true);
-                    imp.outputdevice_dropdown.set_selected(pos);
-                    imp.outputdevice_dropdown_block_signal.set(false);
+                    if imp.outputdevice_dropdown.selected() != pos {
+                        imp.outputdevice_dropdown_block_signal.set(true);
+                        imp.outputdevice_dropdown.set_selected(pos);
+                        imp.outputdevice_dropdown_block_signal.set(false);
+                    }
                 }
             }
         }
