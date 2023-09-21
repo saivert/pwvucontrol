@@ -23,7 +23,7 @@ Current implemented features as of 2023-07-30:
 ![Screenshot](../assets/screenshot.png)
 
 ## Help needed
-I need a nice icon!
+I need a nice icon in SVG!
 
 Help with making it run as a flatpak. Update Aug 1 2023: It runs now but I need help getting it on Flathub.
 
