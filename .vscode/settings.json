@@ -1,0 +1,21 @@
+{
+    "C_Cpp.default.compileCommands": "builddir/compile_commands.json",
+    "rust-analyzer.server.extraEnv": {
+        "CODEGEN_BUILD_DIR": "../builddir/src",
+        "CARGO_HOME": "builddir/cargo-home"
+    },
+    "rust-analyzer.cargo.extraEnv": {
+        "CARGO_HOME": "builddir/cargo-home"
+    },
+    "rust-analyzer.files.excludeDirs": [
+        ".flatpak-builder",
+        "build-aux",
+        "build",
+        "flatpak_app"
+    ],
+    "rust-analyzer.cargo.features": [],
+    "rust-analyzer.cargo.extraArgs": [
+        "--target-dir=builddir/src"
+    ],
+    "rust-analyzer.debug.engine": "ms-vscode.cpptools"
+}

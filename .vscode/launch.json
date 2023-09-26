@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "program": "${workspaceFolder}/builddir/src/pwvucontrol",
+            "env": {
+                "G_MESSAGES_DEBUG": "all",
+                "GSETTINGS_SCHEMA_DIR": "${workspaceFolder}/builddir/data",
+                "RUST_BACKTRACE": "1",
+                "!LC_MESSAGES": "nb_NO.UTF-8",
+                "PWVUCONTROL_LOCALEDIR": "${workspaceFolder}/builddir/locale-test/locale",
+                "GDK_BACKEND": "wayland"
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/builddir/src",
+        },
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "Debug gdb",
+            "program": "${workspaceFolder}/builddir/src/pwvucontrol",
+            "cwd": "${workspaceFolder}/builddir/src",
+            "environment": [
+                {"name": "GSETTINGS_SCHEMA_DIR", "value": "${workspaceFolder}/builddir/data"},
+                {"name": "G_MESSAGES_DEBUG", "value": "all"},
+                {"name": "RUST_BACKTRACE", "value": "1"},
+                {"name": "PWVUCONTROL_LOCALEDIR", "value": "${workspaceFolder}/builddir/locale-test/locale"},
+                {"name": "GDK_BACKEND", "value": "wayland"},
+            ],
+        }
+    ]
+}
