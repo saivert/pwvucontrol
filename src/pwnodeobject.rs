@@ -475,10 +475,33 @@ impl PwNodeObject {
                     };
                 }
             }
+
+            if let Some(target_node) = metadata.find_notype(self.boundid(), "target.node") {
+                if target_node != "-1" {
+                    if let Some(sinknode) = om.lookup([
+                        Constraint::compare(ConstraintType::PwProperty, "object.id", target_node.as_str(), true),
+                    ].iter().collect::<Interest<wp::pw::Node>>()) {
+                        return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
+                    };
+                }
+            }
         } else {
             wp::log::warning!("Cannot get metadata object");
         };
         None
+    }
+
+    pub(crate) fn unset_default_target(&self) {
+        let app = PwvucontrolApplication::default();
+        let manager = app.manager();
+        // let manager = manager.as_ref().unwrap();
+
+        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+            metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some("-1"));
+            metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some("-1"));
+        } else {
+            wp::log::warning!("Cannot get metadata object");
+        };
     }
 
 

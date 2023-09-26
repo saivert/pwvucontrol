@@ -33,6 +33,7 @@ mod pwnodeobject;
 mod volumebox;
 mod window;
 mod manager;
+mod withdefaultlistmodel;
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 

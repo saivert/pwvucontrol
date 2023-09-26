@@ -37,7 +37,7 @@ mod imp {
     use super::*;
     use crate::{
         channelbox::PwChannelBox, levelprovider::LevelbarProvider,
-        pwchannelobject::PwChannelObject, NodeType,
+        pwchannelobject::PwChannelObject, NodeType, withdefaultlistmodel::WithDefaultListModel,
     };
 
     #[derive(Default, gtk::CompositeTemplate, Properties)]
@@ -56,6 +56,7 @@ mod imp {
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
+        pub(super) dropdown_model: RefCell<WithDefaultListModel>,
 
         // Template widgets
         #[template_child]
@@ -179,38 +180,6 @@ mod imp {
                 item.nodetype(),
                 /* NodeType::Input | */ NodeType::Output
             ) {
-                //TODO: Implement support for Audio/Source switching for NodeType::Input
-                let factory = gtk::SignalListItemFactory::new();
-                factory.connect_setup(|_, item| {
-                    let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                    let label = gtk::Label::new(None);
-                    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
-
-                    item.property_expression("item")
-                        .chain_property::<PwNodeObject>("name")
-                        .bind(&label, "label", gtk::Widget::NONE);
-
-                    item.set_child(Some(&label));
-                });
-
-                self.outputdevice_dropdown.set_factory(Some(&factory));
-
-                let listfactory = gtk::SignalListItemFactory::new();
-                listfactory.connect_setup(|_, item| {
-                    let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                    let label = gtk::Label::new(None);
-                    label.set_xalign(0.0);
-
-                    item.property_expression("item")
-                        .chain_property::<PwNodeObject>("name")
-                        .bind(&label, "label", gtk::Widget::NONE);
-
-                    item.set_child(Some(&label));
-                });
-
-                self.outputdevice_dropdown
-                    .set_list_factory(Some(&listfactory));
-
                 let app = PwvucontrolApplication::default();
                 let manager = app.manager();
 
@@ -236,16 +205,100 @@ mod imp {
                     let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
                     wp::info!("default-nodes-api changed: new id {id}");
                     widget.imp().default_node.set(id);
+
                     widget.update_output_device_dropdown();
                 });
                 defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
                 defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
 
-                self.outputdevice_dropdown.connect_notify_local(
-                    Some("selected-item"),
-                    clone!(@weak self as widget, @weak item as nodeobj => move |dropdown, _| {
+                self.container.append(&self.onlabel.get());
+                self.container.append(&self.outputdevice_dropdown.get());
+
+                fn setup_handler(item: &glib::Object, ellipsized: bool) {
+                    let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                    let box_ = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+                    let label = gtk::Label::new(None);
+                    box_.append(&label);
+                    label.set_xalign(0.0);
+                    if ellipsized {
+                        label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+                    } else {
+                        let icon = gtk::Image::from_icon_name("object-select-symbolic");
+                        icon.set_accessible_role(gtk::AccessibleRole::Presentation);
+                        box_.append(&icon);
+                    }
+
+                    item.property_expression("item")
+                        .chain_closure::<Option<String>>(closure_local!(
+                            move |_: Option<glib::Object>, item: Option<glib::Object>| {
+                                if let Some(item) = item {
+                                    if let Some(item) = item.downcast_ref::<PwNodeObject>() {
+                                        return item.name();
+                                    }
+                                    if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
+                                        return Some(item.string().to_string());
+                                    }
+                                }
+
+                                None
+                            }
+                        ))
+                        .bind(&label, "label", gtk::Widget::NONE);
+
+                    item.set_child(Some(&box_));
+                }
+
+                //TODO: Implement support for Audio/Source switching for NodeType::Input
+                let factory = gtk::SignalListItemFactory::new();
+                factory.connect_setup(|_, item| setup_handler(item, true));
+
+                // We need to store the DropDown widget's internal default factory so we can reset the list-factory later
+                // which would otherwise just use the factory we set
+                let default_dropdown_factory = self.outputdevice_dropdown.factory();
+                self.outputdevice_dropdown.set_factory(Some(&factory));
+                self.outputdevice_dropdown
+                    .set_list_factory(default_dropdown_factory.as_ref());
+
+                let sinkmodel = &manager.imp().sinkmodel;
+
+                self.outputdevice_dropdown.set_enable_search(true);
+                // self.outputdevice_dropdown
+                //     .set_expression(Some(gtk::PropertyExpression::new(
+                //         PwNodeObject::static_type(),
+                //         gtk::Expression::NONE,
+                //         "name",
+                //     )));
+
+                self.outputdevice_dropdown
+                    .set_expression(Some(gtk::ClosureExpression::new::<Option<String>>(
+                        gtk::Expression::NONE,
+                        closure_local!(move |item: glib::Object| {
+                            if let Some(item) = item.downcast_ref::<PwNodeObject>() {
+                                item.name()
+                            } else if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
+                                Some(item.string().to_string())
+                            } else {
+                                None
+                            }
+                        }),
+                    )));
+
+                self.dropdown_model.replace(WithDefaultListModel::new(Some(sinkmodel)));
+                self.outputdevice_dropdown.set_model(Some(&*self.dropdown_model.borrow()));
+
+                glib::idle_add_local_once(clone!(@weak self as widget => move || {
+                    widget.obj().update_output_device_dropdown();
+                }));
+
+
+                self.outputdevice_dropdown.connect_selected_item_notify(
+                    clone!(@weak self as widget, @weak item as nodeobj => move |dropdown| {
                         wp::log::info!("selected-item");
                         if widget.outputdevice_dropdown_block_signal.get() {
+                            return;
+                        }
+                        if dropdown.selected() == 0 {
+                            nodeobj.unset_default_target();
                             return;
                         }
                         if let Some(item) = dropdown.selected_item() {
@@ -351,7 +404,7 @@ mod imp {
         fn dispose(&self) {
             if let Some(sid) = self.metadata_changed_event.take() {
                 let app = PwvucontrolApplication::default();
-                let manager = app.manager().unwrap();
+                let manager = app.manager();
                 if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     metadata.disconnect(sid);
                 };
@@ -403,10 +456,34 @@ impl PwVolumeBox {
 
         let imp = self.imp();
 
+        let string = if let Ok(node) = sinkmodel.get_node(imp.default_node.get()) {
+            format!("Default ({})", node.name().unwrap())
+        } else {
+            "Default".to_string()
+        };
+        imp.outputdevice_dropdown_block_signal.set(true);
+        imp.dropdown_model.borrow().set_default_text(&string);
+        imp.outputdevice_dropdown_block_signal.set(false);
+
         let item = imp.row_data.borrow();
         let item = item.as_ref().cloned().unwrap();
 
         if let Some(deftarget) = item.default_target() {
+            // let model: gio::ListModel = imp
+            //     .outputdevice_dropdown
+            //     .model()
+            //     .expect("Model from dropdown")
+            //     .downcast()
+            //     .unwrap();
+            // let pos = model.iter::<glib::Object>().enumerate().find_map(|o| {
+            //     if let Ok(Ok(node)) = o.1.map(|x| x.downcast::<PwNodeObject>()) {
+            //         if node.boundid() == deftarget.boundid() {
+            //             return Some(o.0);
+            //         }
+            //     }
+            //     None
+            // });
+
             if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
                 wp::log::info!(
                     "switching to preferred target pos={pos} boundid={} serial={}",
@@ -414,22 +491,29 @@ impl PwVolumeBox {
                     deftarget.serial()
                 );
                 imp.outputdevice_dropdown_block_signal.set(true);
-                imp.outputdevice_dropdown.set_selected(pos);
+                imp.outputdevice_dropdown.set_selected(pos+1 as u32);
                 imp.outputdevice_dropdown_block_signal.set(false);
             }
         } else {
-            let id = self.imp().default_node.get();
-            wp::log::info!("default_node is {id}");
-            if id != u32::MAX {
-                if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
-                    wp::log::info!("switching to default target");
-                    if imp.outputdevice_dropdown.selected() != pos {
-                        imp.outputdevice_dropdown_block_signal.set(true);
-                        imp.outputdevice_dropdown.set_selected(pos);
-                        imp.outputdevice_dropdown_block_signal.set(false);
-                    }
-                }
-            }
+            imp.outputdevice_dropdown_block_signal.set(true);
+            imp.outputdevice_dropdown.set_selected(0);
+            imp.outputdevice_dropdown_block_signal.set(false);
+
+            // let id = self.imp().default_node.get();
+            // wp::log::info!("default_node is {id}");
+            // if id != u32::MAX {
+            //     if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
+            //         wp::log::info!("switching to default target");
+            //         if true
+            //         /* imp.outputdevice_dropdown.selected() != pos */
+            //         {
+            //             wp::log::info!("actually switching to default target");
+            //             imp.outputdevice_dropdown_block_signal.set(true);
+            //             imp.outputdevice_dropdown.set_selected(pos);
+            //             imp.outputdevice_dropdown_block_signal.set(false);
+            //         }
+            //     }
+            // }
         }
     }
 }
