@@ -13,7 +13,7 @@ impl PwNodeObject {
         let imp = self.imp();
 
         let app = PwvucontrolApplication::default();
-        let manager = app.manager().unwrap();
+        let manager = app.manager();
         let core = manager.imp().wp_core.get().expect("Core setup");
 
         let mixerapi = wp::plugin::Plugin::find(core, "mixer-api").expect("Get mixer-api");

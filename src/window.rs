@@ -108,7 +108,7 @@ mod imp {
             self.obj().setup_scroll_blocker(self.outputlist.get());
 
             let app = PwvucontrolApplication::default();
-            let manager = app.manager().unwrap();
+            let manager = app.manager();
             let model = &manager.imp().nodemodel;
             let sinkmodel = &manager.imp().sinkmodel;
             let window = self;
@@ -164,7 +164,7 @@ mod imp {
 
             self.reconnectbtn.connect_clicked(|_| {
                 let app = PwvucontrolApplication::default();
-                let manager = app.manager().unwrap();
+                let manager = app.manager();
                 if let Some(core) = manager.imp().wp_core.get() {
                     core.connect();
                 }

@@ -451,7 +451,6 @@ impl PwNodeObject {
     pub(crate) fn set_default_target(&self, target_node: &PwNodeObject) {
         let app = PwvucontrolApplication::default();
         let manager = app.manager();
-        let manager = manager.as_ref().unwrap();
 
         if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
@@ -464,7 +463,6 @@ impl PwNodeObject {
     pub(crate) fn default_target(&self) -> Option<PwNodeObject> {
         let app = PwvucontrolApplication::default();
         let manager = app.manager();
-        let manager = manager.as_ref().unwrap();
 
         let om = manager.imp().wp_object_manager.get().unwrap();
         if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {

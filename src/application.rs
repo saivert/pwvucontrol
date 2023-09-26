@@ -31,15 +31,13 @@ use crate::{config::{VERSION, APP_ID}, manager::PwvucontrolManager};
 use crate::PwvucontrolWindow;
 
 mod imp {
-    use std::cell::RefCell;
-
     use super::*;
     use once_cell::unsync::OnceCell;
 
 
     pub struct PwvucontrolApplication {
         pub(super) window: OnceCell<PwvucontrolWindow>,
-        pub(super) manager: RefCell<Option<PwvucontrolManager>>,
+        pub(super) manager: OnceCell<PwvucontrolManager>,
 
     }
 
@@ -52,7 +50,7 @@ mod imp {
         fn new() -> PwvucontrolApplication {
             PwvucontrolApplication {
                 window: OnceCell::default(),
-                manager: RefCell::default(),
+                manager: OnceCell::default(),
             }
         }
     }
@@ -64,7 +62,7 @@ mod imp {
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
 
-            self.manager.replace(Some(crate::manager::PwvucontrolManager::new(self.obj().as_ref())));
+            self.obj().manager();
 
         }
     }
@@ -140,8 +138,10 @@ impl PwvucontrolApplication {
         about.present();
     }
 
-    pub fn manager(&self) -> Option<PwvucontrolManager> {
-        self.imp().manager.borrow().as_ref().cloned()
+    pub fn manager(&self) -> &PwvucontrolManager {
+        self.imp().manager.get_or_init(|| {
+            crate::manager::PwvucontrolManager::new(self)
+        })
     }
 }
 

@@ -212,40 +212,8 @@ mod imp {
                     .set_list_factory(Some(&listfactory));
 
                 let app = PwvucontrolApplication::default();
-                let manager = app.manager().unwrap();
-        
-                // let model = &app.imp().nodemodel;
-                let sinkmodel = &manager.imp().sinkmodel;
+                let manager = app.manager();
 
-                // let filter = gtk::CustomFilter::new(|x| {
-                //     if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                //         return o.nodetype() == crate::NodeType::Sink;
-                //     }
-                //     false
-                // });
-                // let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
-
-                self.outputdevice_dropdown.set_enable_search(true);
-                self.outputdevice_dropdown
-                    .set_expression(Some(gtk::PropertyExpression::new(
-                        PwNodeObject::static_type(),
-                        gtk::Expression::NONE,
-                        "name",
-                    )));
-
-                self.outputdevice_dropdown.set_model(Some(sinkmodel));
-
-                // self.obj().update_output_device_dropdown();
-                glib::idle_add_local_once(clone!(@weak self as widget => move || {
-                    widget.obj().update_output_device_dropdown();
-                }));
-
-                // filterlistmodel.connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
-                //     widget.obj().update_output_device_dropdown();
-                // }));
-
-                let app = PwvucontrolApplication::default();
-                let manager = app.manager().unwrap();
                 if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     let boundid = item.boundid();
                     let widget = self.obj();
