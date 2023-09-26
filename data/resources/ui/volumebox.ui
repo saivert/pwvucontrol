@@ -62,32 +62,13 @@
                         </child>
 
                         <child>
-                            <object class="GtkLabel">
-                                <property name="label" translatable="yes">on</property>
-                                <property name="visible" bind-source="outputdevice_dropdown"
-                                    bind-property="visible" bind-flags="sync-create" />
+                            <object class="GtkBox" id="container">
+                                <property name="orientation">horizontal</property>
+                                <property name="spacing">6</property>
                             </object>
                         </child>
 
 
-                        <child>
-                            <object class="GtkDropDown" id="outputdevice_dropdown">
-                                <property name="hexpand">0</property>
-                                <property name="valign">center</property>
-                                <style>
-                                    <class name="suffixes" />
-                                </style>
-                                <property name="model">
-                                    <object class="GtkStringList">
-                                        <items>
-                                            <item translatable="yes">Intel HDA</item>
-                                            <item translatable="yes">HDMI Audio</item>
-                                            <item translatable="yes">Headphones</item>
-                                        </items>
-                                    </object>
-                                </property>
-                            </object>
-                        </child>
 
                         <!-- Mute toggle -->
                         <child>
@@ -284,4 +265,29 @@
             </object>
         </child>
     </object>
+
+
+        <object class="GtkLabel" id="onlabel">
+            <property name="label" translatable="yes">on</property>
+            <property name="visible" bind-source="outputdevice_dropdown"
+                bind-property="visible" bind-flags="sync-create" />
+        </object>
+
+
+        <object class="GtkDropDown" id="outputdevice_dropdown">
+            <property name="hexpand">0</property>
+            <property name="valign">center</property>
+            <style>
+                <class name="suffixes" />
+            </style>
+            <property name="model">
+                <object class="GtkStringList">
+                    <items>
+                        <item translatable="yes">Intel HDA</item>
+                        <item translatable="yes">HDMI Audio</item>
+                        <item translatable="yes">Headphones</item>
+                    </items>
+                </object>
+            </property>
+        </object>
 </interface>

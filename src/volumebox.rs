@@ -85,6 +85,10 @@ mod imp {
         pub mainvolumescale: TemplateChild<gtk::Scale>,
         #[template_child]
         pub monitorvolumescale: TemplateChild<gtk::Scale>,
+        #[template_child]
+        pub container: TemplateChild<gtk::Box>,
+        #[template_child]
+        pub onlabel: TemplateChild<gtk::Label>,
     }
 
     #[glib::object_subclass]
@@ -96,6 +100,12 @@ mod imp {
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_callbacks();
+
+            // unsafe {
+            //     klass.bind_template_child_with_offset("outputdevice_dropdown", false, FieldOffset::new(|x: *const PwVolumeBox|{
+            //        &(*x).outputdevice_dropdown as *const _
+            //     }));
+            // }
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -309,7 +319,7 @@ mod imp {
                     }),
                 );
             } else {
-                self.outputdevice_dropdown.set_visible(false);
+                // self.outputdevice_dropdown.set_visible(false);
             }
             let channelmodel = self.obj().channelmodel();
 
@@ -450,7 +460,6 @@ impl PwVolumeBox {
     pub(crate) fn update_output_device_dropdown(&self) {
         let app = PwvucontrolApplication::default();
         let manager = app.manager();
-        let manager = manager.unwrap();
 
         let sinkmodel = &manager.imp().sinkmodel;
 
