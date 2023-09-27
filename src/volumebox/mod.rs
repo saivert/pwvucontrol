@@ -1,22 +1,4 @@
-/* window.rs
- *
- * Copyright 2023 Nicolai Syvertsen
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{application::PwvucontrolApplication, pwnodeobject::PwNodeObject};
 
@@ -27,35 +9,37 @@ use std::cell::RefCell;
 
 use wireplumber as wp;
 
-mod imp {
+mod output_dropdown;
 
+mod imp {
     use std::cell::Cell;
 
     use glib::{closure_local, SignalHandlerId};
     use once_cell::sync::OnceCell;
-
+    
     use super::*;
+    use output_dropdown::PwOutputDropDown;
     use crate::{
         channelbox::PwChannelBox, levelprovider::LevelbarProvider,
-        pwchannelobject::PwChannelObject, NodeType, output_dropdown::PwOutputDropDown,
+        pwchannelobject::PwChannelObject, NodeType, 
     };
-
+    
     #[derive(Default, gtk::CompositeTemplate, Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
         #[property(get, set, construct_only)]
         pub(super) row_data: RefCell<Option<PwNodeObject>>,
-
+    
         #[property(get, set, construct_only)]
         channelmodel: OnceCell<gio::ListStore>,
-
+    
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
         levelbarprovider: OnceCell<LevelbarProvider>,
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
-
+    
         // Template widgets
         #[template_child]
         pub icon: TemplateChild<gtk::Image>,
@@ -87,70 +71,70 @@ mod imp {
         pub container: TemplateChild<gtk::Box>,
         #[template_child]
         pub onlabel: TemplateChild<gtk::Label>,
-
+    
         pub outputdevice_dropdown: RefCell<Option<PwOutputDropDown>>,
     }
-
+    
     #[glib::object_subclass]
     impl ObjectSubclass for PwVolumeBox {
         const NAME: &'static str = "PwVolumeBox";
         type Type = super::PwVolumeBox;
         type ParentType = gtk::ListBoxRow;
-
+    
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_callbacks();
-
+    
             // unsafe {
             //     klass.bind_template_child_with_offset("outputdevice_dropdown", false, FieldOffset::new(|x: *const PwVolumeBox|{
             //        &(*x).outputdevice_dropdown as *const _
             //     }));
             // }
         }
-
+    
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
             obj.init_template();
         }
     }
-
+    
     #[glib::derived_properties]
     impl ObjectImpl for PwVolumeBox {
         fn constructed(&self) {
             fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
                 Some(i.cbrt() as f64)
             }
-
+    
             fn cubic_to_linear(_binding: &glib::Binding, i: f64) -> Option<f32> {
                 Some((i * i * i) as f32)
             }
-
+    
             self.parent_constructed();
-
+    
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
-
+    
             self.icon.set_icon_name(Some(&item.iconname()));
-
+    
             item.bind_property("name", &self.title_label.get(), "label")
                 .sync_create()
                 .build();
-
+    
             item.bind_property("description", &self.subtitle_label.get(), "label")
                 .sync_create()
                 .build();
-
+    
             item.bind_property("mute", &self.mutebtn.get(), "active")
                 .sync_create()
                 .bidirectional()
                 .build();
-
+    
             item.bind_property("volume", &self.volume_scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-
+    
             #[rustfmt::skip]
             item.bind_property("monitorvolume", &self.monitorvolumescale.adjustment(), "value")
                 .sync_create()
@@ -158,7 +142,7 @@ mod imp {
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-
+    
             self.volume_scale.set_format_value_func(|_scale, value| {
                 format!(
                     "{:>16}",
@@ -169,30 +153,30 @@ mod imp {
                     )
                 )
             });
-
+    
             item.bind_property("formatstr", &self.format.get(), "label")
                 .sync_create()
                 .build();
-
+    
             item.bind_property("channellock", &self.channellock.get(), "active")
                 .sync_create()
                 .bidirectional()
                 .build();
-
+    
             item.bind_property("mainvolume", &self.mainvolumescale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-
+    
             if matches!(
                 item.nodetype(),
                 /* NodeType::Input | */ NodeType::Output
             ) {
                 let app = PwvucontrolApplication::default();
                 let manager = app.manager();
-
+    
                 if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     let boundid = item.boundid();
                     let widget = self.obj();
@@ -206,7 +190,7 @@ mod imp {
                     });
                     metadata.connect_closure("changed", false, changed_closure);
                 }
-
+    
                 let core = manager.imp().wp_core.get().expect("Core");
                 let defaultnodesapi =
                     wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
@@ -215,27 +199,27 @@ mod imp {
                     let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
                     wp::info!("default-nodes-api changed: new id {id}");
                     widget.imp().default_node.set(id);
-
+    
                     widget.update_output_device_dropdown();
                 });
                 defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
                 defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
-
+    
                 self.container.append(&self.onlabel.get());
-
+    
                 // Create our custom output dropdown widget and add it to the layout
                 self.outputdevice_dropdown.replace(Some(PwOutputDropDown::new(Some(&item))));
                 let output_dropdown = self.outputdevice_dropdown.borrow();
                 let output_dropdown = output_dropdown.as_ref().expect("Dropdown widget");
                 self.container.append(output_dropdown);
-
+    
                 glib::idle_add_local_once(clone!(@weak self as widget => move || {
                     widget.obj().update_output_device_dropdown();
                 }));
-
+    
             }
             let channelmodel = self.obj().channelmodel();
-
+    
             self.channel_listbox.bind_model(
                 Some(&channelmodel),
                 clone!(@weak self as widget => @default-panic, move |item| {
@@ -246,43 +230,43 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
-
+    
             // let obj = self.obj();
             // let c = closure_local!(@watch obj, @strong channelmodel/* , @strong item as nodeobj */ => move |nodeobj: &PwNodeObject|  {
             //     // let nodeobj: &PwNodeObject = v.downcast_ref().expect("downcast to PwNodeObject");
             //     let values = nodeobj.channel_volumes_vec();
             //     let oldlen = channelmodel.n_items();
-
+    
             //     wp::log::info!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
-
+    
             //     if values.len() as u32 != oldlen {
             //         channelmodel.remove_all();
             //         for (i,v) in values.iter().enumerate() {
             //             channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
             //         }
-
+    
             //     }
             // });
             // item.connect_closure("format", false, c);
-
+    
             item.connect_local("format", false, 
             clone!(@weak channelmodel, @weak item as nodeobj => @default-panic, move |_| {
                 let values = nodeobj.channel_volumes_vec();
                 let oldlen = channelmodel.n_items();
-
+    
                 wp::log::debug!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
-
+    
                 if values.len() as u32 != oldlen {
                     channelmodel.remove_all();
                     for (i,v) in values.iter().enumerate() {
                         channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
                     }
-
+    
                     return None;
                 }
                 None
             }));
-
+    
             item.connect_channel_volumes_notify(clone!(@weak channelmodel => move |nodeobj| {
                 let values = nodeobj.channel_volumes_vec();
                 for (i,v) in values.iter().enumerate() {
@@ -293,27 +277,27 @@ mod imp {
                     }
                 }
             }));
-
+    
             self.revealer
                 .connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
                     widget.obj().grab_focus();
                 }));
-
+    
             self.level_bar.set_min_value(0.0);
             self.level_bar.set_max_value(1.0);
-
+    
             self.level_bar
                 .add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
             self.level_bar
                 .add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar
                 .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
-
+    
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider
                     .set(provider)
                     .expect("Provider not set already");
-
+    
                 self.timeoutid.set(Some(glib::timeout_add_local(
                     std::time::Duration::from_millis(25),
                     clone!(@weak self as obj => @default-panic, move || {
@@ -323,7 +307,7 @@ mod imp {
                 )));
             }
         }
-
+    
         fn dispose(&self) {
             if let Some(sid) = self.metadata_changed_event.take() {
                 let app = PwvucontrolApplication::default();
@@ -339,7 +323,7 @@ mod imp {
     }
     impl WidgetImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
-
+    
     #[gtk::template_callbacks]
     impl PwVolumeBox {
         #[template_callback]
@@ -379,11 +363,10 @@ impl PwVolumeBox {
         let imp = self.imp();
 
         let output_dropdown = imp.outputdevice_dropdown.borrow();
-        if output_dropdown.is_none() {
-            return;
-        }
-        let output_dropdown = output_dropdown.as_ref().expect("Dropdown widget");
 
+        let Some(output_dropdown) = output_dropdown.as_ref() else {
+            return;
+        };
 
         let string = if let Ok(node) = sinkmodel.get_node(imp.default_node.get()) {
             format!("Default ({})", node.name().unwrap())

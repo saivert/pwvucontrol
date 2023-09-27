@@ -1,3 +1,5 @@
+// * SPDX-License-Identifier: GPL-3.0-or-later
+
 use glib::{self, closure_local};
 use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
