@@ -34,6 +34,8 @@ mod volumebox;
 mod window;
 mod manager;
 mod withdefaultlistmodel;
+mod output_dropdown;
+
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 

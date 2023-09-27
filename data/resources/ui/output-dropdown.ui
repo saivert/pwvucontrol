@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwOutputDropDown" parent="GtkWidget">
+        <property name="layout-manager">
+            <object class="GtkBinLayout" />
+        </property>
+        <child>
+            <object class="GtkDropDown" id="outputdevice_dropdown">
+                <property name="hexpand">0</property>
+                <property name="valign">center</property>
+                <style>
+                    <class name="suffixes" />
+                </style>
+                <property name="model">
+                    <object class="GtkStringList">
+                        <items>
+                            <item translatable="yes">Intel HDA</item>
+                            <item translatable="yes">HDMI Audio</item>
+                            <item translatable="yes">Headphones</item>
+                        </items>
+                    </object>
+                </property>
+            </object>
+        </child>
+    </template>
+</interface>

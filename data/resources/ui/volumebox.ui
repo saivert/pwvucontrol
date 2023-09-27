@@ -269,12 +269,12 @@
 
         <object class="GtkLabel" id="onlabel">
             <property name="label" translatable="yes">on</property>
-            <property name="visible" bind-source="outputdevice_dropdown"
-                bind-property="visible" bind-flags="sync-create" />
+            <!-- <property name="visible" bind-source="outputdevice_dropdown"
+                bind-property="visible" bind-flags="sync-create" /> -->
         </object>
 
 
-        <object class="GtkDropDown" id="outputdevice_dropdown">
+        <!-- <object class="GtkDropDown" id="outputdevice_dropdown">
             <property name="hexpand">0</property>
             <property name="valign">center</property>
             <style>
@@ -289,5 +289,5 @@
                     </items>
                 </object>
             </property>
-        </object>
+        </object> -->
 </interface>
