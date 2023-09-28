@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- Created with Cambalache 0.10.3 -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <interface>
-    <!-- interface-name channelbox.ui -->
     <requires lib="gtk" version="4.0" />
     <template class="PwChannelBox" parent="GtkListBoxRow">
         <property name="activatable">0</property>

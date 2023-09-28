@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/com/saivert/pwvucontrol">

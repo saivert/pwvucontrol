@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use std::{fmt::Debug, time::Duration};
 
 use glib::{self, clone, ControlFlow};
