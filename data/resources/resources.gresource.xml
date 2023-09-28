@@ -1,5 +1,5 @@
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <gresources>
   <gresource prefix="/com/saivert/pwvucontrol">
     <file preprocess="xml-stripblanks" alias="gtk/volumebox.ui">ui/volumebox.ui</file>

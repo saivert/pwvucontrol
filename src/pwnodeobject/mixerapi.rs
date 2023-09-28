@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::application::PwvucontrolApplication;
 
-use glib::{clone, subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant};
+use glib::{subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant, closure_local};
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 
@@ -24,19 +24,15 @@ impl PwNodeObject {
             .set(mixerapi)
             .expect("mixerapi only set once in PwNodeObject");
 
-        imp.mixerapi.get().unwrap().connect_local(
-            "changed",
-            true,
-            clone!(@weak self as obj => @default-return None, move |x| {
-                let id: u32 = x[1].get().expect("Id in in changed event");
-                if id == obj.boundid() {
-                    obj.imp().block.set(true);
-                    obj.update_volume_using_mixerapi();
-                    obj.imp().block.set(false);
-                }
-                None
-            }),
-        );
+        let changed_handler = closure_local!(@watch self as widget => move |_mixerapi: &wp::plugin::Plugin, id: u32|{
+            if id == widget.boundid() {
+                widget.imp().block.set(true);
+                widget.update_volume_using_mixerapi();
+                widget.imp().block.set(false);
+            }
+        });
+
+        imp.mixerapi.get().unwrap().connect_closure("changed", true, changed_handler);
     }
 
     pub(crate) fn send_volume_using_mixerapi(&self, what: PropertyChanged) {
