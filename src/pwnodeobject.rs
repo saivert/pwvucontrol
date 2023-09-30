@@ -3,7 +3,7 @@
 use glib::{self, clone, subclass::prelude::*, Object, ObjectExt};
 
 use wireplumber as wp;
-use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
+use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt, FromPipewirePropertyString}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
 
 use crate::{NodeType, application::PwvucontrolApplication};
 
@@ -512,6 +512,12 @@ impl PwNodeObject {
         let serial: i32 = node.pw_property("object.serial").expect("object.serial");
 
         serial as u32
+    }
+
+
+    pub(crate) fn node_property<T: FromPipewirePropertyString>(&self, property: &str) -> T {
+        let node = self.imp().wpnode.get().expect("node");
+        node.pw_property(property).expect("object.serial")
     }
 }
 

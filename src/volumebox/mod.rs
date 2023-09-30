@@ -39,6 +39,7 @@ mod imp {
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
+        pub(super) block_default_node_toggle_signal: Cell<bool>,
     
         // Template widgets
         #[template_child]
@@ -61,8 +62,6 @@ mod imp {
         pub revealer: TemplateChild<gtk::Revealer>,
         #[template_child]
         pub channellock: TemplateChild<gtk::ToggleButton>,
-        // #[template_child]
-        // pub outputdevice_dropdown: TemplateChild<gtk::DropDown>,
         #[template_child]
         pub mainvolumescale: TemplateChild<gtk::Scale>,
         #[template_child]
@@ -71,7 +70,9 @@ mod imp {
         pub container: TemplateChild<gtk::Box>,
         #[template_child]
         pub onlabel: TemplateChild<gtk::Label>,
-    
+        #[template_child]
+        pub default_sink_toggle: TemplateChild<gtk::ToggleButton>,
+
         pub outputdevice_dropdown: RefCell<Option<PwOutputDropDown>>,
     }
     
@@ -84,12 +85,6 @@ mod imp {
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_callbacks();
-    
-            // unsafe {
-            //     klass.bind_template_child_with_offset("outputdevice_dropdown", false, FieldOffset::new(|x: *const PwVolumeBox|{
-            //        &(*x).outputdevice_dropdown as *const _
-            //     }));
-            // }
         }
     
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -169,13 +164,28 @@ mod imp {
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-    
+
+            let app = PwvucontrolApplication::default();
+            let manager = app.manager();
+
+            let core = manager.imp().wp_core.get().expect("Core");
+            let defaultnodesapi =
+                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
+            let widget = self.obj();
+            let defaultnodesapi_closure = closure_local!(@watch widget => move |defaultnodesapi: wp::plugin::Plugin| {
+                let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+                wp::info!("default-nodes-api changed: new id {id}");
+                widget.imp().default_node.set(id);
+
+                widget.default_node_changed();
+            });
+            defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
+            defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
+
             if matches!(
                 item.nodetype(),
                 /* NodeType::Input | */ NodeType::Output
             ) {
-                let app = PwvucontrolApplication::default();
-                let manager = app.manager();
     
                 if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                     let boundid = item.boundid();
@@ -191,22 +201,8 @@ mod imp {
                     metadata.connect_closure("changed", false, changed_closure);
                 }
     
-                let core = manager.imp().wp_core.get().expect("Core");
-                let defaultnodesapi =
-                    wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
-                let widget = self.obj();
-                let defaultnodesapi_closure = closure_local!(@watch widget => move |defaultnodesapi: wp::plugin::Plugin| {
-                    let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
-                    wp::info!("default-nodes-api changed: new id {id}");
-                    widget.imp().default_node.set(id);
-    
-                    widget.update_output_device_dropdown();
-                });
-                defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
-                defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
-    
                 self.container.append(&self.onlabel.get());
-    
+
                 // Create our custom output dropdown widget and add it to the layout
                 self.outputdevice_dropdown.replace(Some(PwOutputDropDown::new(Some(&item))));
                 let output_dropdown = self.outputdevice_dropdown.borrow();
@@ -217,6 +213,11 @@ mod imp {
                     widget.obj().update_output_device_dropdown();
                 }));
     
+            }
+
+            if matches!(item.nodetype(), NodeType::Sink) {
+                self.container.append(&self.default_sink_toggle.get());
+
             }
             let channelmodel = self.obj().channelmodel();
     
@@ -330,6 +331,25 @@ mod imp {
         fn invert_bool(&self, value: bool) -> bool {
             !value
         }
+
+        #[template_callback]
+        fn default_sink_toggle_toggled(&self, _togglebutton: &gtk::ToggleButton) {
+            if self.block_default_node_toggle_signal.get() {
+                return;
+            }
+            let node = self.obj().row_data().expect("row data set on volumebox");
+            let node_name: String = node.node_property("node.name");
+
+            let app = PwvucontrolApplication::default();
+            let manager = app.manager();
+
+            let core = manager.imp().wp_core.get().expect("Core");
+            let defaultnodesapi =
+                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
+
+            let result: bool = defaultnodesapi.emit_by_name("set-default-configured-node-name", &[&"Audio/Sink", &node_name]);
+            wp::info!("set-default-configured-node-name result: {result:?}");
+        }
     }
 }
 
@@ -352,6 +372,25 @@ impl PwVolumeBox {
 
     pub(crate) fn set_level(&self, level: f32) {
         self.imp().level.set(level);
+    }
+
+    pub(crate) fn default_node_changed(&self) {
+        let node = self.row_data().expect("row_data set");
+        match node.nodetype() {
+            crate::NodeType::Output => self.update_output_device_dropdown(),
+            crate::NodeType::Sink => self.update_default_toggle(),
+            _ => {},
+        }
+    }
+
+    pub(crate) fn update_default_toggle(&self) {
+        let imp = self.imp();
+        let node = self.row_data().unwrap();
+        let id = self.imp().default_node.get();
+
+        imp.block_default_node_toggle_signal.set(true);
+        self.imp().default_sink_toggle.set_active(node.boundid() == id);
+        imp.block_default_node_toggle_signal.set(false);
     }
 
     pub(crate) fn update_output_device_dropdown(&self) {
