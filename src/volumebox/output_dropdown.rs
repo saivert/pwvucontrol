@@ -172,14 +172,6 @@ impl PwOutputDropDown {
         .build()
     }
 
-    pub fn with_blocked_dropdown(&self, cb: impl FnOnce()) {
-        let imp = self.imp();
-
-        imp.block_signal.set(true);
-        cb();
-        imp.block_signal.set(false);
-    }
-
     pub fn set_selected_no_send(&self, position: u32) {
         let imp = self.imp();
 
@@ -191,7 +183,9 @@ impl PwOutputDropDown {
     pub fn set_default_text(&self, text: &str) {
         let imp = self.imp();
 
+        imp.block_signal.set(true);
         imp.dropdown_model.borrow().set_default_text(text);
+        imp.block_signal.set(false);
     }
 }
 
