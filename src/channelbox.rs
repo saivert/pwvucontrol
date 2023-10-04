@@ -7,9 +7,8 @@ mod imp {
     use super::*;
     use std::cell::RefCell;
     use gtk::{prelude::*, subclass::prelude::*};
-    use glib::Properties;
     
-    #[derive(Debug, Default, gtk::CompositeTemplate, Properties)]
+    #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]
     #[properties(wrapper_type = super::PwChannelBox)]
     pub struct PwChannelBox {

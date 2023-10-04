@@ -5,11 +5,17 @@ use gtk::{
     prelude::*,
     subclass::prelude::*,
 };
-use glib::{self, clone};
+use glib::clone;
 use adw::subclass::prelude::*;
 
-use crate::application::PwvucontrolApplication;
-use crate::config::{APP_ID, PROFILE};
+use crate::{
+    application::PwvucontrolApplication,
+    volumebox::PwVolumeBox,
+    pwnodeobject::PwNodeObject,
+    sinkbox::PwSinkBox,
+    outputbox::PwOutputBox,
+    config::{APP_ID, PROFILE}
+};
 
 use wireplumber as wp;
 
@@ -19,8 +25,6 @@ pub(crate) enum PwvucontrolWindowView {
 }
 mod imp {
     use super::*;
-
-    use crate::{volumebox::PwVolumeBox, pwnodeobject::PwNodeObject};
 
     #[derive(Debug, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/window.ui")]

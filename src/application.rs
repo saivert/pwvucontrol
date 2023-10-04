@@ -1,26 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
- use gtk::{
-    gio,
-    glib,
-    prelude::*,
-    subclass::prelude::*,
-};
+use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 
 use adw::subclass::prelude::*;
 
-use crate::{config::{VERSION, APP_ID}, manager::PwvucontrolManager};
-use crate::PwvucontrolWindow;
+use crate::{
+    config::{APP_ID, VERSION},
+    manager::PwvucontrolManager,
+    PwvucontrolWindow,
+};
 
 mod imp {
     use super::*;
     use once_cell::unsync::OnceCell;
 
-
     pub struct PwvucontrolApplication {
         pub(super) window: OnceCell<PwvucontrolWindow>,
         pub(super) manager: OnceCell<PwvucontrolManager>,
-
     }
 
     #[glib::object_subclass]
@@ -45,7 +41,6 @@ mod imp {
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
 
             self.obj().manager();
-
         }
     }
 
@@ -56,9 +51,9 @@ mod imp {
         // to do that, we'll just present any existing window.
         fn activate(&self) {
             let window = self
-            .window
-            .get()
-            .expect("Should always be initialized in gio_application_startup");
+                .window
+                .get()
+                .expect("Should always be initialized in gio_application_startup");
 
             // Ask the window manager/compositor to present the window
             window.present();
@@ -66,7 +61,7 @@ mod imp {
 
         fn startup(&self) {
             self.parent_startup();
-    
+
             let window = PwvucontrolWindow::new(&self.obj());
             self.window
                 .set(window)
@@ -121,17 +116,17 @@ impl PwvucontrolApplication {
     }
 
     pub fn manager(&self) -> &PwvucontrolManager {
-        self.imp().manager.get_or_init(|| {
-            crate::manager::PwvucontrolManager::new(self)
-        })
+        self.imp()
+            .manager
+            .get_or_init(|| crate::manager::PwvucontrolManager::new(self))
     }
 }
 
 impl Default for PwvucontrolApplication {
     fn default() -> Self {
         gio::Application::default()
-        .expect("Could not get default GApplication")
-        .downcast()
-        .unwrap()
-}
+            .expect("Could not get default GApplication")
+            .downcast()
+            .unwrap()
+    }
 }

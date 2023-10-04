@@ -13,7 +13,6 @@ use gtk::{
 use wireplumber as wp;
 
 mod imp {
-
     use super::*;
 
     // Object holding the state
