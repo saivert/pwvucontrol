@@ -267,21 +267,5 @@
     </object>
 
 
-    <object class="GtkLabel" id="onlabel">
-        <property name="label" translatable="yes">on</property>
-        <!-- <property name="visible" bind-source="outputdevice_dropdown"
-            bind-property="visible" bind-flags="sync-create" /> -->
-    </object>
-
-    <object class="GtkToggleButton" id="default_sink_toggle">
-        <property name="hexpand">0</property>
-        <property name="valign">center</property>
-        <signal name="toggled" handler="default_sink_toggle_toggled" swapped="true"/>
-        <style>
-            <class name="suffixes" />
-            <class name="expander-row-arrow" />
-        </style>
-        <property name="icon-name">emblem-default-symbolic</property>
-    </object>
 
 </interface>

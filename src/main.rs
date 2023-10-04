@@ -34,7 +34,9 @@ mod volumebox;
 mod window;
 mod manager;
 mod withdefaultlistmodel;
-
+mod output_dropdown;
+mod sinkbox;
+mod outputbox;
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 
@@ -95,7 +97,7 @@ fn main() -> gtk::glib::ExitCode {
         Some("resources.gresource"),
     ))
     .or(gio::Resource::load(RESOURCES_FILE))
-    .expect(&gettext("Could not load resources"));
+    .unwrap_or_else(|_| { panic!("{}", gettext("Could not load resources")) });
 
     // Load resources
     gio::resources_register(&resources);

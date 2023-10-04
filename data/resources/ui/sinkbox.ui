@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwSinkBox" parent="PwVolumeBox">
+        <child type="extra">
+            <object class="GtkToggleButton" id="default_sink_toggle">
+                <property name="hexpand">0</property>
+                <property name="valign">center</property>
+                <signal name="toggled" handler="default_sink_toggle_toggled" swapped="true" />
+                <style>
+                    <class name="suffixes" />
+                    <class name="expander-row-arrow" />
+                </style>
+                <property name="icon-name">emblem-default-symbolic</property>
+            </object>
+        </child>
+    </template>
+
+</interface>

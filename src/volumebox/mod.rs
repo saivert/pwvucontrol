@@ -1,45 +1,38 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{application::PwvucontrolApplication, pwnodeobject::PwNodeObject};
+use crate::{
+    application::PwvucontrolApplication,
+    pwnodeobject::PwNodeObject,
+    channelbox::PwChannelBox,
+    levelprovider::LevelbarProvider,
+    pwchannelobject::PwChannelObject
+};
 
-use glib::{self, clone, ControlFlow, Properties};
+use glib::{clone, ControlFlow, closure_local, SignalHandlerId};
 use gtk::{gio, prelude::*, subclass::prelude::*};
-
-use std::cell::RefCell;
-
+use std::cell::{Cell, RefCell};
+use once_cell::sync::OnceCell;
 use wireplumber as wp;
 
-mod output_dropdown;
-
 mod imp {
-    use std::cell::Cell;
-
-    use glib::{closure_local, SignalHandlerId};
-    use once_cell::sync::OnceCell;
-    
     use super::*;
-    use output_dropdown::PwOutputDropDown;
-    use crate::{
-        channelbox::PwChannelBox, levelprovider::LevelbarProvider,
-        pwchannelobject::PwChannelObject, NodeType, 
-    };
-    
-    #[derive(Default, gtk::CompositeTemplate, Properties)]
+
+    #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
         #[property(get, set, construct_only)]
         pub(super) row_data: RefCell<Option<PwNodeObject>>,
     
-        #[property(get, set, construct_only)]
+        // #[property(get, set, construct_only)]
         channelmodel: OnceCell<gio::ListStore>,
     
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
         levelbarprovider: OnceCell<LevelbarProvider>,
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
-        pub(super) default_node: Cell<u32>,
-        pub(super) block_default_node_toggle_signal: Cell<bool>,
+        pub default_node: Cell<u32>,
+        pub(super) default_node_changed_handlers: RefCell<Vec<Box<dyn Fn()>>>,
     
         // Template widgets
         #[template_child]
@@ -68,12 +61,7 @@ mod imp {
         pub monitorvolumescale: TemplateChild<gtk::Scale>,
         #[template_child]
         pub container: TemplateChild<gtk::Box>,
-        #[template_child]
-        pub onlabel: TemplateChild<gtk::Label>,
-        #[template_child]
-        pub default_sink_toggle: TemplateChild<gtk::ToggleButton>,
 
-        pub outputdevice_dropdown: RefCell<Option<PwOutputDropDown>>,
     }
     
     #[glib::object_subclass]
@@ -81,6 +69,7 @@ mod imp {
         const NAME: &'static str = "PwVolumeBox";
         type Type = super::PwVolumeBox;
         type ParentType = gtk::ListBoxRow;
+        type Interfaces = (gtk::Buildable,);
     
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -104,7 +93,9 @@ mod imp {
             }
     
             self.parent_constructed();
-    
+
+            self.channelmodel.set(gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>()).expect("channelmodel not already set");
+
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
     
@@ -177,52 +168,18 @@ mod imp {
                 wp::info!("default-nodes-api changed: new id {id}");
                 widget.imp().default_node.set(id);
 
-                widget.default_node_changed();
+                let list = widget.imp().default_node_changed_handlers.borrow();
+                for cb in list.iter() {
+                    cb();
+                }
             });
             defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
             defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
 
-            if matches!(
-                item.nodetype(),
-                /* NodeType::Input | */ NodeType::Output
-            ) {
-    
-                if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
-                    let boundid = item.boundid();
-                    let widget = self.obj();
-                    let changed_closure = closure_local!(@watch widget =>
-                        move |_obj: &wp::pw::Metadata, id: u32, key: Option<String>, _type: Option<String>, _value: Option<String>| {
-                        let key = key.unwrap_or_default();
-                        if id == boundid && key.contains("target.") {
-                            wp::log::info!("metadata changed handler id: {boundid} {key:?} {_value:?}!");
-                            widget.update_output_device_dropdown();
-                        }
-                    });
-                    metadata.connect_closure("changed", false, changed_closure);
-                }
-    
-                self.container.append(&self.onlabel.get());
-
-                // Create our custom output dropdown widget and add it to the layout
-                self.outputdevice_dropdown.replace(Some(PwOutputDropDown::new(Some(&item))));
-                let output_dropdown = self.outputdevice_dropdown.borrow();
-                let output_dropdown = output_dropdown.as_ref().expect("Dropdown widget");
-                self.container.append(output_dropdown);
-    
-                glib::idle_add_local_once(clone!(@weak self as widget => move || {
-                    widget.obj().update_output_device_dropdown();
-                }));
-    
-            }
-
-            if matches!(item.nodetype(), NodeType::Sink) {
-                self.container.append(&self.default_sink_toggle.get());
-
-            }
-            let channelmodel = self.obj().channelmodel();
+            let channelmodel = self.channelmodel.get().expect("channel model");
     
             self.channel_listbox.bind_model(
-                Some(&channelmodel),
+                Some(channelmodel),
                 clone!(@weak self as widget => @default-panic, move |item| {
                     PwChannelBox::new(
                         item.clone().downcast_ref::<PwChannelObject>()
@@ -324,6 +281,22 @@ mod imp {
     }
     impl WidgetImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
+
+    impl BuildableImpl for PwVolumeBox {
+        fn add_child(&self, builder: &gtk::Builder, child: &glib::Object, type_: Option<&str>) {
+            if type_.unwrap_or_default() == "extra" {
+                if let Some(widget) = child.downcast_ref::<gtk::Widget>() {
+                    if let Some(container) = self.container.try_get() {
+                        widget.unparent();
+                        container.append(widget);
+                        container.set_child_visible(true);
+                    }
+                }
+            } else {
+                self.parent_add_child(builder, child, type_);
+            }
+        }
+    }
     
     #[gtk::template_callbacks]
     impl PwVolumeBox {
@@ -332,31 +305,14 @@ mod imp {
             !value
         }
 
-        #[template_callback]
-        fn default_sink_toggle_toggled(&self, _togglebutton: &gtk::ToggleButton) {
-            if self.block_default_node_toggle_signal.get() {
-                return;
-            }
-            let node = self.obj().row_data().expect("row data set on volumebox");
-            let node_name: String = node.node_property("node.name");
 
-            let app = PwvucontrolApplication::default();
-            let manager = app.manager();
-
-            let core = manager.imp().wp_core.get().expect("Core");
-            let defaultnodesapi =
-                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
-
-            let result: bool = defaultnodesapi.emit_by_name("set-default-configured-node-name", &[&"Audio/Sink", &node_name]);
-            wp::info!("set-default-configured-node-name result: {result:?}");
-        }
     }
 }
 
 glib::wrapper! {
     pub struct PwVolumeBox(ObjectSubclass<imp::PwVolumeBox>)
         @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Buildable;
 }
 
 impl PwVolumeBox {
@@ -374,91 +330,18 @@ impl PwVolumeBox {
         self.imp().level.set(level);
     }
 
-    pub(crate) fn default_node_changed(&self) {
-        let node = self.row_data().expect("row_data set");
-        match node.nodetype() {
-            crate::NodeType::Output => self.update_output_device_dropdown(),
-            crate::NodeType::Sink => self.update_default_toggle(),
-            _ => {},
-        }
-    }
-
-    pub(crate) fn update_default_toggle(&self) {
-        let imp = self.imp();
-        let node = self.row_data().unwrap();
-        let id = self.imp().default_node.get();
-
-        imp.block_default_node_toggle_signal.set(true);
-        self.imp().default_sink_toggle.set_active(node.boundid() == id);
-        imp.block_default_node_toggle_signal.set(false);
-    }
-
-    pub(crate) fn update_output_device_dropdown(&self) {
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
-
-        let sinkmodel = &manager.imp().sinkmodel;
-
+    pub fn add_default_node_change_handler(&self, c: impl Fn() + 'static) {
         let imp = self.imp();
 
-        let output_dropdown = imp.outputdevice_dropdown.borrow();
+        let mut list = imp.default_node_changed_handlers.borrow_mut();
+        list.push(Box::new(c));
+    }
+}
+pub trait PwVolumeBoxImpl: ListBoxRowImpl + ObjectImpl + 'static {}
 
-        let Some(output_dropdown) = output_dropdown.as_ref() else {
-            return;
-        };
+unsafe impl<T: PwVolumeBoxImpl> IsSubclassable<T> for PwVolumeBox {
+    fn class_init(class: &mut glib::Class<Self>) {
+        Self::parent_class_init::<T>(class.upcast_ref_mut());
 
-        let string = if let Ok(node) = sinkmodel.get_node(imp.default_node.get()) {
-            format!("Default ({})", node.name().unwrap())
-        } else {
-            "Default".to_string()
-        };
-        output_dropdown.set_default_text(&string);
-
-        let item = imp.row_data.borrow();
-        let item = item.as_ref().cloned().unwrap();
-
-        if let Some(deftarget) = item.default_target() {
-            // let model: gio::ListModel = imp
-            //     .outputdevice_dropdown
-            //     .model()
-            //     .expect("Model from dropdown")
-            //     .downcast()
-            //     .unwrap();
-            // let pos = model.iter::<glib::Object>().enumerate().find_map(|o| {
-            //     if let Ok(Ok(node)) = o.1.map(|x| x.downcast::<PwNodeObject>()) {
-            //         if node.boundid() == deftarget.boundid() {
-            //             return Some(o.0);
-            //         }
-            //     }
-            //     None
-            // });
-
-            if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
-                wp::log::info!(
-                    "switching to preferred target pos={pos} boundid={} serial={}",
-                    deftarget.boundid(),
-                    deftarget.serial()
-                );
-                output_dropdown.set_selected_no_send(pos+1 as u32);
-            }
-        } else {
-            output_dropdown.set_selected_no_send(0);
-
-            // let id = self.imp().default_node.get();
-            // wp::log::info!("default_node is {id}");
-            // if id != u32::MAX {
-            //     if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
-            //         wp::log::info!("switching to default target");
-            //         if true
-            //         /* imp.outputdevice_dropdown.selected() != pos */
-            //         {
-            //             wp::log::info!("actually switching to default target");
-            //             imp.outputdevice_dropdown_block_signal.set(true);
-            //             imp.outputdevice_dropdown.set_selected(pos);
-            //             imp.outputdevice_dropdown_block_signal.set(false);
-            //         }
-            //     }
-            // }
-        }
     }
 }

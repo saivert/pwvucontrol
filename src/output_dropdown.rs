@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{self, closure_local};
+use crate::{
+    withdefaultlistmodel::WithDefaultListModel,
+    pwnodeobject::PwNodeObject,
+    application::PwvucontrolApplication,
+};
+use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
-use crate::{withdefaultlistmodel::WithDefaultListModel, pwnodeobject::PwNodeObject, application::PwvucontrolApplication};
 use wireplumber as wp;
 
 mod imp {
-
     use super::*;
-    use glib::Properties;
-    use gtk::{self, CompositeTemplate};
-    
 
-    #[derive(Debug, Default, CompositeTemplate, Properties)]
+    #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
     #[properties(wrapper_type = super::PwOutputDropDown)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/output-dropdown.ui")]
     pub struct PwOutputDropDown {
@@ -65,19 +65,11 @@ mod imp {
             let manager = app.manager();
 
             
-            fn setup_handler(item: &glib::Object, ellipsized: bool) {
+            fn setup_handler(item: &glib::Object) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                let box_ = gtk::Box::new(gtk::Orientation::Horizontal, 0);
                 let label = gtk::Label::new(None);
-                box_.append(&label);
                 label.set_xalign(0.0);
-                if ellipsized {
-                    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
-                } else {
-                    let icon = gtk::Image::from_icon_name("object-select-symbolic");
-                    icon.set_accessible_role(gtk::AccessibleRole::Presentation);
-                    box_.append(&icon);
-                }
+                label.set_ellipsize(gtk::pango::EllipsizeMode::End);
 
                 item.property_expression("item")
                     .chain_closure::<Option<String>>(closure_local!(
@@ -96,11 +88,11 @@ mod imp {
                     ))
                     .bind(&label, "label", gtk::Widget::NONE);
 
-                item.set_child(Some(&box_));
+                item.set_child(Some(&label));
             }
 
             let factory = gtk::SignalListItemFactory::new();
-            factory.connect_setup(|_, item| setup_handler(item, true));
+            factory.connect_setup(|_, item| setup_handler(item));
 
             // We need to store the DropDown widget's internal default factory so we can reset the list-factory later
             // which would otherwise just use the factory we set
@@ -113,16 +105,15 @@ mod imp {
 
             self.outputdevice_dropdown.set_enable_search(true);
 
+
             self.outputdevice_dropdown
                 .set_expression(Some(gtk::ClosureExpression::new::<Option<String>>(
                     gtk::Expression::NONE,
                     closure_local!(move |item: glib::Object| {
                         if let Some(item) = item.downcast_ref::<PwNodeObject>() {
                             item.name()
-                        } else if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
-                            Some(item.string().to_string())
                         } else {
-                            None
+                            item.downcast_ref::<gtk::StringObject>().map(|item| item.string().to_string())
                         }
                     }),
                 )));

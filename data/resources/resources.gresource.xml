@@ -7,6 +7,8 @@
     <file preprocess="xml-stripblanks" alias="gtk/window.ui">ui/window.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/help-overlay.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/output-dropdown.ui">ui/output-dropdown.ui</file>
+    <file preprocess="xml-stripblanks" alias="gtk/sinkbox.ui">ui/sinkbox.ui</file>
+    <file preprocess="xml-stripblanks" alias="gtk/outputbox.ui">ui/outputbox.ui</file>
   </gresource>
   <gresource prefix="/com/saivert/pwvucontrol/icons/scalable/actions">
      <file preprocess="xml-stripblanks" alias="com.saivert.pwvucontrol.svg">../icons/com.saivert.pwvucontrol.svg</file>

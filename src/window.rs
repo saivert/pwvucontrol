@@ -110,7 +110,7 @@ mod imp {
             self.playbacklist.bind_model(
                 Some(filterlistmodel),
                 clone!(@weak window => @default-panic, move |item| {
-                    PwVolumeBox::new(
+                    PwOutputBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
@@ -140,7 +140,7 @@ mod imp {
             self.outputlist.bind_model(
                 Some(sinkmodel),
                 clone!(@weak window => @default-panic, move |item| {
-                    PwVolumeBox::new(
+                    PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
