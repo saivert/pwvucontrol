@@ -10,17 +10,27 @@ There is a flatpak-builder manifest in the build-aux directory. I'm planning on 
 
 This is an attempt are making a volume control applet for Pipewire.
 
-Current implemented features as of 2023-07-30:
+Current implemented features as of 2023-11-01:
 
 - Volume control
 - Mute
 - Media name display
 - Peak level meter
 - Output device (Sink) drop down for playback streams
+- Default output device
 
 ## What it looks like
 
 ![Screenshot](../assets/screenshot.png)
+
+## Building
+
+Use meson to build.
+
+    meson setup builddir
+    meson compile -C builddir
+    meson install -C builddir
+
 
 ## Help needed
 I need a nice icon in SVG!
