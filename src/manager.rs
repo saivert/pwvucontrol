@@ -136,7 +136,12 @@ mod imp {
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                     let devicemodel = imp.devicemodel.get().expect("devicemodel");
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                        // Hide ourselves
                         if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
+                            return;
+                        }
+                        // Hide any playback from pavucontrol (mainly volume control notification sound)
+                        if node.name() == Some("pavucontrol".to_string()) {
                             return;
                         }
                         if node.pw_property::<String>("media.class").unwrap_or_default() == "Stream/Input/Audio" {
