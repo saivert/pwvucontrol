@@ -15,7 +15,7 @@ use crate::{PwvucontrolWindow, PwvucontrolApplication};
 mod imp {
     use std::{str::FromStr, cell::RefCell};
 
-    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView, pwnodemodel::PwNodeModel};
+    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView, pwnodemodel::PwNodeModel, pwdeviceobject::PwDeviceObject};
 
     use super::*;
     use glib::Properties;
@@ -49,7 +49,7 @@ mod imp {
     impl ObjectImpl for PwvucontrolManager {
         fn constructed(&self) {
             self.parent_constructed();
-            self.devicemodel.set(gio::ListStore::new::<wp::pw::Device>()).expect("devicemodel not set");
+            self.devicemodel.set(gio::ListStore::new::<PwDeviceObject>()).expect("devicemodel not set");
 
             self.setup_wp_connection();
             self.setup_metadata_om();
@@ -165,7 +165,7 @@ mod imp {
                         let n: String = device.pw_property("device.name").unwrap();
                         wp::log::info!("Got device {} {n}", device.bound_id());
 
-                        devicemodel.append(device);
+                        devicemodel.append(&PwDeviceObject::new(device));
                         
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
@@ -184,8 +184,15 @@ mod imp {
                     model.remove(node.bound_id());
 
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
-                    if let Some(pos) = devicemodel.find(device) {
-                        devicemodel.remove(pos);
+                    for item in devicemodel.iter::<PwDeviceObject>() {
+                        if let Ok(item) = item {
+                            if item.wpdevice().bound_id() == device.bound_id() {
+                                if let Some(pos) = devicemodel.find(&item) {
+                                    wp::log::info!("Removed device {} @ pos {pos}", device.bound_id());
+                                    devicemodel.remove(pos);
+                                }
+                            }
+                        }
                     }
                 } else {
                     wp::log::info!("Object must be one of the above, but is {:?} instead", object.type_());

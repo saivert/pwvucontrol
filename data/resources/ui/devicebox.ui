@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwDeviceBox" parent="GtkListBoxRow">
+        <child>
+            <object class="GtkBox">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">6</property>
+                <child>
+                    <object class="GtkLabel" id="label">
+                    </object>
+                </child>
+                <child>
+                    <object class="PwProfileDropDown" id="profile_dropdown">
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

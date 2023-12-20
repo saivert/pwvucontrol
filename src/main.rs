@@ -37,6 +37,9 @@ mod withdefaultlistmodel;
 mod output_dropdown;
 mod sinkbox;
 mod outputbox;
+mod profile_dropdown;
+mod pwdeviceobject;
+mod devicebox;
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 

@@ -96,10 +96,6 @@ impl PwSinkBox {
     pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("row-data", row_data)
-            // .property(
-            //     "channelmodel",
-            //     gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>(),
-            // )
             .build()
     }
 

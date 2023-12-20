@@ -24,6 +24,8 @@ pub(crate) enum PwvucontrolWindowView {
     Disconnected
 }
 mod imp {
+    use crate::{pwdeviceobject::PwDeviceObject, devicebox::PwDeviceBox};
+
     use super::*;
 
     #[derive(Debug, gtk::CompositeTemplate)]
@@ -39,6 +41,8 @@ mod imp {
         pub recordlist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub outputlist: TemplateChild<gtk::ListBox>,
+        #[template_child]
+        pub cardlist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub viewstack: TemplateChild<gtk::Stack>,
         #[template_child]
@@ -60,6 +64,7 @@ mod imp {
                 playbacklist: TemplateChild::default(),
                 recordlist: TemplateChild::default(),
                 outputlist: TemplateChild::default(),
+                cardlist: TemplateChild::default(),
                 viewstack: TemplateChild::default(),
                 reconnectbtn: TemplateChild::default(),
                 settings: gio::Settings::new(APP_ID)
@@ -97,6 +102,7 @@ mod imp {
             let manager = app.manager();
             let model = &manager.imp().nodemodel;
             let sinkmodel = &manager.imp().sinkmodel;
+            let devicemodel = manager.imp().devicemodel.get().expect("Device model");
             let window = self;
 
             let filter = gtk::CustomFilter::new(|x| {
@@ -145,6 +151,14 @@ mod imp {
                             .expect("RowData is of wrong type"),
                     )
                     .upcast::<gtk::Widget>()
+                }),
+            );
+
+            self.cardlist.bind_model(
+                Some(devicemodel),
+                clone!(@weak window => @default-panic, move |item| {
+                    let obj: &PwDeviceObject = item.downcast_ref().expect("PwDeviceObject");
+                    PwDeviceBox::new(obj).upcast::<gtk::Widget>()
                 }),
             );
 
