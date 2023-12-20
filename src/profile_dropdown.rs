@@ -185,9 +185,7 @@ mod imp {
                 if let Some(deviceobject) = widget.deviceobject() {
                     wp::log::critical!("Had set profile to {}", dropdown.selected());
                     
-                    // NOTE: Commented out for now as it is annoying to have to reset the card profiles
-                    // every time this code isn't doing the right thing.
-                    //deviceobject.set_profile(dropdown.selected() as i32);
+                    deviceobject.set_profile(dropdown.selected() as i32);
                 }
             });
             self.profile_dropdown.connect_closure("notify::selected", true, selected_handler);
