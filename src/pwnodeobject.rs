@@ -30,7 +30,7 @@ pub mod imp {
         ParamSpec,
         Properties,
         Value,
-        subclass::Signal
+        subclass::Signal,
     };
     use once_cell::sync::{Lazy, OnceCell};
 

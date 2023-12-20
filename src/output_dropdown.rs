@@ -122,7 +122,8 @@ mod imp {
             self.outputdevice_dropdown.set_model(Some(&*self.dropdown_model.borrow()));
 
             let widget = self.obj();
-            let selected_handler = closure_local!(@watch widget => move |dropdown: &gtk::DropDown, _values: &glib::Value| {
+            let selected_handler = closure_local!(
+                @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
                 wp::info!("selected-item");
                 let nodeobj = widget.imp().nodeobj.borrow();
                 if nodeobj.is_none() {
@@ -143,7 +144,6 @@ mod imp {
                 }
             });
 
-            
             self.outputdevice_dropdown.connect_closure("notify::selected-item", true, selected_handler);
         }
     }
