@@ -146,14 +146,6 @@ impl PwDeviceObject {
 
     pub(crate) fn update_profiles(&self) {
         let device = self.wpdevice();
-        let deviceid = device.object_id().expect("device id");
-
-        let infomsg = format!(
-            "Listing profiles for device #{deviceid} {}",
-            device
-                .pw_property::<String>("device.nick")
-                .expect("device.nick")
-        );
 
         device.enum_params(Some("EnumProfile"), None, gtk::gio::Cancellable::NONE, 
             clone!(@weak self as widget => move |res| {
@@ -162,9 +154,6 @@ impl PwDeviceObject {
                 let description_key = keys.find_value_from_short_name("description").expect("decription key");
 
                 if let Ok(Some(iter)) = res {
-
-                    wp::log::info!("{infomsg}");
-
                     let removed = widget.imp().profiles.borrow().len();
 
                     let inserted = {
@@ -181,8 +170,6 @@ impl PwDeviceObject {
                             let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
 
                             profiles.insert(index as u32, description.to_string());
-
-                            wp::log::info!("Got profile #{} {}", index, description);
                         }
 
                         profiles.len()
