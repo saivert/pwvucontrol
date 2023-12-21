@@ -26,4 +26,4 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: pwvucontrol.flatpak
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+
