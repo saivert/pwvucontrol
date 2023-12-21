@@ -325,11 +325,15 @@ impl PwNodeObject {
                         return;
                     }
 
-                    let choice = pod.find_spa_property(&channels_key).expect("Channels!");
-                    let channels = get_pod_maybe_choice(choice).int().expect("Channels int");
+                    let channels = match pod.find_spa_property(&channels_key) {
+                        Some(pod) => get_pod_maybe_choice(pod).int().expect("Channels int"),
+                        None => 0
+                    };
 
-                    let choice = pod.find_spa_property(&rate_key).expect("Rate!");
-                    let rate = get_pod_maybe_choice(choice).int().expect("Rate int");
+                    let rate = match pod.find_spa_property(&rate_key) {
+                        Some(pod) => get_pod_maybe_choice(pod).int().expect("Rate int"),
+                        None => 0
+                    };
 
                     let choice = pod.find_spa_property(&position_key).expect("Position!");
                     let positionpod = get_pod_maybe_choice(choice);
