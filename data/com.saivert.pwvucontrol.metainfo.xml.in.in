@@ -10,6 +10,9 @@
   <description>
     <p>A native volume control app made with GTK + Rust.</p>
   </description>
+  <categories>
+    <category>Audio</category>
+  </categories>
   <screenshots>
     <screenshot type="default">
       <image>https://saivert.com/files/pwvucontrol%202023-07-26%2019-16-08.png</image>
