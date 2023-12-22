@@ -6,7 +6,7 @@ use glib::{self, clone, ControlFlow};
 use pipewire::{properties, spa, stream::*, Context, Loop};
 use std::os::fd::AsRawFd;
 
-use crate::volumebox::PwVolumeBox;
+use crate::ui::volumebox::PwVolumeBox;
 
 pub(crate) struct LevelbarProvider {
     _loop: Loop,

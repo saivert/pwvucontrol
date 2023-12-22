@@ -6,7 +6,7 @@ use adw::subclass::prelude::*;
 use once_cell::unsync::OnceCell;
 use crate::{
     config::{APP_ID, VERSION},
-    manager::PwvucontrolManager,
+    backend::manager::PwvucontrolManager,
     PwvucontrolWindow,
 };
 
@@ -117,7 +117,7 @@ impl PwvucontrolApplication {
     pub fn manager(&self) -> &PwvucontrolManager {
         self.imp()
             .manager
-            .get_or_init(|| crate::manager::PwvucontrolManager::new(self))
+            .get_or_init(|| PwvucontrolManager::new(self))
     }
 }
 

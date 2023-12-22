@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::pwprofileobject::PwProfileObject;
+use crate::backend::pwprofileobject::PwProfileObject;
 use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use wireplumber as wp;

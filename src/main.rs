@@ -24,28 +24,14 @@ mod config {
     include!(concat!(env!("CODEGEN_BUILD_DIR"), "/config.rs"));
 }
 
+mod backend;
+mod ui;
 mod application;
-mod channelbox;
-mod levelprovider;
-mod pwchannelobject;
-mod pwnodemodel;
-mod pwnodeobject;
-mod volumebox;
-mod window;
-mod manager;
-mod withdefaultlistmodel;
-mod output_dropdown;
-mod sinkbox;
-mod outputbox;
-mod profile_dropdown;
-mod pwdeviceobject;
-mod devicebox;
-mod pwprofileobject;
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 
 use self::application::PwvucontrolApplication;
-use self::window::PwvucontrolWindow;
+use self::ui::window::PwvucontrolWindow;
 
 use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};

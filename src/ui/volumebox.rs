@@ -2,10 +2,10 @@
 
 use crate::{
     application::PwvucontrolApplication,
-    pwnodeobject::PwNodeObject,
-    channelbox::PwChannelBox,
-    levelprovider::LevelbarProvider,
-    pwchannelobject::PwChannelObject
+    backend::pwnodeobject::PwNodeObject,
+    ui::channelbox::PwChannelBox,
+    ui::levelprovider::LevelbarProvider,
+    backend::pwchannelobject::PwChannelObject,
 };
 
 use glib::{clone, ControlFlow, closure_local, SignalHandlerId};
@@ -94,7 +94,7 @@ mod imp {
     
             self.parent_constructed();
 
-            self.channelmodel.set(gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>()).expect("channelmodel not already set");
+            self.channelmodel.set(gio::ListStore::new::<PwChannelObject>()).expect("channelmodel not already set");
 
             let item = self.row_data.borrow();
             let item = item.as_ref().cloned().unwrap();
@@ -321,7 +321,7 @@ impl PwVolumeBox {
             .property("row-data", row_data)
             .property(
                 "channelmodel",
-                gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>(),
+                gio::ListStore::new::<PwChannelObject>(),
             )
             .build()
     }

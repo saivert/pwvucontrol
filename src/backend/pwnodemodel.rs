@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::pwnodeobject::PwNodeObject;
+use crate::backend::pwnodeobject::PwNodeObject;
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
 use im_rc::Vector;

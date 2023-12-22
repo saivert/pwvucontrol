@@ -7,13 +7,13 @@ use gtk::{
 };
 use glib::clone;
 use adw::subclass::prelude::*;
-use crate::{pwdeviceobject::PwDeviceObject, devicebox::PwDeviceBox};
+use crate::{backend::pwdeviceobject::PwDeviceObject, ui::devicebox::PwDeviceBox};
 use crate::{
     application::PwvucontrolApplication,
-    volumebox::PwVolumeBox,
-    pwnodeobject::PwNodeObject,
-    sinkbox::PwSinkBox,
-    outputbox::PwOutputBox,
+    ui::volumebox::PwVolumeBox,
+    backend::pwnodeobject::PwNodeObject,
+    ui::sinkbox::PwSinkBox,
+    ui::outputbox::PwOutputBox,
     config::{APP_ID, PROFILE}
 };
 use wireplumber as wp;

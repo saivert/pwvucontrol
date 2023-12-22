@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::pwnodeobject::PwNodeObject;
+use crate::backend::pwnodeobject::PwNodeObject;
 use std::cell::{Cell, RefCell};
 use gtk::{
     glib::{self, Properties, Value},

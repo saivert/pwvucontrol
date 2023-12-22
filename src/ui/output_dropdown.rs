@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    withdefaultlistmodel::WithDefaultListModel,
-    pwnodeobject::PwNodeObject,
+    ui::withdefaultlistmodel::WithDefaultListModel,
+    backend::pwnodeobject::PwNodeObject,
     application::PwvucontrolApplication,
 };
 use glib::closure_local;

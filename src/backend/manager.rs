@@ -14,13 +14,15 @@ use wp::{
 };
 use std::{str::FromStr, cell::RefCell};
 use crate::{
-    pwnodeobject::PwNodeObject,
-    window::PwvucontrolWindowView,
-    pwnodemodel::PwNodeModel,
-    pwdeviceobject::PwDeviceObject,
+    backend::pwnodeobject::PwNodeObject,
+    ui::window::PwvucontrolWindowView,
+    backend::pwnodemodel::PwNodeModel,
+    backend::pwdeviceobject::PwDeviceObject,
+    backend::pwnodeobject,
     PwvucontrolWindow,
     PwvucontrolApplication
 };
+
 use once_cell::unsync::OnceCell;
 
 mod imp {
@@ -181,7 +183,7 @@ mod imp {
                 let devicemodel = imp.devicemodel.get().expect("devicemodel");
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
-                    let model = match crate::pwnodeobject::get_node_type_for_node(node) {
+                    let model = match pwnodeobject::get_node_type_for_node(node) {
                         crate::NodeType::Sink => &imp.sinkmodel,
                         _ => &imp.nodemodel
                     };
@@ -282,7 +284,7 @@ glib::wrapper! {
 }
 
 impl PwvucontrolManager {
-    pub(super) fn new<P: glib::IsA<gtk::Application>>(application: &P)  -> Self {
+    pub fn new<P: glib::IsA<gtk::Application>>(application: &P)  -> Self {
         glib::Object::builder()
             .property("application", application)
             .build()

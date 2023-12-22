@@ -2,9 +2,9 @@
 
 use crate::{
     application::PwvucontrolApplication,
-    pwnodeobject::PwNodeObject,
-    volumebox::{PwVolumeBox, PwVolumeBoxImpl},
-    output_dropdown::PwOutputDropDown,
+    backend::pwnodeobject::PwNodeObject,
+    ui::volumebox::{PwVolumeBox, PwVolumeBoxImpl},
+    ui::output_dropdown::PwOutputDropDown,
 };
 use glib::{closure_local, clone};
 use gtk::{prelude::*, subclass::prelude::*};
