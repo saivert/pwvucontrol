@@ -30,7 +30,7 @@ cargo_env = [
   'CODEGEN_BUILD_DIR=' + meson.current_build_dir()
 ]
 
-cargo_build = custom_target(
+custom_target(
   'cargo-build',
   build_by_default: true,
   build_always_stale: true,
