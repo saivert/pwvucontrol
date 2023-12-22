@@ -3,7 +3,7 @@
 use crate::{
     ui::WithDefaultListModel,
     backend::PwNodeObject,
-    application::PwvucontrolApplication,
+    backend::PwvucontrolManager,
 };
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
@@ -61,8 +61,7 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            let app = PwvucontrolApplication::default();
-            let manager = app.manager();
+            let manager = PwvucontrolManager::default();
 
             
             fn setup_handler(item: &glib::Object) {

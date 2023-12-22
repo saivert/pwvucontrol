@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use glib::ExitCode;
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
-
+use glib::Properties;
 use adw::subclass::prelude::*;
 use once_cell::unsync::OnceCell;
 use crate::{
@@ -13,9 +14,12 @@ use crate::{
 mod imp {
     use super::*;
 
+    #[derive(Properties)]
+    #[properties(wrapper_type = super::PwvucontrolApplication)]
     pub struct PwvucontrolApplication {
-        pub(super) window: OnceCell<PwvucontrolWindow>,
-        pub(super) manager: OnceCell<PwvucontrolManager>,
+        pub window: OnceCell<PwvucontrolWindow>,
+        #[property(get)]
+        pub manager: PwvucontrolManager,
     }
 
     #[glib::object_subclass]
@@ -27,19 +31,19 @@ mod imp {
         fn new() -> PwvucontrolApplication {
             PwvucontrolApplication {
                 window: OnceCell::default(),
-                manager: OnceCell::default(),
+                manager: PwvucontrolManager::new(),
             }
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for PwvucontrolApplication {
         fn constructed(&self) {
             self.parent_constructed();
+            
             let obj = self.obj();
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
-
-            self.obj().manager();
         }
     }
 
@@ -81,12 +85,14 @@ glib::wrapper! {
 }
 
 impl PwvucontrolApplication {
-    pub(super) fn new() -> Self {
-        glib::Object::builder()
-            .property("application-id", APP_ID)
-            .property("flags", gio::ApplicationFlags::empty())
-            .property("resource-base-path", "/com/saivert/pwvucontrol")
-            .build()
+    pub fn run() -> ExitCode {
+        let app: Self = glib::Object::builder()
+        .property("application-id", APP_ID)
+        .property("flags", gio::ApplicationFlags::empty())
+        .property("resource-base-path", "/com/saivert/pwvucontrol")
+        .build();
+
+        ApplicationExtManual::run(&app)
     }
 
     fn setup_gactions(&self) {
@@ -114,11 +120,6 @@ impl PwvucontrolApplication {
         about.present();
     }
 
-    pub fn manager(&self) -> &PwvucontrolManager {
-        self.imp()
-            .manager
-            .get_or_init(|| PwvucontrolManager::new(self))
-    }
 }
 
 impl Default for PwvucontrolApplication {

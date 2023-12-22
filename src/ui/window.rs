@@ -7,7 +7,7 @@ use gtk::{
 };
 use glib::clone;
 use adw::subclass::prelude::*;
-use crate::{backend::PwDeviceObject, ui::devicebox::PwDeviceBox};
+use crate::{backend::{PwDeviceObject, PwvucontrolManager}, ui::devicebox::PwDeviceBox};
 use crate::{
     application::PwvucontrolApplication,
     ui::PwVolumeBox,
@@ -95,8 +95,7 @@ mod imp {
             self.obj().setup_scroll_blocker(self.recordlist.get());
             self.obj().setup_scroll_blocker(self.outputlist.get());
 
-            let app = PwvucontrolApplication::default();
-            let manager = app.manager();
+            let manager = PwvucontrolManager::default();
             let model = &manager.imp().nodemodel;
             let sinkmodel = &manager.imp().sinkmodel;
             let devicemodel = manager.imp().devicemodel.get().expect("Device model");
@@ -160,8 +159,7 @@ mod imp {
             );
 
             self.reconnectbtn.connect_clicked(|_| {
-                let app = PwvucontrolApplication::default();
-                let manager = app.manager();
+                let manager = PwvucontrolManager::default();
                 if let Some(core) = manager.imp().wp_core.get() {
                     core.connect();
                 }

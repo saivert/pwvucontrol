@@ -5,7 +5,9 @@ use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, M
 use std::cell::{Cell, RefCell};
 use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
 use once_cell::sync::{Lazy, OnceCell};
-use crate::{NodeType, application::PwvucontrolApplication};
+use crate::NodeType;
+
+use super::PwvucontrolManager;
 
 mod mixerapi;
 
@@ -446,8 +448,8 @@ impl PwNodeObject {
     }
 
     pub(crate) fn set_default_target(&self, target_node: &PwNodeObject) {
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
+
+        let manager = PwvucontrolManager::default();
 
         if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
@@ -458,8 +460,7 @@ impl PwNodeObject {
     }
 
     pub(crate) fn default_target(&self) -> Option<PwNodeObject> {
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
+        let manager = PwvucontrolManager::default();
 
         let om = manager.imp().wp_object_manager.get().unwrap();
         if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
@@ -489,9 +490,7 @@ impl PwNodeObject {
     }
 
     pub(crate) fn unset_default_target(&self) {
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
-        // let manager = manager.as_ref().unwrap();
+        let manager = PwvucontrolManager::default();
 
         if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some("-1"));

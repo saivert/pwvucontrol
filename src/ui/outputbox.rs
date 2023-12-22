@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    application::PwvucontrolApplication,
+    backend::PwvucontrolManager,
     backend::PwNodeObject,
     ui::PwVolumeBox,
     ui::PwVolumeBoxImpl,
@@ -12,6 +12,8 @@ use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
 
 mod imp {
+    use crate::backend::PwvucontrolManager;
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]
@@ -39,8 +41,7 @@ mod imp {
     impl ObjectImpl for PwOutputBox {
         fn constructed(&self) {
 
-            let app = PwvucontrolApplication::default();
-            let manager = app.manager();
+            let manager = PwvucontrolManager::default();
 
             let obj = self.obj();
             let parent: &PwVolumeBox = obj.upcast_ref();
@@ -103,8 +104,7 @@ impl PwOutputBox {
     }
 
     pub(crate) fn update_output_device_dropdown(&self) {
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
+        let manager = PwvucontrolManager::default();
 
         let sinkmodel = &manager.imp().sinkmodel;
 

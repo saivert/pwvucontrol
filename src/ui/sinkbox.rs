@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    application::PwvucontrolApplication,
+    backend::PwvucontrolManager,
     backend::PwNodeObject,
     ui::{PwVolumeBox, PwVolumeBoxImpl},
 };
@@ -70,8 +70,7 @@ mod imp {
             let node = parent.row_data().expect("row data set on volumebox");
             let node_name: String = node.node_property("node.name");
 
-            let app = PwvucontrolApplication::default();
-            let manager = app.manager();
+            let manager = PwvucontrolManager::default();
 
             let core = manager.imp().wp_core.get().expect("Core");
             let defaultnodesapi =

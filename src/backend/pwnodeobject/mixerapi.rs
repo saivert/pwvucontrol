@@ -2,8 +2,6 @@
 
 use std::collections::HashMap;
 
-use crate::application::PwvucontrolApplication;
-
 use glib::{subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant, closure_local};
 use wireplumber as wp;
 use wp::pw::ProxyExt;
@@ -14,8 +12,7 @@ impl PwNodeObject {
     pub(crate) fn get_mixer_api(&self) {
         let imp = self.imp();
 
-        let app = PwvucontrolApplication::default();
-        let manager = app.manager();
+        let manager = PwvucontrolManager::default();
         let core = manager.imp().wp_core.get().expect("Core setup");
 
         let mixerapi = wp::plugin::Plugin::find(core, "mixer-api").expect("Get mixer-api");

@@ -222,7 +222,7 @@ mod imp {
                         }
                     } else {
                         wp::log::critical!("Cannot find plugin {plugin_name}");
-                        manager.application.borrow().as_ref().unwrap().quit();
+                        PwvucontrolApplication::default().quit();
                     }
                 }
             }));
@@ -284,9 +284,14 @@ glib::wrapper! {
 }
 
 impl PwvucontrolManager {
-    pub fn new<P: glib::IsA<gtk::Application>>(application: &P)  -> Self {
+    pub fn new () -> Self {
         glib::Object::builder()
-            .property("application", application)
             .build()
+    }
+}
+
+impl Default for PwvucontrolManager {
+    fn default() -> Self {
+        PwvucontrolApplication::default().manager()
     }
 }

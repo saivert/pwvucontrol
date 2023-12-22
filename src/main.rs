@@ -106,7 +106,5 @@ fn main() -> gtk::glib::ExitCode {
         gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
 
-    let app = PwvucontrolApplication::new();
-
-    app.run()
+    PwvucontrolApplication::run()
 }
