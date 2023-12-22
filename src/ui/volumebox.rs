@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    application::PwvucontrolApplication,
     backend::PwvucontrolManager,
     backend::PwNodeObject,
     ui::PwChannelBox,
