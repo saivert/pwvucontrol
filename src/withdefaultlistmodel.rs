@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::pwnodemodel::PwNodeModel;
+use glib::{Properties, closure_local};
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
 
 mod imp {
-    use glib::{Properties, closure_local};
-
     use super::*;
 
     #[derive(Debug, Default, Properties)]

@@ -1,24 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{self, clone, subclass::prelude::*, Object, ObjectExt};
-
-use gtk::{gio, prelude::ListModelExt};
+use crate::pwprofileobject::PwProfileObject;
+use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
+use gtk::{gio, prelude::*, subclass::prelude::*};
 use wireplumber as wp;
 use wp::{
     pw::{PipewireObjectExt, PipewireObjectExt2},
     spa::SpaPodBuilder,
 };
-
-use crate::pwprofileobject::PwProfileObject;
+use im_rc::Vector;
+use once_cell::sync::{OnceCell, Lazy};
+use std::cell::{Cell, RefCell};
 
 pub mod imp {
     use super::*;
-
-    use glib::{ParamSpec, Properties, Value, subclass::Signal};
-    use gtk::{gio, glib, prelude::*, subclass::prelude::*};
-    use im_rc::Vector;
-    use once_cell::sync::{OnceCell, Lazy};
-    use std::cell::{Cell, RefCell};
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwDeviceObject)]
@@ -242,19 +237,4 @@ impl PwDeviceObject {
     fn update_icon_name(&self) {
         self.set_iconname("soundcard-symbolic");
     }
-
-    // pub(crate) fn serial(&self) -> u32 {
-    //     let serial: i32 = self
-    //         .wpdevice()
-    //         .pw_property("object.serial")
-    //         .expect("object.serial");
-
-    //     serial as u32
-    // }
-
-    // pub(crate) fn device_property<T: FromPipewirePropertyString>(&self, property: &str) -> T {
-    //     self.wpdevice()
-    //         .pw_property(property)
-    //         .expect("object.serial")
-    // }
 }

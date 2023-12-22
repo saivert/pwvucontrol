@@ -3,7 +3,7 @@
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 
 use adw::subclass::prelude::*;
-
+use once_cell::unsync::OnceCell;
 use crate::{
     config::{APP_ID, VERSION},
     manager::PwvucontrolManager,
@@ -12,7 +12,6 @@ use crate::{
 
 mod imp {
     use super::*;
-    use once_cell::unsync::OnceCell;
 
     pub struct PwvucontrolApplication {
         pub(super) window: OnceCell<PwvucontrolWindow>,

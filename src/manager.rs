@@ -1,26 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
- use gtk::{
+use gtk::{
     gio,
-    glib::{self, clone},
+    glib::{self, clone, Properties},
     prelude::*,
     subclass::prelude::*,
 };
-
 use wireplumber as wp;
-use wp::{plugin::PluginFeatures, pw::MetadataExt, registry::{ObjectManager, Interest, Constraint, ConstraintType}};
-
-use crate::{PwvucontrolWindow, PwvucontrolApplication};
+use wp::{
+    plugin::{PluginFeatures, *},
+    pw::{MetadataExt, ProxyExt, PipewireObjectExt2},
+    registry::{ObjectManager, Interest, Constraint, ConstraintType}
+};
+use std::{str::FromStr, cell::RefCell};
+use crate::{
+    pwnodeobject::PwNodeObject,
+    window::PwvucontrolWindowView,
+    pwnodemodel::PwNodeModel,
+    pwdeviceobject::PwDeviceObject,
+    PwvucontrolWindow,
+    PwvucontrolApplication
+};
+use once_cell::unsync::OnceCell;
 
 mod imp {
-    use std::{str::FromStr, cell::RefCell};
-
-    use crate::{pwnodeobject::PwNodeObject, window::PwvucontrolWindowView, pwnodemodel::PwNodeModel, pwdeviceobject::PwDeviceObject};
-
     use super::*;
-    use glib::Properties;
-    use once_cell::unsync::OnceCell;
-    use wp::{pw::{ProxyExt, PipewireObjectExt2}, plugin::*};
 
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwvucontrolManager)]

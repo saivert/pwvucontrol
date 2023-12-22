@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::pwdeviceobject::PwDeviceObject;
+use crate::{pwdeviceobject::PwDeviceObject, pwprofileobject::{PwProfileObject, ProfileAvailability}};
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
+use glib::clone;
+use wp::pw::ProxyExt;
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
-    use glib::clone;
-    use wp::pw::ProxyExt;
-
-    use crate::pwprofileobject::{PwProfileObject, ProfileAvailability};
-
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
@@ -26,7 +23,7 @@ mod imp {
 
         pub(super) block_signal: Cell<bool>,
 
-        pub(super) stringlist: RefCell<gtk::StringList>,
+        //pub(super) stringlist: RefCell<gtk::StringList>,
     }
 
     #[glib::object_subclass]

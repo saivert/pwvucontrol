@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{self, clone, subclass::prelude::*, Object, ObjectExt};
-
 use wireplumber as wp;
 use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt, FromPipewirePropertyString}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
-
+use std::cell::{Cell, RefCell};
+use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
+use once_cell::sync::{Lazy, OnceCell};
 use crate::{NodeType, application::PwvucontrolApplication};
 
 mod mixerapi;
+
 #[derive(Copy, Clone, Debug)]
 pub struct AudioFormat {
     pub channels: i32,
@@ -25,16 +26,6 @@ pub(crate) enum PropertyChanged {
 pub mod imp {
     use super::*;
 
-    use std::cell::{Cell, RefCell};
-    use glib::{
-        ParamSpec,
-        Properties,
-        Value,
-        subclass::Signal,
-    };
-    use once_cell::sync::{Lazy, OnceCell};
-
-    // Object holding the state
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwNodeObject)]
     pub struct PwNodeObject {

@@ -7,7 +7,7 @@ use gtk::{
 };
 use glib::clone;
 use adw::subclass::prelude::*;
-
+use crate::{pwdeviceobject::PwDeviceObject, devicebox::PwDeviceBox};
 use crate::{
     application::PwvucontrolApplication,
     volumebox::PwVolumeBox,
@@ -16,7 +16,6 @@ use crate::{
     outputbox::PwOutputBox,
     config::{APP_ID, PROFILE}
 };
-
 use wireplumber as wp;
 
 pub(crate) enum PwvucontrolWindowView {
@@ -24,8 +23,6 @@ pub(crate) enum PwvucontrolWindowView {
     Disconnected
 }
 mod imp {
-    use crate::{pwdeviceobject::PwDeviceObject, devicebox::PwDeviceBox};
-
     use super::*;
 
     #[derive(Debug, gtk::CompositeTemplate)]

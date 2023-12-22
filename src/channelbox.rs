@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::pwchannelobject::PwChannelObject;
+use std::cell::RefCell;
+use gtk::{prelude::*, subclass::prelude::*};
 
 mod imp {
-
     use super::*;
-    use std::cell::RefCell;
-    use gtk::{prelude::*, subclass::prelude::*};
     
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]
