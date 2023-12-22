@@ -10,7 +10,7 @@ mod imp {
     use glib::clone;
     use wp::pw::ProxyExt;
 
-    use crate::pwprofileobject::PwProfileObject;
+    use crate::pwprofileobject::{PwProfileObject, ProfileAvailability};
 
     use super::*;
 
@@ -178,8 +178,8 @@ mod imp {
                 //     .chain_closure::<f32>(opacity_closure)
                 //     .bind(&label, "opacity", glib::Object::NONE);
 
-                let icon_closure = closure_local!(|_: Option<glib::Object>, availability: u32| {
-                    availability != 2
+                let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ProfileAvailability| {
+                    availability == ProfileAvailability::No
                 });
 
                 item.property_expression("item")

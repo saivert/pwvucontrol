@@ -8,6 +8,25 @@ use gtk::{
     subclass::prelude::*
 };
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, glib::Enum, Default)]
+#[enum_type(name = "ProfileAvailability")]
+pub enum ProfileAvailability {
+    #[default]
+    Unknown,
+    No,
+    Yes
+}
+
+impl From<u32> for ProfileAvailability {
+    fn from(value: u32) -> Self {
+        match value {
+            1 => ProfileAvailability::No,
+            2 => ProfileAvailability::Yes,
+            _ => ProfileAvailability::Unknown,
+        }
+    }
+}
+
 mod imp {
     use super::*;
 
@@ -19,8 +38,8 @@ mod imp {
         index: Cell<u32>,
         #[property(get, set)]
         description: RefCell<String>,
-        #[property(get, set)]
-        availability: Cell<u32>,
+        #[property(get, set, builder(ProfileAvailability::Unknown))]
+        availability: Cell<ProfileAvailability>,
     }
 
     // The central trait for subclassing a GObject
@@ -45,7 +64,7 @@ impl PwProfileObject {
         glib::Object::builder()
         .property("index", index)
         .property("description", description)
-        .property("availability", availability)
+        .property("availability", ProfileAvailability::from(availability))
         .build()
     }
 }
