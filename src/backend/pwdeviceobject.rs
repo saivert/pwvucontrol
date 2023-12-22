@@ -21,7 +21,7 @@ pub mod imp {
         #[property(get, set)]
         name: RefCell<Option<String>>,
         #[property(get, set)]
-        iconname: RefCell<String>,
+        icon_name: RefCell<String>,
         #[property(get, set)]
         pub(super) profile_index: Cell<u32>,
 
@@ -235,6 +235,10 @@ impl PwDeviceObject {
     }
 
     fn update_icon_name(&self) {
-        self.set_iconname("soundcard-symbolic");
+        let icon_name: String = self
+            .wpdevice()
+            .pw_property("device.icon-name")
+            .unwrap_or("soundcard-symbolic".to_string());
+        self.set_icon_name(icon_name);
     }
 }

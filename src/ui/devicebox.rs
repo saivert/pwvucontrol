@@ -14,6 +14,8 @@ mod imp {
     #[properties(wrapper_type = super::PwDeviceBox)]
     pub struct PwDeviceBox {
         #[template_child]
+        pub icon: TemplateChild<gtk::Image>,
+        #[template_child]
         pub label: TemplateChild<gtk::Label>,
         #[template_child]
         pub profile_dropdown: TemplateChild<PwProfileDropDown>,
@@ -51,6 +53,12 @@ mod imp {
                 .bind_property("name", &self.label.get(), "label")
                 .sync_create()
                 .build();
+
+            deviceobject
+                .bind_property("icon-name", &self.icon.get(), "icon-name")
+                .sync_create()
+                .build();
+
 
             self.profile_dropdown.set_deviceobject(obj.deviceobject());
         }

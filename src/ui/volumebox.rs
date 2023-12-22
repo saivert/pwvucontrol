@@ -302,8 +302,6 @@ mod imp {
         fn invert_bool(&self, value: bool) -> bool {
             !value
         }
-
-
     }
 }
 
@@ -317,10 +315,7 @@ impl PwVolumeBox {
     pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("row-data", row_data)
-            .property(
-                "channelmodel",
-                gio::ListStore::new::<PwChannelObject>(),
-            )
+            .property("channelmodel", gio::ListStore::new::<PwChannelObject>())
             .build()
     }
 
