@@ -35,7 +35,6 @@ use self::application::PwvucontrolApplication;
 use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};
 use gtk::gio;
-use gtk::prelude::*;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Default, glib::Enum)]
 #[enum_type(name = "NodeType")]
