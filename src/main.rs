@@ -31,7 +31,6 @@ mod application;
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 
 use self::application::PwvucontrolApplication;
-use self::ui::window::PwvucontrolWindow;
 
 use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};

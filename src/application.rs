@@ -6,8 +6,8 @@ use adw::subclass::prelude::*;
 use once_cell::unsync::OnceCell;
 use crate::{
     config::{APP_ID, VERSION},
-    backend::manager::PwvucontrolManager,
-    PwvucontrolWindow,
+    backend::PwvucontrolManager,
+    ui::PwvucontrolWindow,
 };
 
 mod imp {

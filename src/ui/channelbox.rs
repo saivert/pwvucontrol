@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::pwchannelobject::PwChannelObject;
+use crate::backend::PwChannelObject;
 use std::cell::RefCell;
 use gtk::{prelude::*, subclass::prelude::*};
 

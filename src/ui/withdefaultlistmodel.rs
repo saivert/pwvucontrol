@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::pwnodemodel::PwNodeModel;
+use crate::backend::PwNodeModel;
 use glib::{Properties, closure_local};
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;

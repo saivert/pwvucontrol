@@ -7,18 +7,18 @@ use gtk::{
 };
 use glib::clone;
 use adw::subclass::prelude::*;
-use crate::{backend::pwdeviceobject::PwDeviceObject, ui::devicebox::PwDeviceBox};
+use crate::{backend::PwDeviceObject, ui::devicebox::PwDeviceBox};
 use crate::{
     application::PwvucontrolApplication,
-    ui::volumebox::PwVolumeBox,
-    backend::pwnodeobject::PwNodeObject,
-    ui::sinkbox::PwSinkBox,
-    ui::outputbox::PwOutputBox,
+    ui::PwVolumeBox,
+    backend::PwNodeObject,
+    ui::PwSinkBox,
+    ui::PwOutputBox,
     config::{APP_ID, PROFILE}
 };
 use wireplumber as wp;
 
-pub(crate) enum PwvucontrolWindowView {
+pub enum PwvucontrolWindowView {
     Connected,
     Disconnected
 }

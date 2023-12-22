@@ -2,8 +2,8 @@
 
 use crate::{
     application::PwvucontrolApplication,
-    backend::pwnodeobject::PwNodeObject,
-    ui::volumebox::{PwVolumeBox, PwVolumeBoxImpl},
+    backend::PwNodeObject,
+    ui::{PwVolumeBox, PwVolumeBoxImpl},
 };
 use glib::clone;
 use gtk::{prelude::*, subclass::prelude::*};

@@ -2,10 +2,10 @@
 
 use crate::{
     application::PwvucontrolApplication,
-    backend::pwnodeobject::PwNodeObject,
-    ui::channelbox::PwChannelBox,
-    ui::levelprovider::LevelbarProvider,
-    backend::pwchannelobject::PwChannelObject,
+    backend::PwNodeObject,
+    ui::PwChannelBox,
+    ui::LevelbarProvider,
+    backend::PwChannelObject,
 };
 
 use glib::{clone, ControlFlow, closure_local, SignalHandlerId};

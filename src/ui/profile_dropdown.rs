@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{backend::pwdeviceobject::PwDeviceObject, backend::pwprofileobject::{PwProfileObject, ProfileAvailability}};
+use crate::{backend::PwDeviceObject, backend::{PwProfileObject, ProfileAvailability}};
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use glib::clone;

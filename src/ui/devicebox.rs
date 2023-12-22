@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{ui::profile_dropdown::PwProfileDropDown, backend::pwdeviceobject::PwDeviceObject};
+use crate::backend::PwDeviceObject;
+use crate::ui::PwProfileDropDown;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
+
 
 mod imp {
     use super::*;
