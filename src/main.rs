@@ -40,6 +40,7 @@ mod outputbox;
 mod profile_dropdown;
 mod pwdeviceobject;
 mod devicebox;
+mod pwprofileobject;
 
 use std::{ffi::{OsStr, OsString}, path::PathBuf};
 

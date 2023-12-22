@@ -9,14 +9,14 @@ use wp::{
     spa::SpaPodBuilder,
 };
 
-//use im_rc::HashMap;
-use std::collections::HashMap;
+use crate::pwprofileobject::PwProfileObject;
 
 pub mod imp {
     use super::*;
 
     use glib::{ParamSpec, Properties, Value, subclass::Signal};
     use gtk::{gio, glib, prelude::*, subclass::prelude::*};
+    use im_rc::Vector;
     use once_cell::sync::{OnceCell, Lazy};
     use std::cell::{Cell, RefCell};
 
@@ -33,7 +33,7 @@ pub mod imp {
         #[property(get, set, construct_only)]
         pub(super) wpdevice: OnceCell<wp::pw::Device>,
 
-        pub(super) profiles: RefCell<HashMap<u32, String>>,
+        pub(super) profiles: RefCell<Vector<PwProfileObject>>,
     }
 
     #[glib::object_subclass]
@@ -45,7 +45,7 @@ pub mod imp {
 
     impl ListModelImpl for PwDeviceObject {
         fn item_type(&self) -> glib::Type {
-            gtk::StringObject::static_type()
+            PwProfileObject::static_type()
         }
 
         fn n_items(&self) -> u32 {
@@ -53,13 +53,10 @@ pub mod imp {
         }
 
         fn item(&self, position: u32) -> Option<glib::Object> {
-            match self.profiles.borrow().get(&position) {
-                Some(item) => {
-                    let stringobj = gtk::StringObject::new(item);
-                    Some(stringobj.upcast::<glib::Object>())
-                }
-                None => None,
-            }
+            self.profiles
+                .borrow()
+                .get(position as usize)
+                .map(|o| o.clone().upcast::<glib::Object>())
         }
     }
 
@@ -152,6 +149,7 @@ impl PwDeviceObject {
                 let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Profile").expect("id table");
                 let index_key = keys.find_value_from_short_name("index").expect("index key");
                 let description_key = keys.find_value_from_short_name("description").expect("decription key");
+                let available_key = keys.find_value_from_short_name("available").expect("available key");
 
                 if let Ok(Some(iter)) = res {
                     let removed = widget.imp().profiles.borrow().len();
@@ -168,8 +166,9 @@ impl PwDeviceObject {
 
                             let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
                             let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
+                            let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
 
-                            profiles.insert(index as u32, description.to_string());
+                            profiles.push_back(PwProfileObject::new(index as u32, &description, available));
                         }
 
                         profiles.len()
@@ -231,9 +230,6 @@ impl PwDeviceObject {
         }
     }
 
-    pub(crate) fn get_profiles(&self) -> HashMap<u32, String> {
-        self.imp().profiles.borrow().clone()
-    }
 
     fn label_set_name(&self) {
         let description: String = self

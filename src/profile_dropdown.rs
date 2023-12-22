@@ -7,10 +7,10 @@ use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
-    use std::borrow::Borrow;
-
     use glib::clone;
     use wp::pw::ProxyExt;
+
+    use crate::pwprofileobject::PwProfileObject;
 
     use super::*;
 
@@ -149,28 +149,55 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            fn setup_handler(item: &glib::Object) {
+            fn setup_handler(item: &glib::Object, list: bool) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                let box_ = gtk::Box::new(gtk::Orientation::Horizontal, 6);
+                let unavailable_icon = gtk::Image::from_icon_name("action-unavailable-symbolic");
                 let label = gtk::Label::new(None);
+                box_.append(&label);
+                box_.append(&unavailable_icon);
                 label.set_xalign(0.0);
-                label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+                if !list {
+                    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+                }
+                label.set_use_markup(true);
 
                 item.property_expression("item")
-                    .chain_property::<gtk::StringObject>("string")
+                    .chain_property::<PwProfileObject>("description")
                     .bind(&label, "label", gtk::Widget::NONE);
 
-                item.set_child(Some(&label));
+                // let opacity_closure = closure_local!(|_: Option<glib::Object>, availability: u32| {
+                //     match availability {
+                //         2 => 1.0f32,
+                //         _ => 0.5f32
+                //     }
+                // });
+
+                // item.property_expression("item")
+                //     .chain_property::<PwProfileObject>("availability")
+                //     .chain_closure::<f32>(opacity_closure)
+                //     .bind(&label, "opacity", glib::Object::NONE);
+
+                let icon_closure = closure_local!(|_: Option<glib::Object>, availability: u32| {
+                    availability != 2
+                });
+
+                item.property_expression("item")
+                    .chain_property::<PwProfileObject>("availability")
+                    .chain_closure::<bool>(icon_closure)
+                    .bind(&unavailable_icon, "visible", glib::Object::NONE);
+                
+                item.set_child(Some(&box_));
             }
 
             let factory = gtk::SignalListItemFactory::new();
-            factory.connect_setup(|_, item| setup_handler(item));
+            factory.connect_setup(|_, item| setup_handler(item, false));
 
-            // We need to store the DropDown widget's internal default factory so we can reset the list-factory later
-            // which would otherwise just use the factory we set
-            let default_dropdown_factory = self.profile_dropdown.factory();
+            let list_factory = gtk::SignalListItemFactory::new();
+            list_factory.connect_setup(|_, item| setup_handler(item, true));
+
             self.profile_dropdown.set_factory(Some(&factory));
-            self.profile_dropdown
-                .set_list_factory(default_dropdown_factory.as_ref());
+            self.profile_dropdown.set_list_factory(Some(&list_factory));
 
             self.profile_dropdown.set_enable_search(true);
 
