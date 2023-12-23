@@ -68,14 +68,12 @@ pub mod imp {
         pub(super) block: Cell<bool>,
     }
 
-    // The central trait for subclassing a GObject
     #[glib::object_subclass]
     impl ObjectSubclass for PwNodeObject {
         const NAME: &'static str = "PwNodeObject";
         type Type = super::PwNodeObject;
     }
 
-    // Trait shared by all GObjects
     impl ObjectImpl for PwNodeObject {
         fn properties() -> &'static [ParamSpec] {
             Self::derived_properties()

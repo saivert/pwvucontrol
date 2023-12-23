@@ -12,7 +12,6 @@ use wireplumber as wp;
 mod imp {
     use super::*;
 
-    // Object holding the state
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwChannelObject)]
     pub struct PwChannelObject {
@@ -27,7 +26,6 @@ mod imp {
         pub(super) volume: Cell<f32>,
     }
 
-    // The central trait for subclassing a GObject
     #[glib::object_subclass]
     impl ObjectSubclass for PwChannelObject {
         const NAME: &'static str = "PwChannelObject";

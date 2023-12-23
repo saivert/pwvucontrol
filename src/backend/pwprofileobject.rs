@@ -30,7 +30,6 @@ impl From<u32> for ProfileAvailability {
 mod imp {
     use super::*;
 
-    // Object holding the state
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwProfileObject)]
     pub struct PwProfileObject {
@@ -42,7 +41,6 @@ mod imp {
         availability: Cell<ProfileAvailability>,
     }
 
-    // The central trait for subclassing a GObject
     #[glib::object_subclass]
     impl ObjectSubclass for PwProfileObject {
         const NAME: &'static str = "PwProfileObject";

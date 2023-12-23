@@ -18,7 +18,6 @@ mod imp {
         pub(super) model: RefCell<Option<PwNodeModel>>,
     }
 
-    /// Basic declaration of our type for the GObject type system
     #[glib::object_subclass]
     impl ObjectSubclass for WithDefaultListModel {
         const NAME: &'static str = "WithDefaultListModel";

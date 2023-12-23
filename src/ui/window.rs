@@ -81,7 +81,6 @@ mod imp {
 
     }
 
-
     impl ObjectImpl for PwvucontrolWindow {
         fn constructed(&self) {
             self.parent_constructed();

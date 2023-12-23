@@ -11,7 +11,6 @@ mod imp {
     #[derive(Debug, Default)]
     pub struct PwNodeModel(pub(super) RefCell<Vector<PwNodeObject>>);
     
-    /// Basic declaration of our type for the GObject type system
     #[glib::object_subclass]
     impl ObjectSubclass for PwNodeModel {
         const NAME: &'static str = "Model";
@@ -37,12 +36,10 @@ mod imp {
     }
 }
 
-// Public part of the Model type.
 glib::wrapper! {
     pub struct PwNodeModel(ObjectSubclass<imp::PwNodeModel>) @implements gio::ListModel;
 }
 
-// Constructor for new instances. This simply calls glib::Object::new()
 impl PwNodeModel {
     pub(crate) fn new() -> PwNodeModel {
         glib::Object::new()
