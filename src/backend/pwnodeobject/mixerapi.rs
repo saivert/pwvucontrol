@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 
 use glib::{subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant, closure_local};
-use gtk::prelude::ListModelExt;
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 

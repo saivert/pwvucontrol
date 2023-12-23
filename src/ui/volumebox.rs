@@ -175,8 +175,6 @@ mod imp {
             defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
             defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
 
-            //let channelmodel = self.channelmodel.get().expect("channel model");
-    
             self.channel_listbox.bind_model(
                 Some(&item.channelmodel()),
                 clone!(@weak self as widget => @default-panic, move |item| {
