@@ -92,17 +92,18 @@ mod imp {
 
             wp_core.connect();
 
-            wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");
-            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None).expect("loadig mixer-api plugin");
-
-            
+            wp_core.load_component("libwireplumber-module-mixer-api", "module", None)
+                .expect("loadig mixer-api plugin");
+            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None)
+                .expect("loadig mixer-api plugin");
 
             wp_om.add_interest(
                 {
                     let interest = wp::registry::ObjectInterest::new(
                         wp::pw::Node::static_type(),
                     );
-                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Sink')").expect("variant");
+                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Sink')")
+                        .expect("variant");
                     interest.add_constraint(
                         wp::registry::ConstraintType::PwGlobalProperty,
                         "media.class",

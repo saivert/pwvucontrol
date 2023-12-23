@@ -473,7 +473,10 @@ impl PwNodeObject {
             if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
                 if target_serial != "-1" {
                     if let Some(sinknode) = om.lookup([
-                        Constraint::compare(ConstraintType::PwProperty, "object.serial", target_serial.as_str(), true),
+                        Constraint::compare(ConstraintType::PwProperty,
+                            "object.serial",
+                            target_serial.as_str(),
+                            true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
                         return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
                     };
@@ -483,7 +486,10 @@ impl PwNodeObject {
             if let Some(target_node) = metadata.find_notype(self.boundid(), "target.node") {
                 if target_node != "-1" {
                     if let Some(sinknode) = om.lookup([
-                        Constraint::compare(ConstraintType::PwProperty, "object.id", target_node.as_str(), true),
+                        Constraint::compare(ConstraintType::PwProperty,
+                            "object.id",
+                            target_node.as_str(),
+                            true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
                         return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
                     };
@@ -548,7 +554,10 @@ impl <O: glib::IsA<wp::pw::Metadata>> MetadataExtFix for O {
         use glib::translate::ToGlibPtr;
         unsafe {
             let mut type_ = std::ptr::null();
-            glib::translate::from_glib_none(wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0, subject, ToGlibPtr::to_glib_none(&key).0, &mut type_))
+            glib::translate::from_glib_none(
+                wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0,
+                subject,
+                ToGlibPtr::to_glib_none(&key).0, &mut type_))
         }
     }
 }

@@ -194,17 +194,12 @@ mod imp {
             self.level_bar.set_min_value(0.0);
             self.level_bar.set_max_value(1.0);
     
-            self.level_bar
-                .add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
-            self.level_bar
-                .add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
-            self.level_bar
-                .add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
+            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
+            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
+            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
     
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
-                self.levelbarprovider
-                    .set(provider)
-                    .expect("Provider not set already");
+                self.levelbarprovider.set(provider).expect("Provider not set already");
     
                 self.timeoutid.set(Some(glib::timeout_add_local(
                     std::time::Duration::from_millis(25),

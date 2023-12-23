@@ -97,8 +97,7 @@ mod imp {
             // which would otherwise just use the factory we set
             let default_dropdown_factory = self.outputdevice_dropdown.factory();
             self.outputdevice_dropdown.set_factory(Some(&factory));
-            self.outputdevice_dropdown
-                .set_list_factory(default_dropdown_factory.as_ref());
+            self.outputdevice_dropdown.set_list_factory(default_dropdown_factory.as_ref());
 
             let sinkmodel = &manager.imp().sinkmodel;
 
