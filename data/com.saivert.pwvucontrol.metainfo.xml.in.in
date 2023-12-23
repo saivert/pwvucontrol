@@ -23,7 +23,16 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
-    <release version="0.1.0" date="2023-08-01" />
+    <release version="0.3.1" date="2023-12-21">
+      <description>
+        <p>Changelog since 0.2.0</p>
+        <ul>
+          <li>Added card tab for selecing sound card profile</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.2.0" date="2023-08-11"/>
+    <release version="0.1.0" date="2023-08-01"/>
   </releases>
   <kudos>
      <!--
