@@ -175,10 +175,10 @@ mod imp {
             defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
             defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
 
-            let channelmodel = self.channelmodel.get().expect("channel model");
+            //let channelmodel = self.channelmodel.get().expect("channel model");
     
             self.channel_listbox.bind_model(
-                Some(channelmodel),
+                Some(&item.channelmodel()),
                 clone!(@weak self as widget => @default-panic, move |item| {
                     PwChannelBox::new(
                         item.clone().downcast_ref::<PwChannelObject>()
@@ -187,53 +187,6 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
-    
-            // let obj = self.obj();
-            // let c = closure_local!(@watch obj, @strong channelmodel/* , @strong item as nodeobj */ => move |nodeobj: &PwNodeObject|  {
-            //     // let nodeobj: &PwNodeObject = v.downcast_ref().expect("downcast to PwNodeObject");
-            //     let values = nodeobj.channel_volumes_vec();
-            //     let oldlen = channelmodel.n_items();
-    
-            //     wp::log::info!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
-    
-            //     if values.len() as u32 != oldlen {
-            //         channelmodel.remove_all();
-            //         for (i,v) in values.iter().enumerate() {
-            //             channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
-            //         }
-    
-            //     }
-            // });
-            // item.connect_closure("format", false, c);
-    
-            item.connect_local("format", false, 
-            clone!(@weak channelmodel, @weak item as nodeobj => @default-panic, move |_| {
-                let values = nodeobj.channel_volumes_vec();
-                let oldlen = channelmodel.n_items();
-    
-                wp::log::debug!("format signal, values.len = {}, oldlen = {}", values.len(), oldlen);
-    
-                if values.len() as u32 != oldlen {
-                    channelmodel.remove_all();
-                    for (i,v) in values.iter().enumerate() {
-                        channelmodel.append(&PwChannelObject::new(i as u32, *v, &nodeobj));
-                    }
-    
-                    return None;
-                }
-                None
-            }));
-    
-            item.connect_channel_volumes_notify(clone!(@weak channelmodel => move |nodeobj| {
-                let values = nodeobj.channel_volumes_vec();
-                for (i,v) in values.iter().enumerate() {
-                    if let Some(item) = channelmodel.item(i as u32) {
-                        let channelobj = item.downcast_ref::<PwChannelObject>()
-                            .expect("RowData is of wrong type");
-                        channelobj.set_volume_no_send(*v);
-                    }
-                }
-            }));
     
             self.revealer
                 .connect_child_revealed_notify(clone!(@weak self as widget => move |_| {

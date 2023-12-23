@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use wireplumber as wp;
-use wp::{pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt, FromPipewirePropertyString}, spa::SpaPodBuilder, registry::{Constraint, ConstraintType, Interest}};
+use wp::{
+    pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt, FromPipewirePropertyString},
+    spa::SpaPodBuilder,
+    registry::{Constraint, ConstraintType, Interest}
+};
 use std::cell::{Cell, RefCell};
-use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
+use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone};
 use once_cell::sync::{Lazy, OnceCell};
 use crate::NodeType;
-
+use gtk::{gio, prelude::ListModelExt};
+use crate::backend::PwChannelObject;
 use super::PwvucontrolManager;
 
 mod mixerapi;
@@ -28,7 +33,7 @@ pub(crate) enum PropertyChanged {
 pub mod imp {
     use super::*;
 
-    #[derive(Default, Properties)]
+    #[derive(Properties)]
     #[properties(wrapper_type = super::PwNodeObject)]
     pub struct PwNodeObject {
         #[property(get, set)]
@@ -50,10 +55,12 @@ pub mod imp {
         #[property(get, set)]
         iconname: RefCell<String>,
 
-        #[property(get = Self::channel_volumes, set = Self::set_channel_volumes, type = glib::ValueArray)]
         pub(super) channel_volumes: RefCell<Vec<f32>>,
         #[property(get, set, construct_only, builder(crate::NodeType::Undefined))]
         nodetype: Cell<crate::NodeType>,
+
+        #[property(get)]
+        pub(super) channelmodel: RefCell<gio::ListStore>,
 
         pub(super) format: Cell<Option<AudioFormat>>,
 
@@ -72,6 +79,28 @@ pub mod imp {
     impl ObjectSubclass for PwNodeObject {
         const NAME: &'static str = "PwNodeObject";
         type Type = super::PwNodeObject;
+
+        fn new() -> Self {
+            Self {
+                name: Default::default(),
+                description: Default::default(),
+                formatstr: Default::default(),
+                boundid: Default::default(),
+                mainvolume: Default::default(),
+                volume: Default::default(),
+                monitorvolume: Default::default(),
+                mute: Default::default(),
+                iconname: Default::default(),
+                channel_volumes: Default::default(),
+                nodetype: Default::default(),
+                channelmodel: RefCell::new(gio::ListStore::new::<PwChannelObject>()),
+                format: Default::default(),
+                channellock: Default::default(),
+                wpnode: OnceCell::default(),
+                mixerapi: Default::default(),
+                block: Default::default()
+            }
+        }
     }
 
     impl ObjectImpl for PwNodeObject {
@@ -103,12 +132,6 @@ pub mod imp {
                     }
                 },
                 _ => {},
-            }
-        }
-
-        fn notify(&self, pspec: &ParamSpec) {
-            if pspec.name() == "channel-volumes" && !self.block.get() {
-                self.obj().send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
             }
         }
 
@@ -173,26 +196,7 @@ pub mod imp {
         }
     }
 
-    impl PwNodeObject {
-        pub fn channel_volumes(&self) -> glib::ValueArray {
-            let mut values = glib::ValueArray::new(self.channel_volumes.borrow().len() as u32);
-            let channel_volumes = self.channel_volumes.borrow();
-            channel_volumes.iter().for_each(|volume| {
-                values.append(&Value::from(volume));
-            });
-
-            values
-        }
-
-        pub fn set_channel_volumes(&self, values: glib::ValueArray) {
-            let mut channel_volumes = self.channel_volumes.borrow_mut();
-            values.iter().for_each(|value| {
-                if let Ok(volume) = value.get() {
-                    channel_volumes.push(volume);
-                }
-            });
-        }
-    }
+    impl PwNodeObject {}
 }
 
 glib::wrapper! {
@@ -210,7 +214,7 @@ pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
 
 impl PwNodeObject {
     pub(crate) fn new(node: &wp::pw::Node) -> Self {
-        Object::builder()
+        glib::Object::builder()
             .property("wpnode", node)
             .build()
     }
@@ -342,6 +346,9 @@ impl PwNodeObject {
                     widget.set_formatstr(format!("{}ch {}Hz {}", channels, rate, formatname));
 
                     widget.set_format(AudioFormat { channels, format, rate, positions: a });
+
+                    // Must be done here since EnumFormat is async
+                    widget.update_channelmodel();
                 }
             } else {
                 wp::log::debug!("enum_params async call didn't return anything useful");
@@ -420,7 +427,7 @@ impl PwNodeObject {
 
     pub(crate) fn set_channel_volumes_vec(&self, values: &[f32]) {
         *(self.imp().channel_volumes.borrow_mut()) = values.to_owned();
-        self.notify_channel_volumes();
+        self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
     }
 
     pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
@@ -432,7 +439,8 @@ impl PwNodeObject {
         {
             *value = volume;
         }
-        self.notify_channel_volumes();
+
+        self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
     }
 
     pub(crate) fn set_format(&self, format: AudioFormat) {
@@ -498,6 +506,24 @@ impl PwNodeObject {
         };
     }
 
+    fn update_channelmodel(&self) {
+        let channelmodel = self.imp().channelmodel.borrow();
+        channelmodel.remove_all();
+        for (index, item) in self.channel_volumes_vec().iter().enumerate() {
+            let new_item = PwChannelObject::new(index as u32, *item, self);
+            channelmodel.append(&new_item);
+        }
+    }
+
+    fn update_channel_objects(&self) {
+        let channelmodel = self.imp().channelmodel.borrow();
+        for (index, vol) in self.channel_volumes_vec().iter().enumerate() {
+            if let Some(channel_object) = channelmodel.item(index as u32)
+                .and_downcast_ref::<PwChannelObject>() {
+                    channel_object.set_volume_no_send(*vol);
+            }
+        }
+    }
 
     pub(crate) fn serial(&self) -> u32 {
         let node = self.imp().wpnode.get().expect("node");

@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 
 use glib::{subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant, closure_local};
+use gtk::prelude::ListModelExt;
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 
@@ -150,6 +151,9 @@ impl PwNodeObject {
             } else {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
+
+            // Update the liststore
+            self.update_channel_objects();
 
             // Wireplumber's mixerapi always sets volume to first channel volume
             // instead we will use the max channel
