@@ -12,7 +12,7 @@ mod imp {
     #[properties(wrapper_type = super::PwChannelBox)]
     pub struct PwChannelBox {
         #[property(get, set, construct_only)]
-        row_data: RefCell<Option<PwChannelObject>>,
+        channel_object: RefCell<Option<PwChannelObject>>,
 
         // Template widgets
         #[template_child]
@@ -53,7 +53,7 @@ mod imp {
 
             self.parent_constructed();
 
-            let item = self.row_data.borrow();
+            let item = self.channel_object.borrow();
             let item = item.as_ref().cloned().unwrap();
 
             item.bind_property("volume", &self.scale.adjustment(), "value")
@@ -86,7 +86,7 @@ glib::wrapper! {
 impl PwChannelBox {
     pub(crate) fn new(channelobj: &PwChannelObject) -> Self {
         glib::Object::builder()
-            .property("row-data", channelobj)
+            .property("channel-object", channelobj)
             .build()
     }
 }

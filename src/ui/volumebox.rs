@@ -22,7 +22,7 @@ mod imp {
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
         #[property(get, set, construct_only)]
-        pub(super) row_data: RefCell<Option<PwNodeObject>>,
+        pub(super) node_object: RefCell<Option<PwNodeObject>>,
     
         // #[property(get, set, construct_only)]
         channelmodel: OnceCell<gio::ListStore>,
@@ -96,7 +96,7 @@ mod imp {
 
             self.channelmodel.set(gio::ListStore::new::<PwChannelObject>()).expect("channelmodel not already set");
 
-            let item = self.row_data.borrow();
+            let item = self.node_object.borrow();
             let item = item.as_ref().cloned().unwrap();
     
             self.icon.set_icon_name(Some(&item.iconname()));
@@ -312,9 +312,9 @@ glib::wrapper! {
 }
 
 impl PwVolumeBox {
-    pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
+    pub(crate) fn new(channel_object: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
-            .property("row-data", row_data)
+            .property("node-object", channel_object)
             .property("channelmodel", gio::ListStore::new::<PwChannelObject>())
             .build()
     }

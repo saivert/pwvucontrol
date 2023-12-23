@@ -67,7 +67,7 @@ mod imp {
             }
             let obj = self.obj();
             let parent: &PwVolumeBox = obj.upcast_ref();
-            let node = parent.row_data().expect("row data set on volumebox");
+            let node = parent.node_object().expect("nodeobj");
             let node_name: String = node.node_property("node.name");
 
             let manager = PwvucontrolManager::default();
@@ -92,16 +92,16 @@ glib::wrapper! {
 }
 
 impl PwSinkBox {
-    pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
+    pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
-            .property("row-data", row_data)
+            .property("node-object", node_object)
             .build()
     }
 
     pub(crate) fn default_node_changed(&self) {
         let imp = self.imp();
         let parent: &PwVolumeBox = self.upcast_ref();
-        let node = parent.row_data().expect("nodeobj");
+        let node = parent.node_object().expect("nodeobj");
         let id = parent.imp().default_node.get();
 
         imp.block_default_node_toggle_signal.set(true);

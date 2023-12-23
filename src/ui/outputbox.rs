@@ -45,7 +45,7 @@ mod imp {
 
             let obj = self.obj();
             let parent: &PwVolumeBox = obj.upcast_ref();
-            let item = parent.row_data().expect("nodeobj");
+            let item = parent.node_object().expect("nodeobj");
 
             parent.add_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().update_output_device_dropdown();
@@ -93,13 +93,9 @@ glib::wrapper! {
 }
 
 impl PwOutputBox {
-    pub(crate) fn new(row_data: &impl glib::IsA<PwNodeObject>) -> Self {
+    pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
-        .property("row-data", row_data)
-        // .property(
-        //     "channelmodel",
-        //     gio::ListStore::new::<crate::pwchannelobject::PwChannelObject>(),
-        // )
+        .property("node-object", node_object)
         .build()
     }
 
@@ -122,7 +118,7 @@ impl PwOutputBox {
         };
         output_dropdown.set_default_text(&string);
 
-        let item = parent.row_data().expect("row_data in pwvolumebox");
+        let item = parent.node_object().expect("nodeobj");
 
         if let Some(deftarget) = item.default_target() {
             // let model: gio::ListModel = imp
