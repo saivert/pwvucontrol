@@ -16,7 +16,7 @@ mod imp {
     #[properties(wrapper_type = super::PwChannelObject)]
     pub struct PwChannelObject {
         #[property(get, set, construct_only)]
-        row_data: RefCell<Option<PwNodeObject>>,
+        node_object: RefCell<Option<PwNodeObject>>,
 
         #[property(get, set)]
         name: RefCell<String>,
@@ -46,7 +46,7 @@ mod imp {
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
 
-            if let Some(nodeobj) = self.row_data.borrow().as_ref() {
+            if let Some(nodeobj) = self.node_object.borrow().as_ref() {
                 if nodeobj.channellock() {
                     nodeobj.set_channel_volumes_vec(&vec![volume; nodeobj.channel_volumes_vec().len()]);
                 } else {
@@ -62,10 +62,10 @@ glib::wrapper! {
 }
 
 impl PwChannelObject {
-    pub(crate) fn new(index: u32, volume: f32, row_data: &PwNodeObject) -> Self {
+    pub(crate) fn new(index: u32, volume: f32, node_object: &PwNodeObject) -> Self {
         let t_audiochannel =
             wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
-        let channel = row_data.format().unwrap().positions[index as usize];
+        let channel = node_object.format().unwrap().positions[index as usize];
         let channelname = t_audiochannel
             .values()
             .find(|x| x.number() == channel)
@@ -76,7 +76,7 @@ impl PwChannelObject {
             .property("index", index)
             .property("volume", volume)
             .property("name", channelname)
-            .property("row-data", row_data)
+            .property("node-object", node_object)
             .build()
     }
 
