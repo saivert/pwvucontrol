@@ -20,7 +20,8 @@ use crate::{
     backend::pwdeviceobject::PwDeviceObject,
     backend::pwnodeobject,
     ui::PwvucontrolWindow,
-    PwvucontrolApplication
+    PwvucontrolApplication,
+    NodeType
 };
 
 use once_cell::unsync::OnceCell;
@@ -161,19 +162,17 @@ mod imp {
                                 }
                             }
                         }
-                        wp::log::info!("added: {:?}", node.name());
+                        wp::log::info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                         let pwobj = PwNodeObject::new(node);
                         let model = match pwobj.nodetype() {
-                            crate::NodeType::Sink => &imp.sinkmodel,
+                            NodeType::Sink => &imp.sinkmodel,
                             _ => &imp.nodemodel
                         };
                         model.append(&pwobj);
                     } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                         let n: String = device.pw_property("device.name").unwrap();
-                        wp::log::info!("Got device {} {n}", device.bound_id());
-
+                        wp::log::info!("Got device: {n} bound id {}", device.bound_id());
                         devicemodel.append(&PwDeviceObject::new(device));
-                        
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
                     }
@@ -185,7 +184,7 @@ mod imp {
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
                     let model = match pwnodeobject::get_node_type_for_node(node) {
-                        crate::NodeType::Sink => &imp.sinkmodel,
+                        NodeType::Sink => &imp.sinkmodel,
                         _ => &imp.nodemodel
                     };
                     model.remove(node.bound_id());

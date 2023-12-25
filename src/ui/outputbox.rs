@@ -12,8 +12,6 @@ use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
 
 mod imp {
-    use crate::backend::PwvucontrolManager;
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]

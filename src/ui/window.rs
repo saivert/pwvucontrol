@@ -14,6 +14,7 @@ use crate::{
     backend::PwNodeObject,
     ui::PwSinkBox,
     ui::PwOutputBox,
+    NodeType,
     config::{APP_ID, PROFILE}
 };
 use wireplumber as wp;
@@ -102,7 +103,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == crate::NodeType::Output;
+                    return o.nodetype() == NodeType::Output;
                 }
                 false
             });
@@ -121,7 +122,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == crate::NodeType::Input;
+                    return o.nodetype() == NodeType::Input;
                 }
                 false
             });

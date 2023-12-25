@@ -56,8 +56,8 @@ pub mod imp {
         iconname: RefCell<String>,
 
         pub(super) channel_volumes: RefCell<Vec<f32>>,
-        #[property(get, set, construct_only, builder(crate::NodeType::Undefined))]
-        nodetype: Cell<crate::NodeType>,
+        #[property(get, set, construct_only, builder(NodeType::Undefined))]
+        nodetype: Cell<NodeType>,
 
         #[property(get)]
         pub(super) channelmodel: RefCell<gio::ListStore>,

@@ -55,9 +55,7 @@ pub mod imp {
         fn signals() -> &'static [Signal] {
             static SIGNALS: Lazy<Vec<Signal>> =
                 Lazy::new(|| vec![
-                    Signal::builder("profiles-changed")
-                    //.param_types([i32::static_type()])
-                    .build(),
+                    Signal::builder("profiles-changed").build(),
                     Signal::builder("pre-update").build(),
                     Signal::builder("post-update").build(),
                 ]);
