@@ -37,11 +37,11 @@ pub mod imp {
     #[properties(wrapper_type = super::PwNodeObject)]
     pub struct PwNodeObject {
         #[property(get, set)]
-        name: RefCell<Option<String>>,
+        name: RefCell<String>,
         #[property(get, set)]
-        description: RefCell<Option<String>>,
+        description: RefCell<String>,
         #[property(get, set)]
-        formatstr: RefCell<Option<String>>,
+        formatstr: RefCell<String>,
         #[property(get, set)]
         boundid: Cell<u32>,
         #[property(get, set)]
@@ -56,7 +56,7 @@ pub mod imp {
         iconname: RefCell<String>,
 
         pub(super) channel_volumes: RefCell<Vec<f32>>,
-        #[property(get, set, construct_only, builder(NodeType::Undefined))]
+        #[property(get, builder(NodeType::Undefined))]
         nodetype: Cell<NodeType>,
 
         #[property(get)]

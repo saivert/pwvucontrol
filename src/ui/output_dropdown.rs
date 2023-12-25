@@ -75,7 +75,7 @@ mod imp {
                         move |_: Option<glib::Object>, item: Option<glib::Object>| {
                             if let Some(item) = item {
                                 if let Some(item) = item.downcast_ref::<PwNodeObject>() {
-                                    return item.name();
+                                    return Some(item.name());
                                 }
                                 if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
                                     return Some(item.string().to_string());
@@ -109,7 +109,7 @@ mod imp {
                     gtk::Expression::NONE,
                     closure_local!(move |item: glib::Object| {
                         if let Some(item) = item.downcast_ref::<PwNodeObject>() {
-                            item.name()
+                            Some(item.name())
                         } else {
                             item.downcast_ref::<gtk::StringObject>().map(|item| item.string().to_string())
                         }

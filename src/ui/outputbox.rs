@@ -110,7 +110,7 @@ impl PwOutputBox {
         let id = parent.imp().default_node.get();
 
         let string = if let Ok(node) = sinkmodel.get_node(id) {
-            format!("Default ({})", node.name().unwrap())
+            format!("Default ({})", node.name())
         } else {
             "Default".to_string()
         };
