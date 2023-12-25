@@ -2,13 +2,13 @@
 
 use crate::backend::pwprofileobject::PwProfileObject;
 use glib::{self, clone, subclass::{prelude::*, Signal}, Object, ObjectExt, ParamSpec, Properties, Value};
-use gtk::{gio, prelude::*, subclass::prelude::*};
+use gtk::{gio, prelude::*};
 use wireplumber as wp;
 use wp::{
     pw::{PipewireObjectExt, PipewireObjectExt2},
     spa::SpaPodBuilder,
 };
-use im_rc::Vector;
+
 use once_cell::sync::{OnceCell, Lazy};
 use std::cell::{Cell, RefCell};
 
@@ -28,31 +28,14 @@ pub mod imp {
         #[property(get, set, construct_only)]
         pub(super) wpdevice: OnceCell<wp::pw::Device>,
 
-        pub(super) profiles: RefCell<Vector<PwProfileObject>>,
+        #[property(get)]
+        pub(super) profilemodel: OnceCell<gio::ListStore>,
     }
 
     #[glib::object_subclass]
     impl ObjectSubclass for PwDeviceObject {
         const NAME: &'static str = "PwDeviceObject";
         type Type = super::PwDeviceObject;
-        type Interfaces = (gio::ListModel,);
-    }
-
-    impl ListModelImpl for PwDeviceObject {
-        fn item_type(&self) -> glib::Type {
-            PwProfileObject::static_type()
-        }
-
-        fn n_items(&self) -> u32 {
-            self.profiles.borrow().len() as u32
-        }
-
-        fn item(&self, position: u32) -> Option<glib::Object> {
-            self.profiles
-                .borrow()
-                .get(position as usize)
-                .map(|o| o.clone().upcast::<glib::Object>())
-        }
     }
 
     // Trait shared by all GObjects
@@ -84,6 +67,8 @@ pub mod imp {
 
         fn constructed(&self) {
             self.parent_constructed();
+
+            self.profilemodel.set(gio::ListStore::new::<PwProfileObject>()).expect("profilemodel not set");
 
             let obj = self.obj();
 
@@ -128,7 +113,7 @@ pub mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwDeviceObject(ObjectSubclass<imp::PwDeviceObject>) @implements gio::ListModel;
+    pub struct PwDeviceObject(ObjectSubclass<imp::PwDeviceObject>);
 }
 
 impl PwDeviceObject {
@@ -147,34 +132,29 @@ impl PwDeviceObject {
                 let available_key = keys.find_value_from_short_name("available").expect("available key");
 
                 if let Ok(Some(iter)) = res {
-                    let removed = widget.imp().profiles.borrow().len();
+                    let removed = widget.profilemodel().n_items();
+                    widget.emit_by_name::<()>("pre-update", &[]);
 
-                    let inserted = {
-                        let mut profiles = widget.imp().profiles.borrow_mut();
-                        profiles.clear();
+                    let mut profiles: Vec<PwProfileObject> = Vec::new();
 
-                        for a in iter {
-                            let pod: wp::spa::SpaPod = a.get().unwrap();
-                            if !pod.is_object() {
-                                continue;
-                            }
-
-                            let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
-                            let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
-                            let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
-
-                            profiles.push_back(PwProfileObject::new(index as u32, &description, available));
+                    for a in iter {
+                        let pod: wp::spa::SpaPod = a.get().unwrap();
+                        if !pod.is_object() {
+                            continue;
                         }
 
-                        profiles.len()
-                    };
+                        let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
+                        let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
+                        let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
+
+                        profiles.push(PwProfileObject::new(index as u32, &description, available));
+                    }
+                    widget.profilemodel().splice(0, removed as u32, &profiles);
 
                     // Set profile_index property without notify by setting internal storage directly
                     widget.imp().profile_index.set(widget.get_current_profile_index().unwrap() as u32);
 
                     // Notify update of list model
-                    widget.emit_by_name::<()>("pre-update", &[]);
-                    widget.items_changed(0, removed as u32, inserted as u32);
                     widget.emit_by_name::<()>("post-update", &[]);
                     
                     //widget.emit_by_name::<()>("profiles-changed", &[]);

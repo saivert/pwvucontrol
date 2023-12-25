@@ -104,7 +104,7 @@ mod imp {
             if let Some(deviceobject) = new_deviceobject {
                 self.block_signal.set(true);
                 wp::log::info!("self.profile_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
-                self.profile_dropdown.set_model(Some(deviceobject));
+                self.profile_dropdown.set_model(Some(&deviceobject.profilemodel()));
                 wp::log::info!("self.profile_dropdown.set_selected({});", deviceobject.profile_index());
 
                 self.profile_dropdown.set_selected(deviceobject.profile_index());

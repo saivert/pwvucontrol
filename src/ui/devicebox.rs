@@ -59,7 +59,6 @@ mod imp {
                 .sync_create()
                 .build();
 
-
             self.profile_dropdown.set_deviceobject(obj.deviceobject());
         }
     }
