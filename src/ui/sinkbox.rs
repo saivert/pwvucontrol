@@ -9,6 +9,7 @@ use glib::clone;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use wireplumber as wp;
+use super::volumebox::PwVolumeBoxExt;
 
 mod imp {
     use super::*;
@@ -43,9 +44,8 @@ mod imp {
             self.parent_constructed();
 
             let obj = self.obj();
-            let parent: &PwVolumeBox = obj.upcast_ref();
 
-            parent.add_default_node_change_handler(clone!(@weak self as widget => move || {
+            obj.set_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().default_node_changed();
             }));
 

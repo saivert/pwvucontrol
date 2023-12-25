@@ -11,6 +11,8 @@ use glib::{closure_local, clone};
 use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
 
+use super::volumebox::PwVolumeBoxExt;
+
 mod imp {
     use super::*;
 
@@ -42,10 +44,9 @@ mod imp {
             let manager = PwvucontrolManager::default();
 
             let obj = self.obj();
-            let parent: &PwVolumeBox = obj.upcast_ref();
-            let item = parent.node_object().expect("nodeobj");
+            let item = obj.node_object().expect("nodeobj");
 
-            parent.add_default_node_change_handler(clone!(@weak self as widget => move || {
+            obj.set_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().update_output_device_dropdown();
             }));
 
@@ -103,11 +104,10 @@ impl PwOutputBox {
         let sinkmodel = &manager.imp().sinkmodel;
 
         let imp = self.imp();
-        let parent: &PwVolumeBox = self.upcast_ref();
 
         let output_dropdown = imp.output_dropdown.get();
 
-        let id = parent.imp().default_node.get();
+        let id = self.default_node();
 
         let string = if let Ok(node) = sinkmodel.get_node(id) {
             format!("Default ({})", node.name())
@@ -116,7 +116,7 @@ impl PwOutputBox {
         };
         output_dropdown.set_default_text(&string);
 
-        let item = parent.node_object().expect("nodeobj");
+        let item = self.node_object().expect("nodeobj");
 
         if let Some(deftarget) = item.default_target() {
             // let model: gio::ListModel = imp

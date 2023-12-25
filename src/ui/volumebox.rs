@@ -32,7 +32,7 @@ mod imp {
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
         pub default_node: Cell<u32>,
-        pub(super) default_node_changed_handlers: RefCell<Vec<Box<dyn Fn()>>>,
+        pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
     
         // Template widgets
         #[template_child]
@@ -167,8 +167,8 @@ mod imp {
                 wp::info!("default-nodes-api changed: new id {id}");
                 widget.imp().default_node.set(id);
 
-                let list = widget.imp().default_node_changed_handlers.borrow();
-                for cb in list.iter() {
+                let handler = widget.imp().default_node_changed_handler.borrow();
+                if let Some(cb) = handler.as_ref() {
                     cb();
                 }
             });
@@ -269,14 +269,30 @@ impl PwVolumeBox {
         self.imp().level.set(level);
     }
 
-    pub fn add_default_node_change_handler(&self, c: impl Fn() + 'static) {
+    pub fn set_default_node_change_handler(&self, c: impl Fn() + 'static) {
         let imp = self.imp();
 
-        let mut list = imp.default_node_changed_handlers.borrow_mut();
-        list.push(Box::new(c));
+        let mut handler = imp.default_node_changed_handler.borrow_mut();
+        handler.replace(Box::new(c));
     }
 }
-pub trait PwVolumeBoxImpl: ListBoxRowImpl + ObjectImpl + 'static {}
+pub trait PwVolumeBoxImpl: ListBoxRowImpl  {}
+
+pub trait PwVolumeBoxExt: IsA<PwVolumeBox> {
+    fn default_node(&self) -> u32 {
+        self.upcast_ref::<PwVolumeBox>().imp().default_node.get()
+    }
+
+    fn node_object(&self) -> Option<PwNodeObject> {
+        self.upcast_ref::<PwVolumeBox>().node_object()
+    }
+
+    fn set_default_node_change_handler(&self, c: impl Fn() + 'static) {
+        self.upcast_ref::<PwVolumeBox>().set_default_node_change_handler(c);
+    }
+}
+
+impl<O: IsA<PwVolumeBox>> PwVolumeBoxExt for O {}
 
 unsafe impl<T: PwVolumeBoxImpl> IsSubclassable<T> for PwVolumeBox {
     fn class_init(class: &mut glib::Class<Self>) {
