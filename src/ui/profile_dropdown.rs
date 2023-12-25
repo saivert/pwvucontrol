@@ -172,6 +172,15 @@ mod imp {
                 profilerow.set_handlerid(Some(signal));
             }
 
+            fn unbind_handler(item: &glib::Object) {
+                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                let profilerow = item
+                    .child()
+                    .and_downcast::<PwProfileRow>()
+                    .expect("The child has to be a `PwProfileRow`.");
+                profilerow.set_handlerid(None);
+            }
+
             let dropdown = self.profile_dropdown.get();
 
             let factory = gtk::SignalListItemFactory::new();
@@ -180,14 +189,7 @@ mod imp {
             let list_factory = gtk::SignalListItemFactory::new();
             list_factory.connect_setup(|_, item| setup_handler(item, true));
             list_factory.connect_bind(clone!(@weak dropdown => move |_, item| bind_handler(item, &dropdown)));
-            list_factory.connect_unbind(clone!(@weak dropdown => move |_, item| {
-                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                let profilerow = item
-                    .child()
-                    .and_downcast::<PwProfileRow>()
-                    .expect("The child has to be a `PwProfileRow`.");
-                profilerow.set_handlerid(None);
-            }));
+            list_factory.connect_unbind(|_, item| unbind_handler(item));
 
             self.profile_dropdown.set_factory(Some(&factory));
             self.profile_dropdown.set_list_factory(Some(&list_factory));
