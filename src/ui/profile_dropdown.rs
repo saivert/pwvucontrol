@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{backend::PwDeviceObject, backend::{PwProfileObject, ProfileAvailability}};
+use crate::backend::PwDeviceObject;
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use glib::clone;
 use wp::pw::ProxyExt;
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
+use crate::ui::PwProfileRow;
 
 mod imp {
     use super::*;
@@ -148,50 +149,45 @@ mod imp {
 
             fn setup_handler(item: &glib::Object, list: bool) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                let box_ = gtk::Box::new(gtk::Orientation::Horizontal, 6);
-                let unavailable_icon = gtk::Image::from_icon_name("action-unavailable-symbolic");
-                let label = gtk::Label::new(None);
-                box_.append(&label);
-                box_.append(&unavailable_icon);
-                label.set_xalign(0.0);
-                if !list {
-                    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
-                }
-                label.set_use_markup(true);
+                let profilerow = PwProfileRow::new();
 
-                item.property_expression("item")
-                    .chain_property::<PwProfileObject>("description")
-                    .bind(&label, "label", gtk::Widget::NONE);
-
-                // let opacity_closure = closure_local!(|_: Option<glib::Object>, availability: u32| {
-                //     match availability {
-                //         2 => 1.0f32,
-                //         _ => 0.5f32
-                //     }
-                // });
-
-                // item.property_expression("item")
-                //     .chain_property::<PwProfileObject>("availability")
-                //     .chain_closure::<f32>(opacity_closure)
-                //     .bind(&label, "opacity", glib::Object::NONE);
-
-                let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ProfileAvailability| {
-                    availability == ProfileAvailability::No
-                });
-
-                item.property_expression("item")
-                    .chain_property::<PwProfileObject>("availability")
-                    .chain_closure::<bool>(icon_closure)
-                    .bind(&unavailable_icon, "visible", glib::Object::NONE);
-                
-                item.set_child(Some(&box_));
+                profilerow.setup(item, list);
+                item.set_child(Some(&profilerow));
             }
+
+            fn bind_handler(item: &glib::Object, dropdown: &gtk::DropDown) {
+                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                let profilerow = item
+                    .child()
+                    .and_downcast::<PwProfileRow>()
+                    .expect("PwProfileRow child");
+
+                let signal = dropdown.connect_selected_item_notify(clone!(@weak item => move |dropdown| {
+                    let profilerow = item
+                        .child()
+                        .and_downcast::<PwProfileRow>()
+                        .expect("PwProfileRow child");
+                    profilerow.set_selected(dropdown.selected_item() == item.item());
+                }));
+                profilerow.set_handlerid(Some(signal));
+            }
+
+            let dropdown = self.profile_dropdown.get();
 
             let factory = gtk::SignalListItemFactory::new();
             factory.connect_setup(|_, item| setup_handler(item, false));
 
             let list_factory = gtk::SignalListItemFactory::new();
             list_factory.connect_setup(|_, item| setup_handler(item, true));
+            list_factory.connect_bind(clone!(@weak dropdown => move |_, item| bind_handler(item, &dropdown)));
+            list_factory.connect_unbind(clone!(@weak dropdown => move |_, item| {
+                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                let profilerow = item
+                    .child()
+                    .and_downcast::<PwProfileRow>()
+                    .expect("The child has to be a `PwProfileRow`.");
+                profilerow.set_handlerid(None);
+            }));
 
             self.profile_dropdown.set_factory(Some(&factory));
             self.profile_dropdown.set_list_factory(Some(&list_factory));

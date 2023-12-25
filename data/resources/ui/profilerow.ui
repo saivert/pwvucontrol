@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwProfileRow" parent="GtkBox">
+        <child>
+            <object class="GtkLabel" id="label">
+              <property name="xalign">0.0</property>
+            </object>
+          </child>
+          <child>
+            <object class="GtkImage" id="unavailable_icon">
+              <property name="icon-name">action-unavailable-symbolic</property>
+            </object>
+          </child>
+          <child>
+            <object class="GtkImage" id="checkmark_icon">
+              <property name="icon-name">object-select-symbolic</property>
+            </object>
+          </child>
+    </template>
+</interface>

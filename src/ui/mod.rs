@@ -8,6 +8,7 @@ mod sinkbox;
 mod outputbox;
 mod profile_dropdown;
 mod devicebox;
+mod profilerow;
 
 pub use window::PwvucontrolWindow;
 pub use window::PwvucontrolWindowView;
@@ -19,3 +20,4 @@ pub use sinkbox::PwSinkBox;
 pub use channelbox::PwChannelBox;
 pub use levelprovider::LevelbarProvider;
 pub use outputbox::PwOutputBox;
+pub use profilerow::PwProfileRow;
