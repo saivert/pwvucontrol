@@ -91,9 +91,9 @@ mod imp {
                 self.obj().add_css_class("devel");
             }
 
-            self.obj().setup_scroll_blocker(self.playbacklist.get());
-            self.obj().setup_scroll_blocker(self.recordlist.get());
-            self.obj().setup_scroll_blocker(self.outputlist.get());
+            self.obj().setup_scroll_blocker(&self.playbacklist);
+            self.obj().setup_scroll_blocker(&self.recordlist);
+            self.obj().setup_scroll_blocker(&self.outputlist);
 
             let manager = PwvucontrolManager::default();
             let model = &manager.imp().nodemodel;
@@ -239,7 +239,7 @@ impl PwvucontrolWindow {
     }
 
     /// This prevents child widgets from capturing scroll events
-    fn setup_scroll_blocker(&self, listbox: gtk::ListBox) {
+    fn setup_scroll_blocker(&self, listbox: &gtk::ListBox) {
             let scrolledwindow = listbox.ancestor(gtk::ScrolledWindow::static_type()).and_then(|x|{
                 x.downcast::<gtk::ScrolledWindow>().ok()
             }).expect("downcast to scrolled window");
