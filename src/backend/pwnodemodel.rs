@@ -13,7 +13,7 @@ mod imp {
     
     #[glib::object_subclass]
     impl ObjectSubclass for PwNodeModel {
-        const NAME: &'static str = "Model";
+        const NAME: &'static str = "PwNodeModel";
         type Type = super::PwNodeModel;
         type Interfaces = (gio::ListModel,);
     }
