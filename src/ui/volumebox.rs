@@ -24,14 +24,11 @@ mod imp {
         #[property(get, set, construct_only)]
         pub(super) node_object: RefCell<Option<PwNodeObject>>,
     
-        // #[property(get, set, construct_only)]
-        channelmodel: OnceCell<gio::ListStore>,
-    
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
         levelbarprovider: OnceCell<LevelbarProvider>,
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
-        pub default_node: Cell<u32>,
+        pub(super) default_node: Cell<u32>,
         pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
     
         // Template widgets
@@ -93,8 +90,6 @@ mod imp {
             }
     
             self.parent_constructed();
-
-            self.channelmodel.set(gio::ListStore::new::<PwChannelObject>()).expect("channelmodel not already set");
 
             let item = self.node_object.borrow();
             let item = item.as_ref().cloned().unwrap();
