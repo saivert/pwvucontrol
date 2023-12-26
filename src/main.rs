@@ -81,6 +81,7 @@ fn main() -> gtk::glib::ExitCode {
 
     let css = gtk::CssProvider::new();
     css.load_from_resource("/com/saivert/pwvucontrol/ui/levelbar.css");
+    css.load_from_resource("/com/saivert/pwvucontrol/ui/list.css");
 
     gtk::style_context_add_provider_for_display(
         &gtk::gdk::Display::default().unwrap(),

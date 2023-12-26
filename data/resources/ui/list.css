@@ -1,0 +1,4 @@
+.boxed-list > * list {
+    background: transparent;
+    border: 0px;
+}
