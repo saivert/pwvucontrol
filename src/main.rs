@@ -80,23 +80,7 @@ fn main() -> gtk::glib::ExitCode {
     gio::resources_register(&resources);
 
     let css = gtk::CssProvider::new();
-    css.load_from_data(
-        r#"
-        levelbar block.filled {
-            filter: blur(2px);
-        }
-        levelbar trough {
-            background-color: rgba(0,0,0,0);
-            border: none;
-        }
-        levelbar block.empty {
-            background-color: rgba(0,0,0,0);
-        }
-        levelbar block {
-            border: none;
-        }
-        "#,
-    );
+    css.load_from_resource("/com/saivert/pwvucontrol/ui/levelbar.css");
 
     gtk::style_context_add_provider_for_display(
         &gtk::gdk::Display::default().unwrap(),
