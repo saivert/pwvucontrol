@@ -21,7 +21,7 @@ use crate::{
     backend::pwnodeobject,
     ui::PwvucontrolWindow,
     PwvucontrolApplication,
-    NodeType
+    backend::NodeType
 };
 use crate::macros::*;
 use once_cell::unsync::OnceCell;

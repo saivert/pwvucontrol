@@ -12,9 +12,9 @@ use crate::{
     application::PwvucontrolApplication,
     ui::PwVolumeBox,
     backend::PwNodeObject,
+    backend::NodeType,
     ui::PwSinkBox,
     ui::PwOutputBox,
-    NodeType,
     config::{APP_ID, PROFILE}
 };
 use crate::macros::*;

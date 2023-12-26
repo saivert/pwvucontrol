@@ -37,17 +37,6 @@ use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};
 use gtk::gio;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Default, glib::Enum)]
-#[enum_type(name = "NodeType")]
-pub enum NodeType {
-    #[default]
-    Undefined,
-    Input,
-    Output,
-    Sink,
-    Source,
-}
-
 fn path_override_from_env<K>(var: K, default: K, append: Option<K>) -> OsString
 where
     K: AsRef<OsStr> + Default,

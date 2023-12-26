@@ -9,13 +9,23 @@ use wp::{
 use std::cell::{Cell, RefCell};
 use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone};
 use once_cell::sync::{Lazy, OnceCell};
-use crate::NodeType;
 use gtk::{gio, prelude::ListModelExt};
 use crate::backend::PwChannelObject;
 use super::PwvucontrolManager;
 use crate::macros::*;
 
 mod mixerapi;
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default, glib::Enum)]
+#[enum_type(name = "NodeType")]
+pub enum NodeType {
+    #[default]
+    Undefined,
+    Input,
+    Output,
+    Sink,
+    Source,
+}
 
 #[derive(Copy, Clone, Debug)]
 pub struct AudioFormat {
