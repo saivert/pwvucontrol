@@ -4,18 +4,29 @@ use crate::backend::PwNodeModel;
 use glib::{Properties, closure_local};
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
+use gettextrs::gettext;
 
 mod imp {
     use super::*;
 
-    #[derive(Debug, Default, Properties)]
+    #[derive(Debug, Properties)]
     #[properties(wrapper_type = super::WithDefaultListModel)]
     pub struct WithDefaultListModel {
-        pub(super) string_list: RefCell<Option<gtk::StringList>>,
+        pub(super) string_list: RefCell<gtk::StringList>,
         pub(super) flatten_list_model: RefCell<Option<gtk::FlattenListModel>>,
 
         #[property(get, set = Self::set_model)]
         pub(super) model: RefCell<Option<PwNodeModel>>,
+    }
+
+    impl Default for WithDefaultListModel {
+        fn default() -> Self {
+            Self {
+                string_list: RefCell::new(gtk::StringList::new(&[&gettext("Default")])),
+                flatten_list_model: Default::default(),
+                model: Default::default(),
+            }
+        }
     }
 
     #[glib::object_subclass]
@@ -27,12 +38,6 @@ mod imp {
 
     #[glib::derived_properties]
     impl ObjectImpl for WithDefaultListModel {
-        fn constructed(&self) {
-            self.parent_constructed();
-
-            self.string_list
-                .replace(Some(gtk::StringList::new(&["Default"])));
-        }
     }
 
     impl ListModelImpl for WithDefaultListModel {
@@ -61,11 +66,10 @@ mod imp {
         pub fn set_model(&self, new_model: Option<&PwNodeModel>) {
             let removed = self.n_items();
 
-            let string_list = self.string_list.borrow();
-            let string_list = string_list.as_ref().unwrap();
+            let string_list = self.string_list.borrow().clone();
 
             let composite_store = gio::ListStore::new::<gio::ListModel>();
-            composite_store.append(string_list);
+            composite_store.append(&string_list);
 
             if let Some(new_model) = new_model {
                 composite_store.append(new_model);
@@ -98,8 +102,7 @@ impl WithDefaultListModel {
 
     pub(crate) fn set_default_text(&self, text: &str) {
         let imp = self.imp();
-        let string_list = imp.string_list.borrow();
-        let string_list = string_list.as_ref().unwrap();
+        let string_list = imp.string_list.borrow().clone();
         string_list.splice(0, 1, &[text]);
     }
 }
