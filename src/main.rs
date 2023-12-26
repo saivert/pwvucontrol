@@ -85,6 +85,16 @@ fn main() -> gtk::glib::ExitCode {
         levelbar block.filled {
             filter: blur(2px);
         }
+        levelbar trough {
+            background-color: rgba(0,0,0,0);
+            border: none;
+        }
+        levelbar block.empty {
+            background-color: rgba(0,0,0,0);
+        }
+        levelbar block {
+            border: none;
+        }
         "#,
     );
 
