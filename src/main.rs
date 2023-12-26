@@ -55,7 +55,6 @@ where
 }
 
 fn main() -> gtk::glib::ExitCode {
-    // init_glib_logger();
     // Set up gettext translations
     bindtextdomain(
         GETTEXT_PACKAGE,
@@ -83,10 +82,10 @@ fn main() -> gtk::glib::ExitCode {
     let css = gtk::CssProvider::new();
     css.load_from_data(
         r#"
-    levelbar block.filled {
-        filter: blur(2px);
-    }
-    "#,
+        levelbar block.filled {
+            filter: blur(2px);
+        }
+        "#,
     );
 
     gtk::style_context_add_provider_for_display(
