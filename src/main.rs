@@ -23,6 +23,7 @@ mod config {
 
     include!(concat!(env!("CODEGEN_BUILD_DIR"), "/config.rs"));
 }
+mod macros;
 
 mod backend;
 mod ui;

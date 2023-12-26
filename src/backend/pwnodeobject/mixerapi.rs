@@ -43,7 +43,7 @@ impl PwNodeObject {
         let result =
             mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
         if result.is_none() {
-            wp::log::warning!("Node {bound_id} does not support volume");
+            pwvucontrol_warning!("Node {bound_id} does not support volume");
             return;
         }
 
@@ -80,7 +80,7 @@ impl PwNodeObject {
         let result =
             mixerapi.emit_by_name::<bool>("set-volume", &[&bound_id, &variant.to_variant()]);
         if !result {
-            wp::log::warning!("Cannot set volume on {bound_id}");
+            pwvucontrol_warning!("Cannot set volume on {bound_id}");
         }
     }
 
@@ -140,15 +140,15 @@ impl PwNodeObject {
                     let channel = t_audiochannel.find_value_from_short_name(&channelname);
 
                     if let (Some(c), Some(v)) = (channel, volume) {
-                        wp::log::debug!("Index: {index}, Number: {} = {}", c.number(), v);
+                        pwvucontrol_debug!("Index: {index}, Number: {} = {}", c.number(), v);
                         newvec[index as usize] = v as f32;
                     } else {
-                        wp::log::critical!("Got invalid data via mixer-api");
+                        pwvucontrol_critical!("Got invalid data via mixer-api");
                     }
                 }
                 self.set_channel_volumes_vec(&newvec);
             } else {
-                wp::log::critical!("Cannot get channel volumes via mixer-api");
+                pwvucontrol_critical!("Cannot get channel volumes via mixer-api");
             }
 
             // Wireplumber's mixerapi always sets volume to first channel volume
@@ -166,7 +166,7 @@ impl PwNodeObject {
             let mute: Option<bool> = map.get("mute").and_then(|x| x.get());
             if let Some(m) = mute {
                 self.set_mute(m);
-                wp::log::debug!("Setting mute to {m:?}");
+                pwvucontrol_debug!("Setting mute to {m:?}");
             }
 
             // Update the liststore

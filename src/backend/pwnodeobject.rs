@@ -13,6 +13,7 @@ use crate::NodeType;
 use gtk::{gio, prelude::ListModelExt};
 use crate::backend::PwChannelObject;
 use super::PwvucontrolManager;
+use crate::macros::*;
 
 mod mixerapi;
 
@@ -174,7 +175,7 @@ pub mod imp {
             );
 
             node.connect_params_changed(clone!(@weak obj => move |node,what| {
-                wp::log::debug!("params-changed! {what} id: {}", node.bound_id());
+                pwvucontrol_debug!("params-changed! {what} id: {}", node.bound_id());
                 obj.imp().block.set(true);
                 match what {
                     "Props" => obj.update_props(),
@@ -316,7 +317,7 @@ impl PwNodeObject {
                     let choice = pod.find_spa_property(&format_key).expect("Format!");
                     let format = get_pod_maybe_choice(choice).id().expect("Format id");
                     if format == 0 {
-                        wp::log::warning!("Format is 0, ignoring...");
+                        pwvucontrol_warning!("Format is 0, ignoring...");
                         return;
                     }
 
@@ -338,7 +339,7 @@ impl PwNodeObject {
                         a[i] = *v;
                     }
 
-                    wp::log::info!("For id {}, Got rate {rate}, format {format}, channels {channels}", node.bound_id());
+                    pwvucontrol_info!("For id {}, Got rate {rate}, format {format}, channels {channels}", node.bound_id());
 
                     let t_format = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioFormat").expect("audio format type");
                     let formatname = t_format.values().find(|x| x.number() == format).and_then(|x|x.short_name()).unwrap();
@@ -351,7 +352,7 @@ impl PwNodeObject {
                     widget.update_channelmodel();
                 }
             } else {
-                wp::log::debug!("enum_params async call didn't return anything useful");
+                pwvucontrol_debug!("enum_params async call didn't return anything useful");
             }
             
         }));
@@ -468,7 +469,7 @@ impl PwNodeObject {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
             metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some(&target_node.serial().to_string()));
         } else {
-            wp::log::warning!("Cannot get metadata object");
+            pwvucontrol_warning!("Cannot get metadata object");
         };
     }
 
@@ -503,7 +504,7 @@ impl PwNodeObject {
                 }
             }
         } else {
-            wp::log::warning!("Cannot get metadata object");
+            pwvucontrol_warning!("Cannot get metadata object");
         };
         None
     }
@@ -515,7 +516,7 @@ impl PwNodeObject {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some("-1"));
             metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some("-1"));
         } else {
-            wp::log::warning!("Cannot get metadata object");
+            pwvucontrol_warning!("Cannot get metadata object");
         };
     }
 

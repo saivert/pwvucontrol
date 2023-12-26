@@ -23,7 +23,7 @@ use crate::{
     PwvucontrolApplication,
     NodeType
 };
-
+use crate::macros::*;
 use once_cell::unsync::OnceCell;
 
 mod imp {
@@ -65,9 +65,11 @@ mod imp {
 
     impl PwvucontrolManager {
         fn setup_wp_connection(&self) {
-            wp::core::Core::init();
+            wp::core::Core::init_with_flags(wp::InitFlags::ALL);
 
-            wireplumber::Log::set_default_level("3");
+            if !wp::Log::level_is_enabled(glib::LogLevelFlags::LEVEL_WARNING) {
+                wp::Log::set_default_level("1");
+            }
 
             let props = wp::pw::Properties::new_string("media.category=Manager");
 
@@ -162,7 +164,7 @@ mod imp {
                                 }
                             }
                         }
-                        wp::log::info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
+                        pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                         let pwobj = PwNodeObject::new(node);
                         let model = match pwobj.nodetype() {
                             NodeType::Sink => &imp.sinkmodel,
@@ -171,7 +173,7 @@ mod imp {
                         model.append(&pwobj);
                     } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                         let n: String = device.pw_property("device.name").unwrap();
-                        wp::log::info!("Got device: {n} bound id {}", device.bound_id());
+                        pwvucontrol_info!("Got device: {n} bound id {}", device.bound_id());
                         devicemodel.append(&PwDeviceObject::new(device));
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
@@ -182,7 +184,7 @@ mod imp {
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
                 let devicemodel = imp.devicemodel.get().expect("devicemodel");
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
-                    wp::log::info!("removed: {:?} id: {}", node.name(), node.bound_id());
+                    pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
                     let model = match pwnodeobject::get_node_type_for_node(node) {
                         NodeType::Sink => &imp.sinkmodel,
                         _ => &imp.nodemodel
@@ -194,14 +196,14 @@ mod imp {
                         if let Ok(item) = item {
                             if item.wpdevice().bound_id() == device.bound_id() {
                                 if let Some(pos) = devicemodel.find(&item) {
-                                    wp::log::info!("Removed device {} @ pos {pos}", device.bound_id());
+                                    pwvucontrol_info!("Removed device {} @ pos {pos}", device.bound_id());
                                     devicemodel.remove(pos);
                                 }
                             }
                         }
                     }
                 } else {
-                    wp::log::info!("Object must be one of the above, but is {:?} instead", object.type_());
+                    pwvucontrol_info!("Object must be one of the above, but is {:?} instead", object.type_());
                 }
             }));
 
@@ -212,16 +214,16 @@ mod imp {
                     if let Some(plugin) = Plugin::find(&core, plugin_name) {
                         let result = plugin.activate_future(PluginFeatures::ENABLED).await;
                         if result.is_err() {
-                            wp::log::critical!("Cannot activate plugin {plugin_name}");
+                            pwvucontrol_critical!("Cannot activate plugin {plugin_name}");
                         } else {
-                            wp::log::info!("Activated plugin {plugin_name}");
+                            pwvucontrol_info!("Activated plugin {plugin_name}");
                             count += 1;
                             if count == 2 {
                                 core.install_object_manager(&om);
                             }
                         }
                     } else {
-                        wp::log::critical!("Cannot find plugin {plugin_name}");
+                        pwvucontrol_critical!("Cannot find plugin {plugin_name}");
                         PwvucontrolApplication::default().quit();
                     }
                 }
@@ -253,11 +255,11 @@ mod imp {
             metadata_om.connect_object_added(
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                     if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
-                        wp::log::info!("added metadata object: {:?}", metadataobj.bound_id());
+                        pwvucontrol_info!("added metadata object: {:?}", metadataobj.bound_id());
                         imp.metadata.replace(Some(metadataobj.clone()));
                         for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
                             let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
-                            wp::log::info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
+                            pwvucontrol_info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
                         }
                     } else {
                         unreachable!("Object must be one of the above, but is {:?} instead", object.type_());

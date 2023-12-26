@@ -11,6 +11,7 @@ use wp::{
 
 use once_cell::sync::{OnceCell, Lazy};
 use std::cell::{Cell, RefCell};
+use crate::macros::*;
 
 pub mod imp {
     use super::*;
@@ -80,14 +81,14 @@ pub mod imp {
 
             obj.wpdevice()
                 .connect_properties_notify(clone!(@weak obj => move |device| {
-                    wp::log::debug!("properties changed! id: {}", device.object_id().unwrap());
+                    pwvucontrol_debug!("properties changed! id: {}", device.object_id().unwrap());
 
                     obj.label_set_name();
                 }));
 
             obj.wpdevice()
                 .connect_params_changed(clone!(@weak obj => move |device, what| {
-                    wp::log::debug!("params-changed! {what} id: {}", device.object_id().unwrap());
+                    pwvucontrol_debug!("params-changed! {what} id: {}", device.object_id().unwrap());
 
                     match what {
                         "EnumProfile" => {
@@ -181,7 +182,7 @@ impl PwDeviceObject {
                 let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
                 let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
 
-                wp::log::info!("Current profile #{} {}", index, description);
+                pwvucontrol_info!("Current profile #{} {}", index, description);
 
                 return Some(index);
             }

@@ -8,7 +8,7 @@ use wp::pw::ProxyExt;
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 use crate::ui::PwProfileRow;
-
+use crate::macros::*;
 mod imp {
     use super::*;
 
@@ -63,7 +63,7 @@ mod imp {
         // }
 
         // pub fn update_profiles(&self) -> Option<glib::Value> {
-        //     wp::log::info!("update_profiles");
+        //     pwvucontrol_info!("update_profiles");
         //     self.block_signal.set(true);
 
         //     let deviceobject = self.deviceobject.borrow();
@@ -95,7 +95,7 @@ mod imp {
             let deviceobject = self.deviceobject.borrow();
             let deviceobject = deviceobject.as_ref().unwrap();
 
-            wp::log::info!("update_selected with index {}", deviceobject.profile_index());
+            pwvucontrol_info!("update_selected with index {}", deviceobject.profile_index());
             self.obj().set_selected_no_send(deviceobject.profile_index());
         }
 
@@ -104,9 +104,9 @@ mod imp {
 
             if let Some(deviceobject) = new_deviceobject {
                 self.block_signal.set(true);
-                wp::log::info!("self.profile_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
+                pwvucontrol_info!("self.profile_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
                 self.profile_dropdown.set_model(Some(&deviceobject.profilemodel()));
-                wp::log::info!("self.profile_dropdown.set_selected({});", deviceobject.profile_index());
+                pwvucontrol_info!("self.profile_dropdown.set_selected({});", deviceobject.profile_index());
 
                 self.profile_dropdown.set_selected(deviceobject.profile_index());
 
@@ -205,7 +205,7 @@ mod imp {
                 }
 
                 if let Some(deviceobject) = widget.deviceobject() {
-                    wp::log::critical!("Had set profile to {}", dropdown.selected());
+                    pwvucontrol_critical!("Had set profile to {}", dropdown.selected());
                     
                     deviceobject.set_profile(dropdown.selected() as i32);
                 }

@@ -17,7 +17,7 @@ use crate::{
     NodeType,
     config::{APP_ID, PROFILE}
 };
-use wireplumber as wp;
+use crate::macros::*;
 
 pub enum PwvucontrolWindowView {
     Connected,
@@ -175,7 +175,7 @@ mod imp {
 
         fn close_request(&self) -> glib::Propagation {
             if let Err(err) = self.obj().save_window_size() {
-                wp::log::warning!("Failed to save window state, {}", &err);
+                pwvucontrol_warning!("Failed to save window state, {}", &err);
             }
             self.parent_close_request()
         }

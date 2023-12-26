@@ -10,6 +10,7 @@ use crate::{
 use glib::{closure_local, clone};
 use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
+use crate::macros::*;
 
 use super::volumebox::PwVolumeBoxExt;
 
@@ -60,7 +61,7 @@ mod imp {
                     move |_obj: &wp::pw::Metadata, id: u32, key: Option<String>, _type: Option<String>, _value: Option<String>| {
                     let key = key.unwrap_or_default();
                     if id == boundid && key.contains("target.") {
-                        wp::log::info!("metadata changed handler id: {boundid} {key:?} {_value:?}!");
+                        pwvucontrol_info!("metadata changed handler id: {boundid} {key:?} {_value:?}!");
                         widget.update_output_device_dropdown();
                     }
                 });
@@ -135,7 +136,7 @@ impl PwOutputBox {
             // });
 
             if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
-                wp::log::info!(
+                pwvucontrol_info!(
                     "switching to preferred target pos={pos} boundid={} serial={}",
                     deftarget.boundid(),
                     deftarget.serial()
@@ -146,14 +147,14 @@ impl PwOutputBox {
             output_dropdown.set_selected_no_send(0);
 
             // let id = self.imp().default_node.get();
-            // wp::log::info!("default_node is {id}");
+            // pwvucontrol_info!("default_node is {id}");
             // if id != u32::MAX {
             //     if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
-            //         wp::log::info!("switching to default target");
+            //         pwvucontrol_info!("switching to default target");
             //         if true
             //         /* imp.outputdevice_dropdown.selected() != pos */
             //         {
-            //             wp::log::info!("actually switching to default target");
+            //             pwvucontrol_info!("actually switching to default target");
             //             imp.outputdevice_dropdown_block_signal.set(true);
             //             imp.outputdevice_dropdown.set_selected(pos);
             //             imp.outputdevice_dropdown_block_signal.set(false);

@@ -8,6 +8,7 @@ use gtk::{
     subclass::prelude::*
 };
 use wireplumber as wp;
+use crate::macros::*;
 
 mod imp {
     use super::*;
@@ -37,7 +38,7 @@ mod imp {
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            wp::log::debug!(
+            pwvucontrol_debug!(
                 "Got set_volume on channel object {} = {:?}",
                 self.obj().name(),
                 value.get::<f32>()
