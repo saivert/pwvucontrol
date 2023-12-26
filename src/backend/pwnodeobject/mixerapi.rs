@@ -151,16 +151,13 @@ impl PwNodeObject {
                 wp::log::critical!("Cannot get channel volumes via mixer-api");
             }
 
-            // Update the liststore
-            self.update_channel_objects();
-
             // Wireplumber's mixerapi always sets volume to first channel volume
             // instead we will use the max channel
             let maxvol: Option<f32> = self
                 .channel_volumes_vec()
                 .iter()
                 .max_by(|a, b| a.total_cmp(b))
-                .copied();                
+                .copied();
             
             if let Some(maxvol) = maxvol {
                 self.set_volume(maxvol);
@@ -171,6 +168,9 @@ impl PwNodeObject {
                 self.set_mute(m);
                 wp::log::debug!("Setting mute to {m:?}");
             }
+
+            // Update the liststore
+            //self.update_channel_objects();
         }
     }
 }

@@ -83,6 +83,10 @@ impl PwChannelObject {
     pub fn set_volume_no_send(&self, volume: f32) {
         let imp = self.imp();
 
+        if volume == imp.volume.get() {
+            return;
+        }
+
         imp.volume.set(volume);
         self.notify_volume();
     }

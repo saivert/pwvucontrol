@@ -427,7 +427,11 @@ impl PwNodeObject {
 
     pub(crate) fn set_channel_volumes_vec(&self, values: &[f32]) {
         *(self.imp().channel_volumes.borrow_mut()) = values.to_owned();
-        self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
+
+        self.update_channel_objects();
+        if !self.imp().block.get() {
+            self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
+        }
     }
 
     pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
@@ -440,7 +444,10 @@ impl PwNodeObject {
             *value = volume;
         }
 
-        self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
+        self.update_channel_objects();
+        if !self.imp().block.get() {
+            self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
+        }
     }
 
     pub(crate) fn set_format(&self, format: AudioFormat) {
@@ -541,7 +548,7 @@ impl PwNodeObject {
 
     pub(crate) fn node_property<T: FromPipewirePropertyString>(&self, property: &str) -> T {
         let node = self.imp().wpnode.get().expect("node");
-        node.pw_property(property).expect("object.serial")
+        node.pw_property(property).expect(property)
     }
 }
 
