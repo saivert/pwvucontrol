@@ -100,9 +100,8 @@ impl PwSinkBox {
 
     pub(crate) fn default_node_changed(&self) {
         let imp = self.imp();
-        let parent: &PwVolumeBox = self.upcast_ref();
-        let node = parent.node_object().expect("nodeobj");
-        let id = parent.imp().default_node.get();
+        let node = self.node_object().expect("nodeobj");
+        let id = self.default_node();
 
         imp.block_default_node_toggle_signal.set(true);
         self.imp()
