@@ -10,4 +10,4 @@ pub use manager::PwvucontrolManager;
 pub use pwdeviceobject::PwDeviceObject;
 pub use pwprofileobject::{PwProfileObject, ProfileAvailability};
 pub use pwnodemodel::PwNodeModel;
-pub use pwnodeobject::{AudioFormat, PwNodeObject, NodeType};
+pub use pwnodeobject::{PwNodeObject, NodeType};

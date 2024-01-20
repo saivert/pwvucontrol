@@ -86,12 +86,8 @@ pub mod imp {
         pub(super) block: Cell<bool>,
     }
 
-    #[glib::object_subclass]
-    impl ObjectSubclass for PwNodeObject {
-        const NAME: &'static str = "PwNodeObject";
-        type Type = super::PwNodeObject;
-
-        fn new() -> Self {
+    impl Default for PwNodeObject {
+        fn default() -> Self {
             Self {
                 name: Default::default(),
                 description: Default::default(),
@@ -112,6 +108,12 @@ pub mod imp {
                 block: Default::default()
             }
         }
+    }
+
+    #[glib::object_subclass]
+    impl ObjectSubclass for PwNodeObject {
+        const NAME: &'static str = "PwNodeObject";
+        type Type = super::PwNodeObject;
     }
 
     impl ObjectImpl for PwNodeObject {
@@ -349,7 +351,7 @@ impl PwNodeObject {
                         a[i] = *v;
                     }
 
-                    pwvucontrol_info!("For id {}, Got rate {rate}, format {format}, channels {channels}", node.bound_id());
+                    pwvucontrol_info!("For {} bound id {}, Got rate {rate}, format {format}, channels {channels}", node.name().unwrap_or_default(), node.bound_id());
 
                     let t_format = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioFormat").expect("audio format type");
                     let formatname = t_format.values().find(|x| x.number() == format).and_then(|x|x.short_name()).unwrap();

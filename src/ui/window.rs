@@ -49,13 +49,8 @@ mod imp {
         pub settings: gio::Settings,
     }
 
-    #[glib::object_subclass]
-    impl ObjectSubclass for PwvucontrolWindow {
-        const NAME: &'static str = "PwvucontrolWindow";
-        type Type = super::PwvucontrolWindow;
-        type ParentType = adw::ApplicationWindow;
-
-        fn new() -> Self {
+    impl Default for PwvucontrolWindow {
+        fn default() -> Self {
             Self {
                 header_bar: TemplateChild::default(),
                 stack: TemplateChild::default(),
@@ -68,6 +63,13 @@ mod imp {
                 settings: gio::Settings::new(APP_ID)
             }
         }
+    }
+
+    #[glib::object_subclass]
+    impl ObjectSubclass for PwvucontrolWindow {
+        const NAME: &'static str = "PwvucontrolWindow";
+        type Type = super::PwvucontrolWindow;
+        type ParentType = adw::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
             PwVolumeBox::ensure_type();
