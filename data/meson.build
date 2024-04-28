@@ -76,7 +76,7 @@ if glib_compile_schemas.found()
 endif
 
 # For development always generate a local GSchema
-dev_schema = custom_target(
+custom_target(
   'dev-schema',
   build_by_default: true,
   build_always_stale: true,
