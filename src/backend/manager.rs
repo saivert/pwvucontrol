@@ -290,6 +290,18 @@ impl PwvucontrolManager {
         glib::Object::builder()
             .build()
     }
+
+    pub fn get_device_by_id(&self, id: u32) -> Option<PwDeviceObject> {
+        let devicemodel = self.imp().devicemodel.get().expect("devicemodel");
+        for device in devicemodel.iter::<PwDeviceObject>() {
+            if let Ok(device) = device {
+                if device.wpdevice().bound_id() == id {
+                    return Some(device);
+                }
+            }
+        }
+        None
+    }
 }
 
 impl Default for PwvucontrolManager {
