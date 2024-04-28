@@ -50,7 +50,7 @@ impl LevelbarProvider {
         let stream: Stream = Stream::new(&core, "peakdetect", props)?;
 
         let listener = stream.add_local_listener::<f32>()
-        .process(clone!(@weak volumebox => @default-panic, move |stream, last_peak| {
+        .process(clone!(@weak volumebox => @default-return (), move |stream, last_peak| {
             match stream.dequeue_buffer() {
                 None => println!("No buffer received"),
                 Some(mut buffer) => {
