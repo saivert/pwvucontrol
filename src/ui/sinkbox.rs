@@ -10,8 +10,11 @@ use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use wireplumber as wp;
 use super::volumebox::PwVolumeBoxExt;
+use crate::ui::PwRouteDropDown;
 
 mod imp {
+    use crate::pwvucontrol_info;
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]
@@ -21,6 +24,9 @@ mod imp {
 
         #[template_child]
         pub default_sink_toggle: TemplateChild<gtk::ToggleButton>,
+
+        #[template_child]
+        pub route_dropdown: TemplateChild<PwRouteDropDown>,
     }
 
     #[glib::object_subclass]
@@ -52,6 +58,14 @@ mod imp {
             glib::idle_add_local_once(clone!(@weak self as widget => move || {
                 widget.obj().default_node_changed();
             }));
+
+            let obj = self.obj();
+            let parent: &PwVolumeBox = obj.upcast_ref();
+            let node = parent.node_object().expect("nodeobj");
+
+            pwvucontrol_info!("sinkbox set_nodeobject {}", node.name());
+
+            self.route_dropdown.set_nodeobject(Some(node));
         }
     }
     impl WidgetImpl for PwSinkBox {}

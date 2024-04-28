@@ -10,6 +10,8 @@ use wireplumber as wp;
 use crate::ui::PwProfileRow;
 use crate::macros::*;
 mod imp {
+    use crate::backend::PwProfileObject;
+
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
@@ -112,14 +114,14 @@ mod imp {
 
                 self.block_signal.set(false);
 
-                deviceobject.connect_local("pre-update", false,
+                deviceobject.connect_local("pre-update-profile", false,
                     clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(true);
 
                         None
                     })
                 );
-                deviceobject.connect_local("post-update", false,
+                deviceobject.connect_local("post-update-profile", false,
                 clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(false);
                         widget.update_selected();
@@ -151,7 +153,7 @@ mod imp {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                 let profilerow = PwProfileRow::new();
 
-                profilerow.setup(item, list);
+                profilerow.setup::<PwProfileObject>(item, list);
                 item.set_child(Some(&profilerow));
             }
 

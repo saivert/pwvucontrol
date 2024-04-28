@@ -9,6 +9,7 @@ mod outputbox;
 mod profile_dropdown;
 mod devicebox;
 mod profilerow;
+mod route_dropdown;
 
 pub use window::PwvucontrolWindow;
 pub use window::PwvucontrolWindowView;
@@ -21,3 +22,4 @@ pub use channelbox::PwChannelBox;
 pub use levelprovider::LevelbarProvider;
 pub use outputbox::PwOutputBox;
 pub use profilerow::PwProfileRow;
+pub use route_dropdown::PwRouteDropDown;

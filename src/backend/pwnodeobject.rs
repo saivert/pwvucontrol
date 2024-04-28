@@ -11,7 +11,7 @@ use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Pr
 use once_cell::sync::{Lazy, OnceCell};
 use gtk::{gio, prelude::ListModelExt};
 use crate::backend::PwChannelObject;
-use super::PwvucontrolManager;
+use super::{PwDeviceObject, PwvucontrolManager};
 use crate::macros::*;
 
 mod mixerapi;
@@ -483,6 +483,22 @@ impl PwNodeObject {
         } else {
             pwvucontrol_warning!("Cannot get metadata object");
         };
+    }
+
+    pub(crate) fn get_device(&self) -> Option<PwDeviceObject> {
+        if let Ok(Some(device_id)) = self.wpnode().device_id() {
+            let manager = PwvucontrolManager::default();
+            return manager.get_device_by_id(device_id);
+        }
+        None
+    }
+
+    pub(crate) fn set_route(&self, index: u32) {
+        if let Ok(Some(card_profile_device)) = self.wpnode().device_index() {
+            if let Some(device) = self.get_device() {
+                device.set_route(index, card_profile_device as i32);
+            }
+        }
     }
 
     pub(crate) fn default_target(&self) -> Option<PwNodeObject> {

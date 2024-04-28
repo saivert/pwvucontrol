@@ -9,7 +9,7 @@ use crate::{
 };
 
 use glib::{clone, ControlFlow, closure_local, SignalHandlerId};
-use gtk::{gio, prelude::*, subclass::prelude::*};
+use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
 use once_cell::sync::OnceCell;
 use wireplumber as wp;
@@ -256,7 +256,7 @@ impl PwVolumeBox {
     pub(crate) fn new(channel_object: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder()
             .property("node-object", channel_object)
-            .property("channelmodel", gio::ListStore::new::<PwChannelObject>())
+            //.property("channelmodel", gio::ListStore::new::<PwChannelObject>())
             .build()
     }
 

@@ -4,7 +4,7 @@ use glib::closure_local;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
 
-use crate::backend::{PwProfileObject, ProfileAvailability};
+use crate::backend::ParamAvailability;
 
 mod imp {
     use super::*;
@@ -54,24 +54,25 @@ impl PwProfileRow {
         glib::Object::builder().build()
     }
 
-    pub fn setup(&self, item: &gtk::ListItem, list: bool) {
+    pub fn setup<Type: glib::IsA<glib::Object>>(&self, item: &gtk::ListItem, list: bool) {
         let label = self.imp().label.get();
         let unavailable_icon = self.imp().unavailable_icon.get();
 
         if !list {
             label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+            self.imp().checkmark_icon.set_visible(false);
         }
 
         item.property_expression("item")
-        .chain_property::<PwProfileObject>("description")
+        .chain_property::<Type>("description")
         .bind(&label, "label", gtk::Widget::NONE);
 
-        let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ProfileAvailability| {
-            availability == ProfileAvailability::No
+        let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ParamAvailability| {
+            availability == ParamAvailability::No
         });
 
         item.property_expression("item")
-            .chain_property::<PwProfileObject>("availability")
+            .chain_property::<Type>("availability")
             .chain_closure::<bool>(icon_closure)
             .bind(&unavailable_icon, "visible", glib::Object::NONE);
     }

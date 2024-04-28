@@ -10,6 +10,7 @@
     <file preprocess="xml-stripblanks" alias="gtk/sinkbox.ui">ui/sinkbox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/outputbox.ui">ui/outputbox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/profile-dropdown.ui">ui/profile-dropdown.ui</file>
+    <file preprocess="xml-stripblanks" alias="gtk/route-dropdown.ui">ui/route-dropdown.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/devicebox.ui">ui/devicebox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/profilerow.ui">ui/profilerow.ui</file>
     <file>ui/levelbar.css</file>

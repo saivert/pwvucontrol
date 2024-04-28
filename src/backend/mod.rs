@@ -1,13 +1,21 @@
+mod paramavailability;
 mod pwchannelobject;
 mod manager;
 mod pwdeviceobject;
 mod pwprofileobject;
 mod pwnodemodel;
 mod pwnodeobject;
+mod pwrouteobject;
+mod routedirection;
+mod pwroutefiltermodel;
 
+pub use paramavailability::ParamAvailability;
 pub use pwchannelobject::PwChannelObject;
 pub use manager::PwvucontrolManager;
 pub use pwdeviceobject::PwDeviceObject;
-pub use pwprofileobject::{PwProfileObject, ProfileAvailability};
+pub use pwprofileobject::PwProfileObject;
 pub use pwnodemodel::PwNodeModel;
 pub use pwnodeobject::{PwNodeObject, NodeType};
+pub use pwrouteobject::PwRouteObject;
+pub use routedirection::RouteDirection;
+pub use pwroutefiltermodel::PwRouteFilterModel;
