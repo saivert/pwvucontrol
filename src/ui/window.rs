@@ -38,6 +38,8 @@ mod imp {
         #[template_child]
         pub recordlist: TemplateChild<gtk::ListBox>,
         #[template_child]
+        pub inputlist: TemplateChild<gtk::ListBox>,
+        #[template_child]
         pub outputlist: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub cardlist: TemplateChild<gtk::ListBox>,
@@ -56,6 +58,7 @@ mod imp {
                 stack: TemplateChild::default(),
                 playbacklist: TemplateChild::default(),
                 recordlist: TemplateChild::default(),
+                inputlist: TemplateChild::default(),
                 outputlist: TemplateChild::default(),
                 cardlist: TemplateChild::default(),
                 viewstack: TemplateChild::default(),
@@ -95,10 +98,12 @@ mod imp {
 
             self.obj().setup_scroll_blocker(&self.playbacklist);
             self.obj().setup_scroll_blocker(&self.recordlist);
+            self.obj().setup_scroll_blocker(&self.inputlist);
             self.obj().setup_scroll_blocker(&self.outputlist);
 
             let manager = PwvucontrolManager::default();
             let model = &manager.imp().nodemodel;
+            let sourcemodel = &manager.imp().sourcemodel;
             let sinkmodel = &manager.imp().sinkmodel;
             let devicemodel = manager.imp().devicemodel.get().expect("Device model");
             let window = self;
@@ -134,6 +139,17 @@ mod imp {
                 Some(filterlistmodel),
                 clone!(@weak window => @default-panic, move |item| {
                     PwVolumeBox::new(
+                        item.downcast_ref::<PwNodeObject>()
+                            .expect("RowData is of wrong type"),
+                    )
+                    .upcast::<gtk::Widget>()
+                }),
+            );
+
+            self.inputlist.bind_model(
+                Some(sourcemodel),
+                clone!(@weak window => @default-panic, move |item| {
+                    PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )

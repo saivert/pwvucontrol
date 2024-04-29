@@ -36,6 +36,7 @@ mod imp {
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
         pub nodemodel: PwNodeModel,
+        pub sourcemodel: PwNodeModel,
         pub sinkmodel: PwNodeModel,
         pub devicemodel: OnceCell<gio::ListStore>,
 
@@ -105,7 +106,7 @@ mod imp {
                     let interest = wp::registry::ObjectInterest::new(
                         wp::pw::Node::static_type(),
                     );
-                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Sink')")
+                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Source', 'Audio/Sink')")
                         .expect("variant");
                     interest.add_constraint(
                         wp::registry::ConstraintType::PwGlobalProperty,
@@ -168,6 +169,7 @@ mod imp {
                         let pwobj = PwNodeObject::new(node);
                         let model = match pwobj.nodetype() {
                             NodeType::Sink => &imp.sinkmodel,
+                            NodeType::Source => &imp.sourcemodel,
                             _ => &imp.nodemodel
                         };
                         model.append(&pwobj);
@@ -187,6 +189,7 @@ mod imp {
                     pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
                     let model = match pwnodeobject::get_node_type_for_node(node) {
                         NodeType::Sink => &imp.sinkmodel,
+                        NodeType::Source => &imp.sourcemodel,
                         _ => &imp.nodemodel
                     };
                     model.remove(node.bound_id());

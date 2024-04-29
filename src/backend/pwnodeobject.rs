@@ -220,6 +220,7 @@ pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
     match node.get_pw_property("media.class").as_deref() {
         Some("Stream/Output/Audio") => NodeType::Output,
         Some("Stream/Input/Audio") => NodeType::Input,
+        Some("Audio/Source") => NodeType::Source,
         Some("Audio/Sink") => NodeType::Sink,
         _ => NodeType::Undefined,
     }

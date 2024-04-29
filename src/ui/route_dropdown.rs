@@ -10,7 +10,7 @@ use crate::ui::PwProfileRow;
 use crate::macros::*;
 
 mod imp {
-    use crate::backend::{PwNodeObject, PwRouteObject};
+    use crate::backend::{NodeType, PwNodeObject, PwRouteFilterModel, PwRouteObject};
 
     use super::*;
 
@@ -44,27 +44,50 @@ mod imp {
 
     impl PwRouteDropDown {
         pub fn update_selected(&self) {
+            if let Some(index) = self.get_route_index() {
+                pwvucontrol_info!("update_selected with index {index}");
+                self.obj().set_selected_no_send(index);
+            }
+        }
+
+        fn get_route_index(&self) -> Option<u32> {
             let nodeobject = self.nodeobject.borrow();
             let nodeobject = nodeobject.as_ref().unwrap();
 
             let deviceobject = nodeobject.get_device().expect("device");
+            match nodeobject.nodetype() {
+                NodeType::Input => Some(deviceobject.route_index_input()),
+                NodeType::Output => Some(deviceobject.route_index_output()),
+                _ => None
+            }
+        }
 
-            pwvucontrol_info!("update_selected with index {}", deviceobject.route_index_output());
-            self.obj().set_selected_no_send(deviceobject.route_index_output());
+        fn get_route_model(&self) -> Option<PwRouteFilterModel> {
+            let nodeobject = self.nodeobject.borrow();
+            let nodeobject = nodeobject.as_ref().unwrap();
+
+            let deviceobject = nodeobject.get_device().expect("device");
+            match nodeobject.nodetype() {
+                NodeType::Source => Some(deviceobject.routemodel_input()),
+                NodeType::Sink => Some(deviceobject.routemodel_output()),
+                _ => None
+            }
         }
 
         pub fn set_nodeobject(&self, new_nodeobject: Option<&PwNodeObject>) {
             self.nodeobject.replace(new_nodeobject.cloned());
 
             if let Some(nodeobject) = new_nodeobject {
+
                 let deviceobject = nodeobject.get_device().expect("device");
 
                 self.block_signal.set(true);
                 pwvucontrol_info!("self.route_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
-                self.route_dropdown.set_model(Some(&deviceobject.routemodel_output()));
-                pwvucontrol_info!("self.route_dropdown.set_selected({});", deviceobject.route_index_output());
-
-                self.route_dropdown.set_selected(deviceobject.route_index_output());
+                self.route_dropdown.set_model(self.get_route_model().as_ref());
+                if let Some(index) = self.get_route_index() {
+                    pwvucontrol_info!("self.route_dropdown.set_selected({index});");
+                    self.route_dropdown.set_selected(index);
+                }
 
                 self.block_signal.set(false);
 
