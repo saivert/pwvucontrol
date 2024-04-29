@@ -10,10 +10,10 @@ use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use wireplumber as wp;
 use super::volumebox::PwVolumeBoxExt;
+use crate::{backend::NodeType, pwvucontrol_info};
 use crate::ui::PwRouteDropDown;
 
 mod imp {
-    use crate::pwvucontrol_info;
 
     use super::*;
 
@@ -82,7 +82,11 @@ mod imp {
             let obj = self.obj();
             let parent: &PwVolumeBox = obj.upcast_ref();
             let node = parent.node_object().expect("nodeobj");
-            let node_name: String = node.node_property("node.name");
+            let node_name: String = if _togglebutton.is_active() {
+                node.node_property("node.name")
+            } else {
+                "".to_string()
+            };
 
             let manager = PwvucontrolManager::default();
 
@@ -90,9 +94,15 @@ mod imp {
             let defaultnodesapi =
                 wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
 
+            let type_name = match node.nodetype() {
+                NodeType::Sink => "Audio/Sink",
+                NodeType::Source => "Audio/Source",
+                _ => unreachable!()
+            };
+
             let result: bool = defaultnodesapi.emit_by_name(
                 "set-default-configured-node-name",
-                &[&"Audio/Sink", &node_name],
+                &[&type_name, &node_name],
             );
             wp::info!("set-default-configured-node-name result: {result:?}");
         }
