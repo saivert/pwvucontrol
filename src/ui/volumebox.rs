@@ -153,9 +153,7 @@ mod imp {
 
             let manager = PwvucontrolManager::default();
 
-            let core = manager.imp().wp_core.get().expect("Core");
-            let defaultnodesapi =
-                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
+            let defaultnodesapi = manager.default_nodes_api();
             let widget = self.obj();
             let defaultnodesapi_closure = closure_local!(@watch widget => move |defaultnodesapi: wp::plugin::Plugin| {
                 let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);

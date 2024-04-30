@@ -81,8 +81,6 @@ pub mod imp {
         #[property(get, set, construct_only)]
         pub(super) wpnode: OnceCell<wp::pw::Node>,
 
-        pub(super) mixerapi: OnceCell<wp::plugin::Plugin>,
-
         pub(super) block: Cell<bool>,
     }
 
@@ -104,7 +102,6 @@ pub mod imp {
                 format: Default::default(),
                 channellock: Default::default(),
                 wpnode: OnceCell::default(),
-                mixerapi: Default::default(),
                 block: Default::default()
             }
         }

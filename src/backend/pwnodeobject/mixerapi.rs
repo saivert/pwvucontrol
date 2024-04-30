@@ -10,16 +10,8 @@ use super::*;
 
 impl PwNodeObject {
     pub(crate) fn get_mixer_api(&self) {
-        let imp = self.imp();
-
         let manager = PwvucontrolManager::default();
-        let core = manager.imp().wp_core.get().expect("Core setup");
-
-        let mixerapi = wp::plugin::Plugin::find(core, "mixer-api").expect("Get mixer-api");
-
-        imp.mixerapi
-            .set(mixerapi)
-            .expect("mixerapi only set once in PwNodeObject");
+        let mixerapi = manager.mixer_api();
 
         let changed_handler = closure_local!(@watch self as widget => move |_mixerapi: &wp::plugin::Plugin, id: u32|{
             if id == widget.boundid() {
@@ -29,16 +21,14 @@ impl PwNodeObject {
             }
         });
 
-        imp.mixerapi.get().unwrap().connect_closure("changed", true, changed_handler);
+        mixerapi.connect_closure("changed", true, changed_handler);
     }
 
     pub(crate) fn send_volume_using_mixerapi(&self, what: PropertyChanged) {
         let imp = self.imp();
         let node = imp.wpnode.get().expect("node in send_volume");
-        let mixerapi = imp
-            .mixerapi
-            .get()
-            .expect("Mixer api must be set on PwNodeObject");
+        let manager = PwvucontrolManager::default();
+        let mixerapi = manager.mixer_api();
         let bound_id = node.bound_id();
         let result =
             mixerapi.emit_by_name::<Option<glib::Variant>>("get-volume", &[&node.bound_id()]);
@@ -110,11 +100,8 @@ impl PwNodeObject {
     }
 
     pub(crate) fn update_volume_using_mixerapi(&self) {
-        let mixerapi = self
-            .imp()
-            .mixerapi
-            .get()
-            .expect("Mixer api must be set on PwNodeObject");
+        let manager = PwvucontrolManager::default();
+        let mixerapi = manager.mixer_api();
         let node = self
             .imp()
             .wpnode

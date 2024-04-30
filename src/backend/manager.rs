@@ -32,6 +32,7 @@ mod imp {
     #[derive(Default, Properties)]
     #[properties(wrapper_type = super::PwvucontrolManager)]
     pub struct PwvucontrolManager {
+        #[property(get)]
         pub wp_core: OnceCell<wp::core::Core>,
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
@@ -42,6 +43,11 @@ mod imp {
 
         pub metadata_om: OnceCell<wp::registry::ObjectManager>,
         pub metadata: RefCell<Option<wp::pw::Metadata>>,
+
+        #[property(get)]
+        pub default_nodes_api: OnceCell<Plugin>,
+        #[property(get)]
+        pub mixer_api: OnceCell<Plugin>,
 
         #[property(get, set, construct_only)]
         application: RefCell<Option<PwvucontrolApplication>>,
@@ -211,17 +217,19 @@ mod imp {
             }));
 
             glib::MainContext::default().spawn_local(clone!(@weak self as manager, @weak wp_core as core, @weak wp_om as om => async move {
-                let plugin_names = vec!["mixer-api", "default-nodes-api"];
+                let plugin_names = vec![("mixer-api", &manager.mixer_api), ("default-nodes-api", &manager.default_nodes_api)];
+
                 let mut count = 0;
-                for plugin_name in plugin_names {
+                for (plugin_name, plugin_cell) in plugin_names.iter() {
                     if let Some(plugin) = Plugin::find(&core, plugin_name) {
                         let result = plugin.activate_future(PluginFeatures::ENABLED).await;
                         if result.is_err() {
                             pwvucontrol_critical!("Cannot activate plugin {plugin_name}");
                         } else {
+                            plugin_cell.set(plugin).expect("Plugin not set");
                             pwvucontrol_info!("Activated plugin {plugin_name}");
                             count += 1;
-                            if count == 2 {
+                            if count == plugin_names.len() {
                                 core.install_object_manager(&om);
                             }
                         }
