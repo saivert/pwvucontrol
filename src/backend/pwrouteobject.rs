@@ -25,6 +25,8 @@ mod imp {
         availability: Cell<ParamAvailability>,
         #[property(get, set, builder(RouteDirection::Unknown))]
         direction: Cell<RouteDirection>,
+
+        pub(super) profiles: RefCell<Vec<u32>>,
     }
 
     #[glib::object_subclass]
@@ -44,12 +46,25 @@ glib::wrapper! {
 }
 
 impl PwRouteObject {
-    pub(crate) fn new(index: u32, description: &str, availability: u32, direction: u32) -> Self {
-        glib::Object::builder()
+    pub(crate) fn new(index: u32, description: &str, availability: u32, direction: u32, profiles: &[u32]) -> Self {
+        let new: PwRouteObject = glib::Object::builder()
         .property("index", index)
         .property("description", format!("{description} ({index})"))
         .property("availability", ParamAvailability::from(availability))
         .property("direction", RouteDirection::from(direction))
-        .build()
+        .build();
+
+        new.set_profiles(profiles);
+
+        new
     }
+
+    pub(crate) fn get_profiles(&self) -> Vec<u32> {
+        self.imp().profiles.borrow().clone()
+    }
+
+    pub(crate) fn set_profiles(&self, list: &[u32]) {
+        self.imp().profiles.replace(list.to_vec());
+    }
+
 }

@@ -265,6 +265,7 @@ impl PwDeviceObject {
                 let description_key = keys.find_value_from_short_name("description").expect("decription key");
                 let available_key = keys.find_value_from_short_name("available").expect("available key");
                 let direction_key = keys.find_value_from_short_name("direction").expect("direction key");
+                let profiles_key = keys.find_value_from_short_name("profiles").expect("profiles key");
 
                 if let Ok(Some(iter)) = res {
                     let removed = widget.imp().routemodel.n_items();
@@ -282,8 +283,11 @@ impl PwDeviceObject {
                         let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
                         let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
                         let direction = pod.find_spa_property(&direction_key).expect("Direction!").id().expect("Id");
+                        let profiles = pod.find_spa_property(&profiles_key).expect("Profiles!");
+                        assert!(profiles.is_array());
+                        let profiles_vec: Vec<u32> =  profiles.array_iterator::<i32>().map(|x| x as u32).collect();
 
-                        routes.push(PwRouteObject::new(index as u32, &description, available, direction));
+                        routes.push(PwRouteObject::new(index as u32, &description, available, direction, &profiles_vec));
                     }
                     widget.imp().routemodel.splice(0, removed as u32, &routes);
 

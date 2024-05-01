@@ -174,7 +174,6 @@ mod imp {
             self.route_dropdown.set_factory(Some(&factory));
             self.route_dropdown.set_list_factory(Some(&list_factory));
 
-            self.route_dropdown.set_enable_search(true);
 
             let widget = self.obj();
             let selected_handler = closure_local!(
@@ -188,7 +187,7 @@ mod imp {
                     pwvucontrol_critical!("Had set profile to {}", dropdown.selected());
 
                     if let Some(routeobject) = dropdown.selected_item().and_downcast::<PwRouteObject>() {
-                        nodeobject.set_route(routeobject.index());
+                        nodeobject.set_route(&routeobject);
                     }
 
                 }
