@@ -135,7 +135,6 @@ pub mod imp {
                 match what {
                     "EnumProfile" => {
                         obj.update_profiles();
-                        //obj.emit_by_name::<()>("profiles-changed", &[]);
                     },
                     "Profile" => {
                         if let Some(index) = obj.get_current_profile_index() {
@@ -146,7 +145,6 @@ pub mod imp {
                         obj.update_routes();
                     },
                     "Route" => {
-                        //obj.update_routes();
                         obj.update_current_route_index();
                     },
                     _ => {},
@@ -342,13 +340,7 @@ impl PwDeviceObject {
                         RouteDirection::Output => self.set_route_index_output(modelindex),
                         _ => unreachable!()
                     }
-                //     match direction {
-                //         RouteDirection::Input => self.imp().route_index_input.set(modelindex),
-                //         RouteDirection::Output => self.imp().route_index_output.set(modelindex),
-                //         _ => unreachable!()
-                //     }
-                //     self.emit_by_name::<()>("post-update-route", &[]);
-                // } else {
+                } else {
                     pwvucontrol_critical!("{direction:?} Unable to get model index from route index in update_current_route_index_for_direction_sync");
                 };
             }
