@@ -15,13 +15,11 @@ use wp::{
 
 use crate::macros::*;
 use once_cell::sync::{Lazy, OnceCell};
+use super::{PwRouteFilterModel, PwRouteObject, RouteDirection};
 use std::cell::{Cell, RefCell};
 
-use super::PwRouteObject;
-use crate::backend::RouteDirection;
-use crate::backend::PwRouteFilterModel;
-
 pub mod imp {
+
     use super::*;
 
     #[derive(Properties)]
@@ -110,8 +108,8 @@ pub mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            self.routemodel_input.set_model(Some(self.routemodel.clone()));
-            self.routemodel_output.set_model(Some(self.routemodel.clone()));
+            self.routemodel_input.set_model(Some(self.routemodel.as_ref()));
+            self.routemodel_output.set_model(Some(self.routemodel.as_ref()));
 
             let obj = self.obj();
 
@@ -344,9 +342,14 @@ impl PwDeviceObject {
                         RouteDirection::Output => self.set_route_index_output(modelindex),
                         _ => unreachable!()
                     }
-                    break;
-                } else {
-                    pwvucontrol_critical!("Unable to get model index from route index in update_current_route_index_for_direction_sync");
+                //     match direction {
+                //         RouteDirection::Input => self.imp().route_index_input.set(modelindex),
+                //         RouteDirection::Output => self.imp().route_index_output.set(modelindex),
+                //         _ => unreachable!()
+                //     }
+                //     self.emit_by_name::<()>("post-update-route", &[]);
+                // } else {
+                    pwvucontrol_critical!("{direction:?} Unable to get model index from route index in update_current_route_index_for_direction_sync");
                 };
             }
         }
@@ -355,12 +358,19 @@ impl PwDeviceObject {
     fn get_model_index_from_route_index(&self, direction: RouteDirection, routeindex: i32) -> Option<u32> {
         let routemodel = self.get_route_model_for_direction(direction);
 
-        for a in routemodel.iter::<PwRouteObject>().enumerate() {
-            if let Ok(b) = a.1 {
+        pwvucontrol_info!("{direction:?} routemodel.n_items = {}, routeindex = {routeindex}", routemodel.n_items());
+        for (i, x) in routemodel.iter::<PwRouteObject>().map_while(Result::ok).enumerate() {
+            pwvucontrol_info!("{direction:?} #{i} item.index = {}, item.description = {}", x.index(), x.description());
+        }
+
+        for (i, o) in routemodel.iter::<PwRouteObject>().enumerate() {
+            if let Ok(obj) = o {
                 //let b: PwRouteObject = b.downcast().expect("PwRouteObject");
-                if b.index() == routeindex as u32 {
-                    return Some(a.0 as u32);
+                if obj.index() as u32 == routeindex as u32 {
+                    return Some(i as u32);
                 }
+            } else {
+                pwvucontrol_critical!("model mutated while iterating, returning None");
             }
         }
         None

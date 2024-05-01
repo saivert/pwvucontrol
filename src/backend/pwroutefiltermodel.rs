@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{Properties, closure_local};
-use glib::subclass::prelude::*;
+use glib::{closure_local, subclass::prelude::*, Properties};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
 use im_rc::Vector;
-use super::{PwRouteObject, RouteDirection};
+use super::{ParamAvailability, PwRouteObject, RouteDirection};
 
 mod imp {
-
-    use crate::backend::ParamAvailability;
-
     use super::*;
 
     #[derive(Debug, Properties, Default)]
@@ -23,7 +19,7 @@ mod imp {
         pub(super) direction: Cell<RouteDirection>,
 
         /// The model we are filtering.
-        #[property(get, set = Self::set_model, nullable )]
+        #[property(get, set = Self::set_model, nullable)]
         pub(super) model: RefCell<Option<gio::ListModel>>,
     }
 
@@ -54,7 +50,7 @@ mod imp {
     }
 
     impl PwRouteFilterModel {
-        pub fn set_model(&self, new_model: Option<gio::ListModel>) {
+        pub fn set_model(&self, new_model: Option<&gio::ListModel>) {
             let removed = self.filtered_model.borrow().len() as u32;
 
             if let Some(new_model) = new_model {
@@ -63,7 +59,6 @@ mod imp {
 
                 let widget = self.obj();
                 let handler = closure_local!(@watch widget => move |listmodel: &gio::ListModel, _position: u32, _removed: u32, _added: u32| {
-    
                     let u: Vector<PwRouteObject> = listmodel.iter::<PwRouteObject>()
                         .map_while(Result::ok)
                         .filter(|routeobject| {
@@ -78,13 +73,14 @@ mod imp {
                         filtered_model.append(u);
                         filtered_model.len() as u32
                     };
-                    widget.items_changed(0, removed, added)
+                    widget.items_changed(0, removed, added);
                 });
                 handler.invoke::<()>(&[&new_model, &0u32, &0u32, &0u32]);
                 new_model.connect_closure("items-changed", true, handler);
 
                 self.model.replace(Some(new_model.clone().upcast()));
             } else {
+                self.filtered_model.borrow_mut().clear();
                 self.obj().items_changed(0, removed, 0);
             }
         }

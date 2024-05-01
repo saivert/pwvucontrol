@@ -110,7 +110,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == NodeType::Output;
+                    return o.nodetype() == NodeType::StreamOutput;
                 }
                 false
             });
@@ -129,7 +129,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(|x| {
                 if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == NodeType::Input;
+                    return o.nodetype() == NodeType::StreamInput;
                 }
                 false
             });

@@ -21,8 +21,8 @@ mod mixerapi;
 pub enum NodeType {
     #[default]
     Undefined,
-    Input,
-    Output,
+    StreamInput,
+    StreamOutput,
     Sink,
     Source,
 }
@@ -215,8 +215,8 @@ glib::wrapper! {
 
 pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
     match node.get_pw_property("media.class").as_deref() {
-        Some("Stream/Output/Audio") => NodeType::Output,
-        Some("Stream/Input/Audio") => NodeType::Input,
+        Some("Stream/Output/Audio") => NodeType::StreamOutput,
+        Some("Stream/Input/Audio") => NodeType::StreamInput,
         Some("Audio/Source") => NodeType::Source,
         Some("Audio/Sink") => NodeType::Sink,
         _ => NodeType::Undefined,
@@ -281,7 +281,7 @@ impl PwNodeObject {
 
     fn update_icon_name(&self) {
         match self.nodetype() {
-            NodeType::Input | NodeType::Output => {
+            NodeType::StreamInput | NodeType::StreamOutput => {
                 self.set_iconname("library-music-symbolic");
                 let icon_props = ["media.icon-name", "window.icon-name", "application.icon-name"];
                 for prop in icon_props {

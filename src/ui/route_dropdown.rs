@@ -56,8 +56,8 @@ mod imp {
 
             let deviceobject = nodeobject.get_device().expect("device");
             match nodeobject.nodetype() {
-                NodeType::Input => Some(deviceobject.route_index_input()),
-                NodeType::Output => Some(deviceobject.route_index_output()),
+                NodeType::Source => Some(deviceobject.route_index_input()),
+                NodeType::Sink => Some(deviceobject.route_index_output()),
                 _ => None
             }
         }
