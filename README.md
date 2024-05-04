@@ -8,9 +8,9 @@ There is a flatpak-builder manifest in the build-aux directory. I'm planning on 
 
 ## General info
 
-This is an attempt are making a volume control applet for Pipewire.
+This is an attempt at making a volume control applet for Pipewire.
 
-Current implemented features as of 2023-12-23:
+Current implemented features as of 2024-05-04:
 
 - Volume control
 - Mute
@@ -19,6 +19,7 @@ Current implemented features as of 2023-12-23:
 - Output device (Sink) drop down for playback streams
 - Default output device
 - Card profile selection
+- Port selection for sinks and sources
 
 ## What it looks like
 
