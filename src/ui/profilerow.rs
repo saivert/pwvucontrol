@@ -64,12 +64,10 @@ impl PwProfileRow {
         }
 
         item.property_expression("item")
-        .chain_property::<Type>("description")
-        .bind(&label, "label", gtk::Widget::NONE);
+            .chain_property::<Type>("description")
+            .bind(&label, "label", gtk::Widget::NONE);
 
-        let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ParamAvailability| {
-            availability == ParamAvailability::No
-        });
+        let icon_closure = closure_local!(|_: Option<glib::Object>, availability: ParamAvailability| { availability == ParamAvailability::No });
 
         item.property_expression("item")
             .chain_property::<Type>("availability")
@@ -78,7 +76,7 @@ impl PwProfileRow {
     }
 
     pub fn set_selected(&self, selected: bool) {
-        self.imp().checkmark_icon.set_opacity(if selected {1.0} else {0.0});
+        self.imp().checkmark_icon.set_opacity(if selected { 1.0 } else { 0.0 });
     }
 
     pub fn set_handlerid(&self, id: Option<glib::SignalHandlerId>) {
