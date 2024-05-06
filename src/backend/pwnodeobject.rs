@@ -495,14 +495,14 @@ impl PwNodeObject {
         let index = routeobj.index();
         if let Ok(Some(card_profile_device)) = self.wpnode().device_index() {
             if let Some(device) = self.get_device() {
+                device.set_route(index, card_profile_device as i32);
+
                 let profiles = routeobj.get_profiles();
                 if !profiles.is_empty() {
-                    if device.profile_index() != profiles[0] {
+                    if !profiles.contains(&device.profile_index()) {
                         device.set_profile(profiles[0] as i32);
                     }
                 }
-
-                device.set_route(index, card_profile_device as i32);
             }
         }
     }
