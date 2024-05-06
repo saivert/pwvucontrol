@@ -54,7 +54,9 @@ mod imp {
             let nodeobject = self.nodeobject.borrow();
             let nodeobject = nodeobject.as_ref().unwrap();
 
-            let deviceobject = nodeobject.get_device().expect("device");
+            let Some(deviceobject) = nodeobject.get_device() else {
+                return None;
+            };
             match nodeobject.nodetype() {
                 NodeType::Source => Some(deviceobject.route_index_input()),
                 NodeType::Sink => Some(deviceobject.route_index_output()),
