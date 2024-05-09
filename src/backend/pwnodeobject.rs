@@ -520,7 +520,7 @@ impl PwNodeObject {
                             target_serial.as_str(),
                             true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
-                        return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
+                        return manager.get_node_by_id(sinknode.bound_id());
                     };
                 }
             }
@@ -533,7 +533,7 @@ impl PwNodeObject {
                             target_node.as_str(),
                             true),
                     ].iter().collect::<Interest<wp::pw::Node>>()) {
-                        return manager.imp().sinkmodel.get_node(sinknode.bound_id()).ok();
+                        return manager.get_node_by_id(sinknode.bound_id());
                     };
                 }
             }

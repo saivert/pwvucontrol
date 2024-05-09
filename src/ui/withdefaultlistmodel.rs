@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::PwNodeModel;
+use crate::backend::PwNodeFilterModel;
 use glib::{Properties, closure_local};
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
@@ -16,7 +16,7 @@ mod imp {
         pub(super) flatten_list_model: RefCell<Option<gtk::FlattenListModel>>,
 
         #[property(get, set = Self::set_model)]
-        pub(super) model: RefCell<Option<PwNodeModel>>,
+        pub(super) model: RefCell<Option<PwNodeFilterModel>>,
     }
 
     impl Default for WithDefaultListModel {
@@ -63,7 +63,7 @@ mod imp {
     }
 
     impl WithDefaultListModel {
-        pub fn set_model(&self, new_model: Option<&PwNodeModel>) {
+        pub fn set_model(&self, new_model: Option<&PwNodeFilterModel>) {
             let removed = self.n_items();
 
             let string_list = self.string_list.borrow().clone();
@@ -96,7 +96,7 @@ glib::wrapper! {
 }
 
 impl WithDefaultListModel {
-    pub(crate) fn new(model: Option<&PwNodeModel>) -> Self {
+    pub(crate) fn new(model: Option<&PwNodeFilterModel>) -> Self {
         glib::Object::builder().property("model", model).build()
     }
 

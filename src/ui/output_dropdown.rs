@@ -99,7 +99,7 @@ mod imp {
             self.outputdevice_dropdown.set_factory(Some(&factory));
             self.outputdevice_dropdown.set_list_factory(default_dropdown_factory.as_ref());
 
-            let sinkmodel = &manager.imp().sinkmodel;
+            let sinkmodel = &manager.sink_model();
 
             self.outputdevice_dropdown.set_enable_search(true);
 

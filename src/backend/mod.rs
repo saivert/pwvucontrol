@@ -8,6 +8,7 @@ mod pwnodeobject;
 mod pwrouteobject;
 mod routedirection;
 mod pwroutefiltermodel;
+mod pwnodefiltermodel;
 
 pub use paramavailability::ParamAvailability;
 pub use pwchannelobject::PwChannelObject;
@@ -19,3 +20,4 @@ pub use pwnodeobject::{PwNodeObject, NodeType};
 pub use pwrouteobject::PwRouteObject;
 pub use routedirection::RouteDirection;
 pub use pwroutefiltermodel::PwRouteFilterModel;
+pub use pwnodefiltermodel::PwNodeFilterModel;

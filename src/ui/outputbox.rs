@@ -102,7 +102,7 @@ impl PwOutputBox {
     pub(crate) fn update_output_device_dropdown(&self) {
         let manager = PwvucontrolManager::default();
 
-        let sinkmodel = &manager.imp().sinkmodel;
+        let sinkmodel = manager.sink_model();
 
         let imp = self.imp();
 
@@ -110,7 +110,7 @@ impl PwOutputBox {
 
         let id = self.default_node();
 
-        let string = if let Ok(node) = sinkmodel.get_node(id) {
+        let string = if let Some(node) = manager.get_node_by_id(id) {
             format!("Default ({})", node.name())
         } else {
             "Default".to_string()

@@ -12,7 +12,6 @@ use crate::{
     application::PwvucontrolApplication,
     ui::PwVolumeBox,
     backend::PwNodeObject,
-    backend::NodeType,
     ui::PwSinkBox,
     ui::PwOutputBox,
     config::{APP_ID, PROFILE}
@@ -102,23 +101,10 @@ mod imp {
             self.obj().setup_scroll_blocker(&self.outputlist);
 
             let manager = PwvucontrolManager::default();
-            let model = &manager.imp().nodemodel;
-            let sourcemodel = &manager.imp().sourcemodel;
-            let sinkmodel = &manager.imp().sinkmodel;
-            let devicemodel = manager.imp().devicemodel.get().expect("Device model");
-            let window = self;
-
-            let filter = gtk::CustomFilter::new(|x| {
-                if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == NodeType::StreamOutput;
-                }
-                false
-            });
-            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
 
             self.playbacklist.bind_model(
-                Some(filterlistmodel),
-                clone!(@weak window => @default-panic, move |item| {
+                Some(&manager.stream_output_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
                     PwOutputBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
@@ -127,17 +113,9 @@ mod imp {
                 }),
             );
 
-            let filter = gtk::CustomFilter::new(|x| {
-                if let Some(o) = x.downcast_ref::<PwNodeObject>() {
-                    return o.nodetype() == NodeType::StreamInput;
-                }
-                false
-            });
-            let filterlistmodel = &gtk::FilterListModel::new(Some(model.clone()), Some(filter));
-
             self.recordlist.bind_model(
-                Some(filterlistmodel),
-                clone!(@weak window => @default-panic, move |item| {
+                Some(&manager.stream_input_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
                     PwVolumeBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
@@ -147,8 +125,8 @@ mod imp {
             );
 
             self.inputlist.bind_model(
-                Some(sourcemodel),
-                clone!(@weak window => @default-panic, move |item| {
+                Some(&manager.source_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
                     PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
@@ -158,8 +136,8 @@ mod imp {
             );
 
             self.outputlist.bind_model(
-                Some(sinkmodel),
-                clone!(@weak window => @default-panic, move |item| {
+                Some(&manager.sink_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
                     PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
@@ -169,8 +147,8 @@ mod imp {
             );
 
             self.cardlist.bind_model(
-                Some(devicemodel),
-                clone!(@weak window => @default-panic, move |item| {
+                Some(&manager.device_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
                     let obj: &PwDeviceObject = item.downcast_ref().expect("PwDeviceObject");
                     PwDeviceBox::new(obj).upcast::<gtk::Widget>()
                 }),

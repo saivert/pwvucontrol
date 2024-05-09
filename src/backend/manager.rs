@@ -18,28 +18,42 @@ use crate::{
     ui::PwvucontrolWindowView,
     backend::pwnodemodel::PwNodeModel,
     backend::pwdeviceobject::PwDeviceObject,
-    backend::pwnodeobject,
     ui::PwvucontrolWindow,
     PwvucontrolApplication,
-    backend::NodeType
+    backend::NodeType,
+    backend::PwNodeFilterModel
 };
 use crate::macros::*;
 use once_cell::unsync::OnceCell;
 
 mod imp {
+
     use super::*;
 
-    #[derive(Default, Properties)]
+    #[derive(Properties)]
     #[properties(wrapper_type = super::PwvucontrolManager)]
     pub struct PwvucontrolManager {
         #[property(get)]
         pub wp_core: OnceCell<wp::core::Core>,
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
-        pub nodemodel: PwNodeModel,
-        pub sourcemodel: PwNodeModel,
-        pub sinkmodel: PwNodeModel,
-        pub devicemodel: OnceCell<gio::ListStore>,
+        #[property(get)]
+        pub(crate) node_model: PwNodeModel,
+
+        #[property(get)]
+        pub(crate) stream_output_model: PwNodeFilterModel,
+
+        #[property(get)]
+        pub(crate) stream_input_model: PwNodeFilterModel,
+
+        #[property(get)]
+        pub(crate) source_model: PwNodeFilterModel,
+
+        #[property(get)]
+        pub(crate) sink_model: PwNodeFilterModel,
+
+        #[property(get)]
+        pub(crate) device_model: gio::ListStore,
 
         pub metadata_om: OnceCell<wp::registry::ObjectManager>,
         pub metadata: RefCell<Option<wp::pw::Metadata>>,
@@ -53,6 +67,26 @@ mod imp {
         application: RefCell<Option<PwvucontrolApplication>>,
     }
 
+    impl Default for PwvucontrolManager {
+        fn default() -> Self {
+            Self {
+                wp_core: Default::default(),
+                wp_object_manager: Default::default(),
+                node_model: Default::default(),
+                stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, None::<gio::ListModel>),
+                stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, None::<gio::ListModel>),
+                source_model: PwNodeFilterModel::new(NodeType::Source, None::<gio::ListModel>),
+                sink_model: PwNodeFilterModel::new(NodeType::Sink, None::<gio::ListModel>),
+                device_model: gio::ListStore::new::<PwDeviceObject>(),
+                metadata_om: Default::default(),
+                metadata: Default::default(),
+                default_nodes_api: Default::default(),
+                mixer_api: Default::default(),
+                application: Default::default(),
+            }
+        }
+    }
+
     #[glib::object_subclass]
     impl ObjectSubclass for PwvucontrolManager {
         const NAME: &'static str = "PwvucontrolManager";
@@ -63,7 +97,11 @@ mod imp {
     impl ObjectImpl for PwvucontrolManager {
         fn constructed(&self) {
             self.parent_constructed();
-            self.devicemodel.set(gio::ListStore::new::<PwDeviceObject>()).expect("devicemodel not set");
+
+            self.stream_input_model.set_model(Some(self.node_model.clone()));
+            self.stream_output_model.set_model(Some(self.node_model.clone()));
+            self.sink_model.set_model(Some(self.node_model.clone()));
+            self.source_model.set_model(Some(self.node_model.clone()));
 
             self.setup_wp_connection();
             self.setup_metadata_om();
@@ -151,7 +189,7 @@ mod imp {
 
             wp_om.connect_object_added(
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
-                    let devicemodel = imp.devicemodel.get().expect("devicemodel");
+                    let devicemodel = &imp.device_model;
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                         // Hide ourselves
                         if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
@@ -173,11 +211,7 @@ mod imp {
                         }
                         pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                         let pwobj = PwNodeObject::new(node);
-                        let model = match pwobj.nodetype() {
-                            NodeType::Sink => &imp.sinkmodel,
-                            NodeType::Source => &imp.sourcemodel,
-                            _ => &imp.nodemodel
-                        };
+                        let model = &imp.node_model;
                         model.append(&pwobj);
                     } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                         let n: String = device.pw_property("device.name").unwrap();
@@ -190,14 +224,10 @@ mod imp {
             );
 
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
-                let devicemodel = imp.devicemodel.get().expect("devicemodel");
+                let devicemodel = &imp.device_model;
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
-                    let model = match pwnodeobject::get_node_type_for_node(node) {
-                        NodeType::Sink => &imp.sinkmodel,
-                        NodeType::Source => &imp.sourcemodel,
-                        _ => &imp.nodemodel
-                    };
+                    let model = &imp.node_model;
                     model.remove(node.bound_id());
 
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
@@ -303,11 +333,23 @@ impl PwvucontrolManager {
     }
 
     pub fn get_device_by_id(&self, id: u32) -> Option<PwDeviceObject> {
-        let devicemodel = self.imp().devicemodel.get().expect("devicemodel");
+        let devicemodel = &self.imp().device_model;
         for device in devicemodel.iter::<PwDeviceObject>() {
             if let Ok(device) = device {
                 if device.wpdevice().bound_id() == id {
                     return Some(device);
+                }
+            }
+        }
+        None
+    }
+
+    pub fn get_node_by_id(&self, id: u32) -> Option<PwNodeObject> {
+        let nodemodel = &self.imp().node_model;
+        for node in nodemodel.iter::<PwNodeObject>() {
+            if let Ok(node) = node {
+                if node.wpnode().bound_id() == id {
+                    return Some(node);
                 }
             }
         }
