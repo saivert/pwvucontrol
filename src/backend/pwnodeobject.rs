@@ -10,8 +10,7 @@ use std::cell::{Cell, RefCell};
 use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone};
 use once_cell::sync::{Lazy, OnceCell};
 use gtk::{gio, prelude::ListModelExt};
-use crate::backend::PwChannelObject;
-use super::{PwDeviceObject, PwRouteObject, PwvucontrolManager};
+use super::{PwDeviceObject, PwRouteObject, PwChannelObject, PwvucontrolManager};
 use crate::macros::*;
 
 mod mixerapi;
