@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    backend::PwvucontrolManager,
-    backend::PwNodeObject,
-    ui::PwVolumeBox,
-    ui::PwVolumeBoxImpl,
-    ui::PwOutputDropDown,
+    backend::{PwNodeObject, PwvucontrolManager},
+    macros::*,
+    ui::{PwOutputDropDown, PwVolumeBox, PwVolumeBoxImpl},
 };
-use glib::{closure_local, clone};
+use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
-use crate::macros::*;
 
 use super::volumebox::PwVolumeBoxExt;
 
@@ -23,25 +20,24 @@ mod imp {
         #[template_child]
         pub output_dropdown: TemplateChild<PwOutputDropDown>,
     }
-    
+
     #[glib::object_subclass]
     impl ObjectSubclass for PwOutputBox {
         const NAME: &'static str = "PwOutputBox";
         type Type = super::PwOutputBox;
         type ParentType = PwVolumeBox;
-    
+
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
         }
-    
+
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
             obj.init_template();
         }
     }
-    
+
     impl ObjectImpl for PwOutputBox {
         fn constructed(&self) {
-
             let manager = PwvucontrolManager::default();
 
             let obj = self.obj();
@@ -52,7 +48,6 @@ mod imp {
             }));
 
             self.parent_constructed();
-
 
             if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
                 let boundid = item.boundid();
@@ -75,15 +70,12 @@ mod imp {
                 widget.obj().update_output_device_dropdown();
             }));
         }
-    
     }
     impl WidgetImpl for PwOutputBox {}
     impl ListBoxRowImpl for PwOutputBox {}
     impl PwVolumeBoxImpl for PwOutputBox {}
-    
-    impl PwOutputBox {
 
-    }
+    impl PwOutputBox {}
 }
 
 glib::wrapper! {
@@ -94,9 +86,7 @@ glib::wrapper! {
 
 impl PwOutputBox {
     pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
-        glib::Object::builder()
-        .property("node-object", node_object)
-        .build()
+        glib::Object::builder().property("node-object", node_object).build()
     }
 
     pub(crate) fn update_output_device_dropdown(&self) {
@@ -141,7 +131,7 @@ impl PwOutputBox {
                     deftarget.boundid(),
                     deftarget.serial()
                 );
-                output_dropdown.set_selected_no_send(pos+1);
+                output_dropdown.set_selected_no_send(pos + 1);
             }
         } else {
             output_dropdown.set_selected_no_send(0);
@@ -163,5 +153,4 @@ impl PwOutputBox {
             // }
         }
     }
-
 }

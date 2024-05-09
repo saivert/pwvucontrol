@@ -14,10 +14,10 @@ use wp::{
 };
 use std::{str::FromStr, cell::RefCell};
 use crate::{
-    backend::pwnodeobject::PwNodeObject,
+    backend::PwNodeObject,
     ui::PwvucontrolWindowView,
-    backend::pwnodemodel::PwNodeModel,
-    backend::pwdeviceobject::PwDeviceObject,
+    backend::PwNodeModel,
+    backend::PwDeviceObject,
     ui::PwvucontrolWindow,
     PwvucontrolApplication,
     backend::NodeType,

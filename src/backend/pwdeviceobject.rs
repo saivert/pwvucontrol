@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::pwprofileobject::PwProfileObject;
+use crate::backend::PwProfileObject;
 use glib::{
     self, clone,
     subclass::{prelude::*, Signal},

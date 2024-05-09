@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use super::volumebox::PwVolumeBoxExt;
 use crate::{
-    backend::PwvucontrolManager,
-    backend::PwNodeObject,
-    ui::{PwVolumeBox, PwVolumeBoxImpl},
+    backend::{NodeType, PwNodeObject, PwvucontrolManager},
+    pwvucontrol_info,
+    ui::{PwRouteDropDown, PwVolumeBox, PwVolumeBoxImpl},
 };
 use glib::clone;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use wireplumber as wp;
-use super::volumebox::PwVolumeBoxExt;
-use crate::{backend::NodeType, pwvucontrol_info};
-use crate::ui::PwRouteDropDown;
 
 mod imp {
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]
@@ -91,19 +88,15 @@ mod imp {
             let manager = PwvucontrolManager::default();
 
             let core = manager.imp().wp_core.get().expect("Core");
-            let defaultnodesapi =
-                wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
+            let defaultnodesapi = wp::plugin::Plugin::find(core, "default-nodes-api").expect("Get mixer-api");
 
             let type_name = match node.nodetype() {
                 NodeType::Sink => "Audio/Sink",
                 NodeType::Source => "Audio/Source",
-                _ => unreachable!()
+                _ => unreachable!(),
             };
 
-            let result: bool = defaultnodesapi.emit_by_name(
-                "set-default-configured-node-name",
-                &[&type_name, &node_name],
-            );
+            let result: bool = defaultnodesapi.emit_by_name("set-default-configured-node-name", &[&type_name, &node_name]);
             wp::info!("set-default-configured-node-name result: {result:?}");
         }
     }
@@ -117,9 +110,7 @@ glib::wrapper! {
 
 impl PwSinkBox {
     pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
-        glib::Object::builder()
-            .property("node-object", node_object)
-            .build()
+        glib::Object::builder().property("node-object", node_object).build()
     }
 
     pub(crate) fn default_node_changed(&self) {
@@ -128,9 +119,7 @@ impl PwSinkBox {
         let id = self.default_node();
 
         imp.block_default_node_toggle_signal.set(true);
-        self.imp()
-            .default_sink_toggle
-            .set_active(node.boundid() == id);
+        self.imp().default_sink_toggle.set_active(node.boundid() == id);
         imp.block_default_node_toggle_signal.set(false);
     }
 }

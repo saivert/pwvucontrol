@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::PwDeviceObject;
+use crate::{
+    backend::{PwDeviceObject, PwProfileObject},
+    macros::*,
+    ui::PwProfileRow,
+};
+use glib::clone;
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
-use glib::clone;
-use wp::pw::ProxyExt;
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
-use crate::ui::PwProfileRow;
-use crate::macros::*;
+use wp::pw::ProxyExt;
 mod imp {
-    use crate::backend::PwProfileObject;
-
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
@@ -25,7 +25,6 @@ mod imp {
         pub profile_dropdown: TemplateChild<gtk::DropDown>,
 
         pub(super) block_signal: Cell<bool>,
-
         //pub(super) stringlist: RefCell<gtk::StringList>,
     }
 
@@ -114,26 +113,27 @@ mod imp {
 
                 self.block_signal.set(false);
 
-                deviceobject.connect_local("pre-update-profile", false,
+                deviceobject.connect_local(
+                    "pre-update-profile",
+                    false,
                     clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(true);
 
                         None
-                    })
+                    }),
                 );
-                deviceobject.connect_local("post-update-profile", false,
-                clone!(@weak self as widget => @default-return None, move |_| {
+                deviceobject.connect_local(
+                    "post-update-profile",
+                    false,
+                    clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(false);
                         widget.update_selected();
 
                         None
-                    })
+                    }),
                 );
 
-
-                deviceobject.connect_profile_index_notify(
-                    clone!(@weak self as widget => move |_| widget.update_selected())
-                );
+                deviceobject.connect_profile_index_notify(clone!(@weak self as widget => move |_| widget.update_selected()));
             } else {
                 self.profile_dropdown.set_model(gtk::gio::ListModel::NONE);
             }
@@ -159,10 +159,7 @@ mod imp {
 
             fn bind_handler(item: &glib::Object, dropdown: &gtk::DropDown) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                let profilerow = item
-                    .child()
-                    .and_downcast::<PwProfileRow>()
-                    .expect("PwProfileRow child");
+                let profilerow = item.child().and_downcast::<PwProfileRow>().expect("PwProfileRow child");
 
                 let signal = dropdown.connect_selected_item_notify(clone!(@weak item => move |dropdown| {
                     let profilerow = item
@@ -208,7 +205,7 @@ mod imp {
 
                 if let Some(deviceobject) = widget.deviceobject() {
                     pwvucontrol_critical!("Had set profile to {}", dropdown.selected());
-                    
+
                     deviceobject.set_profile(dropdown.selected() as i32);
                 }
             });

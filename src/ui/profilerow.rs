@@ -3,7 +3,6 @@
 use glib::closure_local;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
-
 use crate::backend::ParamAvailability;
 
 mod imp {

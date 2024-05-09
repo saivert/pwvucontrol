@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::pwnodeobject::PwNodeObject;
+use crate::{backend::PwNodeObject, macros::*};
 use std::cell::{Cell, RefCell};
 use gtk::{
     glib::{self, Properties, Value},
@@ -8,7 +8,6 @@ use gtk::{
     subclass::prelude::*
 };
 use wireplumber as wp;
-use crate::macros::*;
 
 mod imp {
     use super::*;

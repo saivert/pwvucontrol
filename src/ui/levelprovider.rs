@@ -5,7 +5,6 @@ use std::{fmt::Debug, time::Duration};
 use glib::{self, clone, ControlFlow};
 use pipewire::{properties, spa, stream::*, Context, Loop};
 use std::os::fd::AsRawFd;
-
 use crate::ui::PwVolumeBox;
 
 pub struct LevelbarProvider {

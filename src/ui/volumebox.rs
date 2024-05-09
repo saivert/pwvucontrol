@@ -1,17 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{
-    backend::PwvucontrolManager,
-    backend::PwNodeObject,
-    ui::PwChannelBox,
-    ui::LevelbarProvider,
-    backend::PwChannelObject,
-};
+use crate::{backend::PwChannelObject, backend::PwNodeObject, backend::PwvucontrolManager, ui::LevelbarProvider, ui::PwChannelBox};
 
-use glib::{clone, ControlFlow, closure_local, SignalHandlerId};
+use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
-use std::cell::{Cell, RefCell};
 use once_cell::sync::OnceCell;
+use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
@@ -23,14 +17,14 @@ mod imp {
     pub struct PwVolumeBox {
         #[property(get, set, construct_only)]
         pub(super) node_object: RefCell<Option<PwNodeObject>>,
-    
+
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
         levelbarprovider: OnceCell<LevelbarProvider>,
         timeoutid: Cell<Option<glib::SourceId>>,
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
         pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
-    
+
         // Template widgets
         #[template_child]
         pub icon: TemplateChild<gtk::Image>,
@@ -58,64 +52,61 @@ mod imp {
         pub monitorvolumescale: TemplateChild<gtk::Scale>,
         #[template_child]
         pub container: TemplateChild<gtk::Box>,
-
     }
-    
+
     #[glib::object_subclass]
     impl ObjectSubclass for PwVolumeBox {
         const NAME: &'static str = "PwVolumeBox";
         type Type = super::PwVolumeBox;
         type ParentType = gtk::ListBoxRow;
         type Interfaces = (gtk::Buildable,);
-    
+
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
             klass.bind_template_callbacks();
         }
-    
+
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
             obj.init_template();
         }
     }
-    
+
     #[glib::derived_properties]
     impl ObjectImpl for PwVolumeBox {
         fn constructed(&self) {
             fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
                 Some(i.cbrt() as f64)
             }
-    
+
             fn cubic_to_linear(_binding: &glib::Binding, i: f64) -> Option<f32> {
                 Some((i * i * i) as f32)
             }
-    
+
             self.parent_constructed();
 
             let item = self.node_object.borrow();
             let item = item.as_ref().cloned().unwrap();
-    
+
             self.icon.set_icon_name(Some(&item.iconname()));
-    
-            item.bind_property("name", &self.title_label.get(), "label")
-                .sync_create()
-                .build();
-    
+
+            item.bind_property("name", &self.title_label.get(), "label").sync_create().build();
+
             item.bind_property("description", &self.subtitle_label.get(), "label")
                 .sync_create()
                 .build();
-    
+
             item.bind_property("mute", &self.mutebtn.get(), "active")
                 .sync_create()
                 .bidirectional()
                 .build();
-    
+
             item.bind_property("volume", &self.volume_scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-    
+
             #[rustfmt::skip]
             item.bind_property("monitorvolume", &self.monitorvolumescale.adjustment(), "value")
                 .sync_create()
@@ -123,27 +114,21 @@ mod imp {
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
-    
+
             self.volume_scale.set_format_value_func(|_scale, value| {
                 format!(
                     "{:>16}",
-                    format!(
-                        "{:.0}% ({:.2} dB)",
-                        value * 100.0,
-                        (value * value * value).log10() * 20.0
-                    )
+                    format!("{:.0}% ({:.2} dB)", value * 100.0, (value * value * value).log10() * 20.0)
                 )
             });
-    
-            item.bind_property("formatstr", &self.format.get(), "label")
-                .sync_create()
-                .build();
-    
+
+            item.bind_property("formatstr", &self.format.get(), "label").sync_create().build();
+
             item.bind_property("channellock", &self.channellock.get(), "active")
                 .sync_create()
                 .bidirectional()
                 .build();
-    
+
             item.bind_property("mainvolume", &self.mainvolumescale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
@@ -178,22 +163,21 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
-    
-            self.revealer
-                .connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
-                    widget.obj().grab_focus();
-                }));
-    
+
+            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
+                widget.obj().grab_focus();
+            }));
+
             self.level_bar.set_min_value(0.0);
             self.level_bar.set_max_value(1.0);
-    
+
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
-    
+
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider.set(provider).expect("Provider not set already");
-    
+
                 self.timeoutid.set(Some(glib::timeout_add_local(
                     std::time::Duration::from_millis(25),
                     clone!(@weak self as obj => @default-panic, move || {
@@ -203,7 +187,7 @@ mod imp {
                 )));
             }
         }
-    
+
         fn dispose(&self) {
             if let Some(sid) = self.metadata_changed_event.take() {
                 let manager = PwvucontrolManager::default();
@@ -234,7 +218,7 @@ mod imp {
             }
         }
     }
-    
+
     #[gtk::template_callbacks]
     impl PwVolumeBox {
         #[template_callback]
@@ -269,7 +253,7 @@ impl PwVolumeBox {
         handler.replace(Box::new(c));
     }
 }
-pub trait PwVolumeBoxImpl: ListBoxRowImpl  {}
+pub trait PwVolumeBoxImpl: ListBoxRowImpl {}
 
 pub trait PwVolumeBoxExt: IsA<PwVolumeBox> {
     fn default_node(&self) -> u32 {
@@ -290,6 +274,5 @@ impl<O: IsA<PwVolumeBox>> PwVolumeBoxExt for O {}
 unsafe impl<T: PwVolumeBoxImpl> IsSubclassable<T> for PwVolumeBox {
     fn class_init(class: &mut glib::Class<Self>) {
         Self::parent_class_init::<T>(class.upcast_ref_mut());
-
     }
 }

@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use crate::{
+    backend::{NodeType, PwNodeObject, PwRouteFilterModel, PwRouteObject},
+    macros::*,
+    ui::PwProfileRow,
+};
+use glib::clone;
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
-use glib::clone;
-use wp::pw::ProxyExt;
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
-use crate::ui::PwProfileRow;
-use crate::macros::*;
+use wp::pw::ProxyExt;
 
 mod imp {
-    use crate::backend::{NodeType, PwNodeObject, PwRouteFilterModel, PwRouteObject};
-
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
@@ -60,7 +61,7 @@ mod imp {
             match nodeobject.nodetype() {
                 NodeType::Source => Some(deviceobject.route_index_input()),
                 NodeType::Sink => Some(deviceobject.route_index_output()),
-                _ => None
+                _ => None,
             }
         }
 
@@ -72,7 +73,7 @@ mod imp {
             match nodeobject.nodetype() {
                 NodeType::Source => Some(deviceobject.routemodel_input()),
                 NodeType::Sink => Some(deviceobject.routemodel_output()),
-                _ => None
+                _ => None,
             }
         }
 
@@ -80,7 +81,6 @@ mod imp {
             self.nodeobject.replace(new_nodeobject.cloned());
 
             if let Some(nodeobject) = new_nodeobject {
-
                 let deviceobject = nodeobject.get_device().expect("device");
 
                 self.block_signal.set(true);
@@ -93,27 +93,29 @@ mod imp {
 
                 self.block_signal.set(false);
 
-                deviceobject.connect_local("pre-update-route", false,
+                deviceobject.connect_local(
+                    "pre-update-route",
+                    false,
                     clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(true);
 
                         None
-                    })
+                    }),
                 );
 
-                deviceobject.connect_local("post-update-route", false,
-                clone!(@weak self as widget => @default-return None, move |_| {
+                deviceobject.connect_local(
+                    "post-update-route",
+                    false,
+                    clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(false);
                         pwvucontrol_info!("About to call widget.update_selected() inside post-update-route handler");
                         widget.update_selected();
 
                         None
-                    })
+                    }),
                 );
 
-                deviceobject.connect_route_index_output_notify(
-                    clone!(@weak self as widget => move |_| widget.update_selected())
-                );
+                deviceobject.connect_route_index_output_notify(clone!(@weak self as widget => move |_| widget.update_selected()));
             } else {
                 self.route_dropdown.set_model(gtk::gio::ListModel::NONE);
             }
@@ -139,10 +141,7 @@ mod imp {
 
             fn bind_handler(item: &glib::Object, dropdown: &gtk::DropDown) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                let profilerow = item
-                    .child()
-                    .and_downcast::<PwProfileRow>()
-                    .expect("PwProfileRow child");
+                let profilerow = item.child().and_downcast::<PwProfileRow>().expect("PwProfileRow child");
 
                 let signal = dropdown.connect_selected_item_notify(clone!(@weak item => move |dropdown| {
                     let profilerow = item
@@ -176,7 +175,6 @@ mod imp {
             self.route_dropdown.set_factory(Some(&factory));
             self.route_dropdown.set_list_factory(Some(&list_factory));
 
-
             let widget = self.obj();
             let selected_handler = closure_local!(
                 @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
@@ -206,7 +204,6 @@ glib::wrapper! {
 }
 
 impl PwRouteDropDown {
-
     pub fn set_selected_no_send(&self, position: u32) {
         let imp = self.imp();
 

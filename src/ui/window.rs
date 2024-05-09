@@ -1,26 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use gtk::{
-    gio,
-    prelude::*,
-    subclass::prelude::*,
-};
-use glib::clone;
-use adw::subclass::prelude::*;
-use crate::{backend::{PwDeviceObject, PwvucontrolManager}, ui::devicebox::PwDeviceBox};
+use crate::macros::*;
 use crate::{
     application::PwvucontrolApplication,
-    ui::PwVolumeBox,
-    backend::PwNodeObject,
-    ui::PwSinkBox,
-    ui::PwOutputBox,
-    config::{APP_ID, PROFILE}
+    backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
+    config::{APP_ID, PROFILE},
+    ui::{devicebox::PwDeviceBox, PwOutputBox, PwSinkBox, PwVolumeBox},
 };
-use crate::macros::*;
+use adw::subclass::prelude::*;
+use glib::clone;
+use gtk::{gio, prelude::*};
 
 pub enum PwvucontrolWindowView {
     Connected,
-    Disconnected
+    Disconnected,
 }
 mod imp {
     use super::*;
@@ -62,7 +55,7 @@ mod imp {
                 cardlist: TemplateChild::default(),
                 viewstack: TemplateChild::default(),
                 reconnectbtn: TemplateChild::default(),
-                settings: gio::Settings::new(APP_ID)
+                settings: gio::Settings::new(APP_ID),
             }
         }
     }
@@ -75,7 +68,7 @@ mod imp {
 
         fn class_init(klass: &mut Self::Class) {
             PwVolumeBox::ensure_type();
-            
+
             klass.bind_template();
             klass.bind_template_callbacks();
         }
@@ -83,7 +76,6 @@ mod imp {
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
             obj.init_template();
         }
-
     }
 
     impl ObjectImpl for PwvucontrolWindow {
@@ -162,7 +154,6 @@ mod imp {
             });
 
             self.obj().load_window_state();
-
         }
     }
     impl WidgetImpl for PwvucontrolWindow {}
@@ -180,8 +171,7 @@ mod imp {
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
 
     #[gtk::template_callbacks]
-    impl PwvucontrolWindow {
-    }
+    impl PwvucontrolWindow {}
 }
 
 glib::wrapper! {
@@ -192,9 +182,7 @@ glib::wrapper! {
 
 impl PwvucontrolWindow {
     pub fn new(application: &PwvucontrolApplication) -> Self {
-        glib::Object::builder()
-        .property("application", application)
-        .build()
+        glib::Object::builder().property("application", application).build()
     }
 
     pub(crate) fn set_view(&self, view: PwvucontrolWindowView) {
@@ -203,7 +191,6 @@ impl PwvucontrolWindow {
             PwvucontrolWindowView::Connected => imp.viewstack.set_visible_child_name("connected"),
             PwvucontrolWindowView::Disconnected => imp.viewstack.set_visible_child_name("disconnected"),
         }
-        
     }
 
     fn save_window_size(&self) -> Result<(), glib::BoolError> {
@@ -231,44 +218,44 @@ impl PwvucontrolWindow {
         if is_maximized {
             self.maximize();
         }
-
     }
 
     /// This prevents child widgets from capturing scroll events
     fn setup_scroll_blocker(&self, listbox: &gtk::ListBox) {
-            let scrolledwindow = listbox.ancestor(gtk::ScrolledWindow::static_type()).and_then(|x|{
-                x.downcast::<gtk::ScrolledWindow>().ok()
-            }).expect("downcast to scrolled window");
+        let scrolledwindow = listbox
+            .ancestor(gtk::ScrolledWindow::static_type())
+            .and_then(|x| x.downcast::<gtk::ScrolledWindow>().ok())
+            .expect("downcast to scrolled window");
 
-            let ecs = gtk::EventControllerScroll::new(gtk::EventControllerScrollFlags::VERTICAL);
-            ecs.set_propagation_phase(gtk::PropagationPhase::Capture);
-            ecs.set_propagation_limit(gtk::PropagationLimit::SameNative);
+        let ecs = gtk::EventControllerScroll::new(gtk::EventControllerScrollFlags::VERTICAL);
+        ecs.set_propagation_phase(gtk::PropagationPhase::Capture);
+        ecs.set_propagation_limit(gtk::PropagationLimit::SameNative);
 
-            // Need to actually handle the scroll event in order to block propagation
-            ecs.connect_local("scroll", false, clone!(@weak scrolledwindow => @default-return None, move |v| {
+        // Need to actually handle the scroll event in order to block propagation
+        ecs.connect_local(
+            "scroll",
+            false,
+            clone!(@weak scrolledwindow => @default-return None, move |v| {
                 let y: f64 = v.get(2).unwrap().get().unwrap();
 
                 // No way to redirect this event to underlying widget so we need to reimplement the scroll handling
                 let adjustment = scrolledwindow.vadjustment();
-                
+
                 if (adjustment.upper() - adjustment.page_size()).abs() < f64::EPSILON {
                     return Some(false.to_value());
                 }
-                
+
                 adjustment.set_value(adjustment.value() + y*adjustment.page_size().powf(2.0 / 3.0));
-                
+
                 Some(true.to_value())
-            }));
-            scrolledwindow.add_controller(ecs);
+            }),
+        );
+        scrolledwindow.add_controller(ecs);
     }
 }
 
 impl Default for PwvucontrolWindow {
     fn default() -> Self {
-        PwvucontrolApplication::default()
-            .active_window()
-            .unwrap()
-            .downcast()
-            .unwrap()
+        PwvucontrolApplication::default().active_window().unwrap().downcast().unwrap()
     }
 }
