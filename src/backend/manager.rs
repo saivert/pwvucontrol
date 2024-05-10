@@ -1,30 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use crate::macros::*;
+use crate::{
+    backend::NodeType, backend::PwDeviceObject, backend::PwNodeFilterModel, backend::PwNodeModel, backend::PwNodeObject, ui::PwvucontrolWindow,
+    ui::PwvucontrolWindowView, PwvucontrolApplication,
+};
 use gtk::{
     gio,
     glib::{self, clone, Properties},
     prelude::*,
     subclass::prelude::*,
 };
+use once_cell::unsync::OnceCell;
+use std::{cell::RefCell, str::FromStr};
 use wireplumber as wp;
 use wp::{
     plugin::{PluginFeatures, *},
-    pw::{MetadataExt, ProxyExt, PipewireObjectExt2},
-    registry::{ObjectManager, Interest, Constraint, ConstraintType}
+    pw::{MetadataExt, PipewireObjectExt2, ProxyExt},
+    registry::{Constraint, ConstraintType, Interest, ObjectManager},
 };
-use std::{str::FromStr, cell::RefCell};
-use crate::{
-    backend::PwNodeObject,
-    ui::PwvucontrolWindowView,
-    backend::PwNodeModel,
-    backend::PwDeviceObject,
-    ui::PwvucontrolWindow,
-    PwvucontrolApplication,
-    backend::NodeType,
-    backend::PwNodeFilterModel
-};
-use crate::macros::*;
-use once_cell::unsync::OnceCell;
 
 mod imp {
 
@@ -137,55 +131,44 @@ mod imp {
                 None
             });
 
-
             wp_core.connect();
 
-            wp_core.load_component("libwireplumber-module-mixer-api", "module", None)
+            wp_core
+                .load_component("libwireplumber-module-mixer-api", "module", None)
                 .expect("loadig mixer-api plugin");
-            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None)
+            wp_core
+                .load_component("libwireplumber-module-default-nodes-api", "module", None)
                 .expect("loadig mixer-api plugin");
 
-            wp_om.add_interest(
-                {
-                    let interest = wp::registry::ObjectInterest::new(
-                        wp::pw::Node::static_type(),
-                    );
-                    let variant = glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Source', 'Audio/Sink')")
-                        .expect("variant");
-                    interest.add_constraint(
-                        wp::registry::ConstraintType::PwGlobalProperty,
-                        "media.class",
-                        wp::registry::ConstraintVerb::InList,
-                        Some(&variant));
-    
-                    interest
-                }
-            );
+            wp_om.add_interest({
+                let interest = wp::registry::ObjectInterest::new(wp::pw::Node::static_type());
+                let variant =
+                    glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Source', 'Audio/Sink')").expect("variant");
+                interest.add_constraint(
+                    wp::registry::ConstraintType::PwGlobalProperty,
+                    "media.class",
+                    wp::registry::ConstraintVerb::InList,
+                    Some(&variant),
+                );
 
-            wp_om.add_interest(
-                {
-                    let interest = wp::registry::ObjectInterest::new(
-                        wp::pw::Device::static_type(),
-                    );
-                    interest.add_constraint(
-                        wp::registry::ConstraintType::PwGlobalProperty,
-                        "media.class",
-                        wp::registry::ConstraintVerb::Equals,
-                        Some(&"Audio/Device".to_variant()));
-    
-                    interest
-                }
-            );
+                interest
+            });
 
-            wp_om.request_object_features(
-                wp::pw::Node::static_type(),
-                wp::core::ObjectFeatures::ALL,
-            );
+            wp_om.add_interest({
+                let interest = wp::registry::ObjectInterest::new(wp::pw::Device::static_type());
+                interest.add_constraint(
+                    wp::registry::ConstraintType::PwGlobalProperty,
+                    "media.class",
+                    wp::registry::ConstraintVerb::Equals,
+                    Some(&"Audio/Device".to_variant()),
+                );
 
-            wp_om.request_object_features(
-                wp::pw::GlobalProxy::static_type(),
-                wp::core::ObjectFeatures::ALL,
-            );
+                interest
+            });
+
+            wp_om.request_object_features(wp::pw::Node::static_type(), wp::core::ObjectFeatures::ALL);
+
+            wp_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
             wp_om.connect_object_added(
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
