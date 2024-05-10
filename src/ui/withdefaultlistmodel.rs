@@ -45,16 +45,14 @@ mod imp {
             glib::Object::static_type()
         }
         fn n_items(&self) -> u32 {
-            let model = self.flatten_list_model.borrow();
-            if let Some(model) = model.as_ref() {
+            if let Some(model) = &*self.flatten_list_model.borrow() {
                 model.n_items()
             } else {
                 0
             }
         }
         fn item(&self, position: u32) -> Option<glib::Object> {
-            let model = self.flatten_list_model.borrow();
-            if let Some(model) = model.as_ref() {
+            if let Some(model) = &*self.flatten_list_model.borrow() {
                 model.item(position)
             } else {
                 None
@@ -64,12 +62,10 @@ mod imp {
 
     impl WithDefaultListModel {
         pub fn set_model(&self, new_model: Option<&PwNodeFilterModel>) {
-            let removed = self.n_items();
-
-            let string_list = self.string_list.borrow().clone();
+            let string_list = &*self.string_list.borrow();
 
             let composite_store = gio::ListStore::new::<gio::ListModel>();
-            composite_store.append(&string_list);
+            composite_store.append(string_list);
 
             if let Some(new_model) = new_model {
                 composite_store.append(new_model);
@@ -83,10 +79,7 @@ mod imp {
             });
             flattened_model.connect_closure("items-changed", true, handler);
 
-            let added = flattened_model.n_items();
             self.flatten_list_model.replace(Some(flattened_model));
-
-            self.obj().items_changed(0, removed, added);
         }
     }
 }
