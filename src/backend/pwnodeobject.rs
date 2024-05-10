@@ -474,7 +474,7 @@ impl PwNodeObject {
 
         let manager = PwvucontrolManager::default();
 
-        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+        if let Some(metadata) = manager.metadata() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
             metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some(&target_node.serial().to_string()));
         } else {
@@ -510,7 +510,7 @@ impl PwNodeObject {
         let manager = PwvucontrolManager::default();
 
         let om = manager.imp().wp_object_manager.get().unwrap();
-        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+        if let Some(metadata) = manager.metadata() {
             if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
                 if target_serial != "-1" {
                     if let Some(sinknode) = om.lookup([
@@ -545,7 +545,7 @@ impl PwNodeObject {
     pub(crate) fn unset_default_target(&self) {
         let manager = PwvucontrolManager::default();
 
-        if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+        if let Some(metadata) = manager.metadata() {
             metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some("-1"));
             metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some("-1"));
         } else {

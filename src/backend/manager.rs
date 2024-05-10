@@ -50,6 +50,7 @@ mod imp {
         pub(crate) device_model: gio::ListStore,
 
         pub metadata_om: OnceCell<wp::registry::ObjectManager>,
+        #[property(get)]
         pub metadata: RefCell<Option<wp::pw::Metadata>>,
 
         #[property(get)]

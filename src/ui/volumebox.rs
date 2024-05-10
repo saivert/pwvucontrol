@@ -191,7 +191,7 @@ mod imp {
         fn dispose(&self) {
             if let Some(sid) = self.metadata_changed_event.take() {
                 let manager = PwvucontrolManager::default();
-                if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+                if let Some(metadata) = manager.metadata() {
                     metadata.disconnect(sid);
                 };
             };
