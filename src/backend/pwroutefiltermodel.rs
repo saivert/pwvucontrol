@@ -4,7 +4,7 @@ use super::{ParamAvailability, PwRouteObject, RouteDirection};
 use glib::{closure_local, subclass::prelude::*, Properties};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
-use std::collections::BTreeSet;
+use imbl::OrdSet;
 
 mod imp {
     use super::*;
@@ -13,7 +13,7 @@ mod imp {
     #[properties(wrapper_type = super::PwRouteFilterModel)]
     pub struct PwRouteFilterModel {
         /// Contains the items that matches the filter predicate.
-        pub(super) hashset: RefCell<BTreeSet<u32>>,
+        pub(super) hashset: RefCell<OrdSet<u32>>,
 
         #[property(get, set, construct_only, builder(RouteDirection::Unknown))]
         pub(super) direction: Cell<RouteDirection>,
@@ -53,6 +53,8 @@ mod imp {
 
     impl PwRouteFilterModel {
         pub fn set_model(&self, new_model: Option<&gio::ListModel>) {
+
+            
             if let Some(new_model) = new_model {
                 assert!(self.item_type().is_a(new_model.item_type()));
 
@@ -60,7 +62,7 @@ mod imp {
                 let handler = closure_local!(@watch widget => move |listmodel: &gio::ListModel, position: u32, _removed: u32, _added: u32| {
                     let removed = widget.imp().hashset.borrow().len() as u32;
 
-                    let mut hashset = BTreeSet::new();
+                    let mut hashset = OrdSet::new();
 
                     for (a, routeobject) in listmodel.iter::<PwRouteObject>()
                         .skip(position as usize)

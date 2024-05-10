@@ -3,7 +3,7 @@
 use crate::backend::PwNodeObject;
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
-use im_rc::Vector;
+use imbl::Vector;
 
 mod imp {
     use super::*;
