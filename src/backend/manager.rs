@@ -343,6 +343,17 @@ impl PwvucontrolManager {
         }
         None
     }
+
+    pub fn get_model_for_nodetype(&self, nodetype: NodeType) -> PwNodeFilterModel {
+        match nodetype {
+            NodeType::Sink => self.sink_model(),
+            NodeType::Source => self.source_model(),
+            NodeType::StreamInput => self.stream_input_model(),
+            NodeType::StreamOutput => self.stream_output_model(),
+            _ => unreachable!()
+        }
+    }
+
 }
 
 impl Default for PwvucontrolManager {

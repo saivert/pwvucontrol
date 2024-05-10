@@ -108,7 +108,7 @@ mod imp {
             self.recordlist.bind_model(
                 Some(&manager.stream_input_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
-                    PwVolumeBox::new(
+                    PwOutputBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )

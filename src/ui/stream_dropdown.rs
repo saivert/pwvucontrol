@@ -11,13 +11,15 @@ use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
+    use crate::{backend::NodeType, pwvucontrol_warning};
+
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
     #[properties(wrapper_type = super::PwOutputDropDown)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/output-dropdown.ui")]
-    pub struct PwOutputDropDown {
-        #[property(get, set, nullable)]
+    pub struct PwStreamDropDown {
+        #[property(get, set = Self::set_nodeobj, nullable)]
         pub(super) nodeobj: RefCell<Option<PwNodeObject>>,
 
         #[template_child]
@@ -28,7 +30,7 @@ mod imp {
     }
 
     #[glib::object_subclass]
-    impl ObjectSubclass for PwOutputDropDown {
+    impl ObjectSubclass for PwStreamDropDown {
         const NAME: &'static str = "PwOutputDropDown";
         type Type = super::PwOutputDropDown;
         type ParentType = gtk::Widget;
@@ -45,12 +47,29 @@ mod imp {
     }
 
     #[gtk::template_callbacks]
-    impl PwOutputDropDown {
+    impl PwStreamDropDown {
+        fn set_nodeobj(&self, nodeobj: Option<&PwNodeObject>) {
+            let manager = PwvucontrolManager::default();
 
+            let Some(nodeobj) = nodeobj else {
+                pwvucontrol_warning!("PwOutputDropDown::set_nodeobj: Tried to set nodeobj to None");
+                return;
+            };
+
+            let model = match nodeobj.nodetype() {
+                NodeType::StreamOutput => manager.sink_model(),
+                NodeType::StreamInput => manager.source_model(),
+                _ => return,
+            };
+
+            self.dropdown_model.replace(WithDefaultListModel::new(Some(&model)));
+            self.outputdevice_dropdown.set_model(Some(&*self.dropdown_model.borrow()));
+
+        }
     }
 
     #[glib::derived_properties]
-    impl ObjectImpl for PwOutputDropDown {
+    impl ObjectImpl for PwStreamDropDown {
         // Needed for direct subclasses of GtkWidget;
         // Here you need to unparent all direct children
         // of your template.
@@ -61,7 +80,6 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            let manager = PwvucontrolManager::default();
 
             
             fn setup_handler(item: &glib::Object) {
@@ -99,8 +117,6 @@ mod imp {
             self.outputdevice_dropdown.set_factory(Some(&factory));
             self.outputdevice_dropdown.set_list_factory(default_dropdown_factory.as_ref());
 
-            let sinkmodel = &manager.sink_model();
-
             self.outputdevice_dropdown.set_enable_search(true);
 
 
@@ -116,8 +132,6 @@ mod imp {
                     }),
                 )));
 
-            self.dropdown_model.replace(WithDefaultListModel::new(Some(sinkmodel)));
-            self.outputdevice_dropdown.set_model(Some(&*self.dropdown_model.borrow()));
 
             let widget = self.obj();
             let selected_handler = closure_local!(
@@ -146,11 +160,11 @@ mod imp {
         }
     }
 
-    impl WidgetImpl for PwOutputDropDown {}
+    impl WidgetImpl for PwStreamDropDown {}
 }
 
 glib::wrapper! {
-    pub struct PwOutputDropDown(ObjectSubclass<imp::PwOutputDropDown>) @extends gtk::Widget;
+    pub struct PwOutputDropDown(ObjectSubclass<imp::PwStreamDropDown>) @extends gtk::Widget;
 }
 
 impl PwOutputDropDown {

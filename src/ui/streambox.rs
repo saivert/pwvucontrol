@@ -16,13 +16,13 @@ mod imp {
 
     #[derive(Default, gtk::CompositeTemplate)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/outputbox.ui")]
-    pub struct PwOutputBox {
+    pub struct PwStreamBox {
         #[template_child]
         pub output_dropdown: TemplateChild<PwOutputDropDown>,
     }
 
     #[glib::object_subclass]
-    impl ObjectSubclass for PwOutputBox {
+    impl ObjectSubclass for PwStreamBox {
         const NAME: &'static str = "PwOutputBox";
         type Type = super::PwOutputBox;
         type ParentType = PwVolumeBox;
@@ -36,7 +36,7 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for PwOutputBox {
+    impl ObjectImpl for PwStreamBox {
         fn constructed(&self) {
             let manager = PwvucontrolManager::default();
 
@@ -49,7 +49,7 @@ mod imp {
 
             self.parent_constructed();
 
-            if let Some(metadata) = manager.imp().metadata.borrow().as_ref() {
+            if let Some(metadata) = manager.metadata() {
                 let boundid = item.boundid();
                 let widget = self.obj();
                 let changed_closure = closure_local!(@watch widget =>
@@ -71,15 +71,15 @@ mod imp {
             }));
         }
     }
-    impl WidgetImpl for PwOutputBox {}
-    impl ListBoxRowImpl for PwOutputBox {}
-    impl PwVolumeBoxImpl for PwOutputBox {}
+    impl WidgetImpl for PwStreamBox {}
+    impl ListBoxRowImpl for PwStreamBox {}
+    impl PwVolumeBoxImpl for PwStreamBox {}
 
-    impl PwOutputBox {}
+    impl PwStreamBox {}
 }
 
 glib::wrapper! {
-    pub struct PwOutputBox(ObjectSubclass<imp::PwOutputBox>)
+    pub struct PwOutputBox(ObjectSubclass<imp::PwStreamBox>)
         @extends gtk::Widget, gtk::ListBoxRow, PwVolumeBox,
         @implements gtk::Actionable;
 }
@@ -92,7 +92,9 @@ impl PwOutputBox {
     pub(crate) fn update_output_device_dropdown(&self) {
         let manager = PwvucontrolManager::default();
 
-        let sinkmodel = manager.sink_model();
+        let item = self.node_object().expect("nodeobj");
+
+        let sinkmodel = manager.get_model_for_nodetype(item.nodetype());
 
         let imp = self.imp();
 
@@ -107,7 +109,6 @@ impl PwOutputBox {
         };
         output_dropdown.set_default_text(&string);
 
-        let item = self.node_object().expect("nodeobj");
 
         if let Some(deftarget) = item.default_target() {
             // let model: gio::ListModel = imp
