@@ -60,18 +60,19 @@ mod imp {
                 let handler = closure_local!(@watch widget => move |listmodel: &gio::ListModel, position: u32, _removed: u32, _added: u32| {
                     let removed = widget.imp().hashset.borrow().len() as u32;
 
-                    widget.imp().hashset.borrow_mut().clear();
+                    let mut hashset = BTreeSet::new();
 
                     for (a, routeobject) in listmodel.iter::<PwRouteObject>()
                         .skip(position as usize)
                         .map_while(Result::ok)
                         .enumerate() {
                         if routeobject.direction() == widget.direction() && routeobject.availability() == ParamAvailability::Yes {
-                            widget.imp().hashset.borrow_mut().insert(a as u32);
+                            hashset.insert(a as u32);
                         }
                     }
 
-                    let added = widget.imp().hashset.borrow().len() as u32;
+                    let added = hashset.len() as u32;
+                    widget.imp().hashset.replace(hashset);
                     widget.items_changed(0, removed, added);
                 });
                 handler.invoke::<()>(&[&new_model, &0u32, &0u32, &0u32]);
