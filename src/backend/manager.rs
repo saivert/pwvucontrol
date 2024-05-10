@@ -212,23 +212,12 @@ mod imp {
             }));
 
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
-                let devicemodel = &imp.device_model;
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
                     let model = &imp.node_model;
                     model.remove(node.bound_id());
-
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
-                    for item in devicemodel.iter::<PwDeviceObject>() {
-                        if let Ok(item) = item {
-                            if item.wpdevice().bound_id() == device.bound_id() {
-                                if let Some(pos) = devicemodel.find(&item) {
-                                    pwvucontrol_info!("Removed device {} @ pos {pos}", device.bound_id());
-                                    devicemodel.remove(pos);
-                                }
-                            }
-                        }
-                    }
+                    imp.obj().remove_device_by_id(device.bound_id());
                 } else {
                     pwvucontrol_info!("Object must be one of the above, but is {:?} instead", object.type_());
                 }
@@ -264,7 +253,6 @@ mod imp {
             self.wp_object_manager
                 .set(wp_om)
                 .expect("wp_object_manager should only be set once during application activation");
-   
         }
 
         fn setup_metadata_om(&self) {
@@ -297,11 +285,9 @@ mod imp {
 
             }));
 
-
             wp_core.install_object_manager(&metadata_om);
             self.metadata_om.set(metadata_om).expect("metadata object manager set already");
         }
-
     }
 }
 
@@ -310,9 +296,8 @@ glib::wrapper! {
 }
 
 impl PwvucontrolManager {
-    pub fn new () -> Self {
-        glib::Object::builder()
-            .build()
+    pub fn new() -> Self {
+        glib::Object::builder().build()
     }
 
     pub fn get_device_by_id(&self, id: u32) -> Option<PwDeviceObject> {
@@ -322,9 +307,26 @@ impl PwvucontrolManager {
                 if device.wpdevice().bound_id() == id {
                     return Some(device);
                 }
+            } else {
+                panic!("Device model mutated during iteration!");
             }
         }
         None
+    }
+
+    pub fn remove_device_by_id(&self, id: u32) {
+        let devicemodel = &self.imp().device_model;
+
+        for (i, item) in (0..).zip(devicemodel.iter::<PwDeviceObject>()) {
+            if let Ok(item) = item {
+                if item.wpdevice().bound_id() == id {
+                    devicemodel.remove(i);
+                    break;
+                }
+            } else {
+                panic!("Device model mutated during iteration!");
+            }
+        }
     }
 
     pub fn get_node_by_id(&self, id: u32) -> Option<PwNodeObject> {
@@ -334,6 +336,8 @@ impl PwvucontrolManager {
                 if node.wpnode().bound_id() == id {
                     return Some(node);
                 }
+            } else {
+                panic!("Node model mutated during iteration!");
             }
         }
         None
