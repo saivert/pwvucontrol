@@ -170,41 +170,33 @@ mod imp {
 
             wp_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
-            wp_om.connect_object_added(
-                clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
-                    let devicemodel = &imp.device_model;
-                    if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
-                        // Hide ourselves.
-                        if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
-                            return;
-                        }
+            wp_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+                let devicemodel = &imp.device_model;
+                if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                    // Hide ourselves.
+                    if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
+                        return;
+                    }
 
-                        // Hide any playback from pavucontrol (mainly volume control notification sound).
-                        if node.name().unwrap_or_default() == "pavucontrol" {
-                            return;
-                        }
+                    // Hide any playback from pavucontrol (mainly volume control notification sound).
+                    if node.name().unwrap_or_default() == "pavucontrol" {
+                        return;
+                    }
 
-                        // Hide any notification sounds.
-                        // The presence of the event.id property means most likely this is an event sound.
-                        if node.pw_property::<String>("event.id").is_ok() {
-                            return;
-                        }
-                        // Or media.role being Notification.
-                        if node.pw_property::<String>("media.role").unwrap_or_default() == "Notification" {
-                            return;
-                        }
+                    // Hide any notification sounds.
+                    // The presence of the event.id property means most likely this is an event sound.
+                    if node.pw_property::<String>("event.id").is_ok() {
+                        return;
+                    }
+                    // Or media.role being Notification.
+                    if node.pw_property::<String>("media.role").unwrap_or_default() == "Notification" {
+                        return;
+                    }
 
-                        // Hide applications that only record for peak meter.
-                        if node.pw_property::<String>("media.class").unwrap_or_default() == "Stream/Input/Audio" {
-                            if let Ok(medianame) = node.pw_property::<String>("application.id") {
-                                let hidden_apps = ["org.PulseAudio.pavucontrol", "org.gnome.VolumeControl", "org.kde.kmixd"];
-                                for app in hidden_apps {
-                                    if app == medianame {
-                                        return;
-                                    }
-                                }
-                            }
-                        }
+                    // Hide applications that only record for peak meter.
+                    if node.pw_property::<String>("stream.monitor").is_ok() {
+                        return;
+                    }
 
                         pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                         let pwobj = PwNodeObject::new(node);
