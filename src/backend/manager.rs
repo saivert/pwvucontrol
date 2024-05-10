@@ -191,14 +191,27 @@ mod imp {
                 clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                     let devicemodel = &imp.device_model;
                     if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
-                        // Hide ourselves
-                        if node.name() == Some("pwvucontrol-peak-detect".to_string()) {
+                        // Hide ourselves.
+                        if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
                             return;
                         }
-                        // Hide any playback from pavucontrol (mainly volume control notification sound)
-                        if node.name() == Some("pavucontrol".to_string()) {
+
+                        // Hide any playback from pavucontrol (mainly volume control notification sound).
+                        if node.name().unwrap_or_default() == "pavucontrol" {
                             return;
                         }
+
+                        // Hide any notification sounds.
+                        // The presence of the event.id property means most likely this is an event sound.
+                        if node.pw_property::<String>("event.id").is_ok() {
+                            return;
+                        }
+                        // Or media.role being Notification.
+                        if node.pw_property::<String>("media.role").unwrap_or_default() == "Notification" {
+                            return;
+                        }
+
+                        // Hide applications that only record for peak meter.
                         if node.pw_property::<String>("media.class").unwrap_or_default() == "Stream/Input/Audio" {
                             if let Ok(medianame) = node.pw_property::<String>("application.id") {
                                 let hidden_apps = ["org.PulseAudio.pavucontrol", "org.gnome.VolumeControl", "org.kde.kmixd"];
@@ -209,6 +222,7 @@ mod imp {
                                 }
                             }
                         }
+
                         pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                         let pwobj = PwNodeObject::new(node);
                         let model = &imp.node_model;
