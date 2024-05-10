@@ -198,19 +198,18 @@ mod imp {
                         return;
                     }
 
-                        pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
-                        let pwobj = PwNodeObject::new(node);
-                        let model = &imp.node_model;
-                        model.append(&pwobj);
-                    } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
-                        let n: String = device.pw_property("device.name").unwrap();
-                        pwvucontrol_info!("Got device: {n} bound id {}", device.bound_id());
-                        devicemodel.append(&PwDeviceObject::new(device));
-                    } else {
-                        unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
-                    }
-                }),
-            );
+                    pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
+                    let pwobj = PwNodeObject::new(node);
+                    let model = &imp.node_model;
+                    model.append(&pwobj);
+                } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
+                    let n: String = device.pw_property("device.name").unwrap();
+                    pwvucontrol_info!("Got device: {n} bound id {}", device.bound_id());
+                    devicemodel.append(&PwDeviceObject::new(device));
+                } else {
+                    unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+                }
+            }));
 
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
                 let devicemodel = &imp.device_model;
@@ -273,31 +272,26 @@ mod imp {
 
             let wp_core = self.wp_core.get().expect("wp_core to be set");
 
-            metadata_om.add_interest([
-                Constraint::compare(ConstraintType::PwGlobalProperty, "metadata.name", "default", true),
-            ].iter().collect::<Interest<wp::pw::Metadata>>());
-
-            metadata_om.request_object_features(
-                wp::pw::GlobalProxy::static_type(),
-                wp::core::ObjectFeatures::ALL,
+            metadata_om.add_interest(
+                [Constraint::compare(ConstraintType::PwGlobalProperty, "metadata.name", "default", true)]
+                    .iter()
+                    .collect::<Interest<wp::pw::Metadata>>(),
             );
 
-            metadata_om.connect_object_added(
-                clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
-                    if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
-                        pwvucontrol_info!("added metadata object: {:?}", metadataobj.bound_id());
-                        imp.metadata.replace(Some(metadataobj.clone()));
-                        for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
-                            let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
-                            pwvucontrol_info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
-                        }
-                    } else {
-                        unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+            metadata_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
+
+            metadata_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+                if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
+                    pwvucontrol_info!("added metadata object: {:?}", metadataobj.bound_id());
+                    imp.metadata.replace(Some(metadataobj.clone()));
+                    for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
+                        let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
+                        pwvucontrol_info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
                     }
-                }),
-            );
-
-
+                } else {
+                    unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+                }
+            }));
 
             metadata_om.connect_objects_changed(clone!(@weak self as imp => move |_| {
 
