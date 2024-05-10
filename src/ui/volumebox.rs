@@ -235,12 +235,6 @@ glib::wrapper! {
 }
 
 impl PwVolumeBox {
-    pub(crate) fn new(channel_object: &impl glib::IsA<PwNodeObject>) -> Self {
-        glib::Object::builder()
-            .property("node-object", channel_object)
-            //.property("channelmodel", gio::ListStore::new::<PwChannelObject>())
-            .build()
-    }
 
     pub(crate) fn set_level(&self, level: f32) {
         self.imp().level.set(level);

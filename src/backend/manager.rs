@@ -2,7 +2,7 @@
 
 use crate::macros::*;
 use crate::{
-    backend::NodeType, backend::PwDeviceObject, backend::PwNodeFilterModel, backend::PwNodeModel, backend::PwNodeObject, ui::PwvucontrolWindow,
+    backend::NodeType, backend::PwDeviceObject, backend::PwNodeFilterModel, backend::PwNodeObject, ui::PwvucontrolWindow,
     ui::PwvucontrolWindowView, PwvucontrolApplication,
 };
 use gtk::{
@@ -32,7 +32,7 @@ mod imp {
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
         #[property(get)]
-        pub(crate) node_model: PwNodeModel,
+        pub(crate) node_model: gio::ListStore,
 
         #[property(get)]
         pub(crate) stream_output_model: PwNodeFilterModel,
@@ -67,7 +67,7 @@ mod imp {
             Self {
                 wp_core: Default::default(),
                 wp_object_manager: Default::default(),
-                node_model: Default::default(),
+                node_model: gio::ListStore::new::<PwNodeObject>(),
                 stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, None::<gio::ListModel>),
                 stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, None::<gio::ListModel>),
                 source_model: PwNodeFilterModel::new(NodeType::Source, None::<gio::ListModel>),
@@ -215,8 +215,7 @@ mod imp {
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
                     pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
-                    let model = &imp.node_model;
-                    model.remove(node.bound_id());
+                    imp.obj().remove_node_by_id(node.bound_id());
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
                     imp.obj().remove_device_by_id(device.bound_id());
                 } else {
@@ -342,6 +341,21 @@ impl PwvucontrolManager {
             }
         }
         None
+    }
+
+    pub fn remove_node_by_id(&self, id: u32) {
+        let nodemodel = &self.imp().node_model;
+
+        for (i, item) in (0..).zip(nodemodel.iter::<PwNodeObject>()) {
+            if let Ok(item) = item {
+                if item.wpnode().bound_id() == id {
+                    nodemodel.remove(i);
+                    break;
+                }
+            } else {
+                panic!("Device model mutated during iteration!");
+            }
+        }
     }
 
     pub fn get_model_for_nodetype(&self, nodetype: NodeType) -> PwNodeFilterModel {
