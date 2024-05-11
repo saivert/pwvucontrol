@@ -12,7 +12,7 @@ use gtk::{
     subclass::prelude::*,
 };
 use once_cell::unsync::OnceCell;
-use std::{cell::RefCell, str::FromStr};
+use std::cell::RefCell;
 use wireplumber as wp;
 use wp::{
     plugin::{PluginFeatures, *},
@@ -21,7 +21,6 @@ use wp::{
 };
 
 mod imp {
-
     use super::*;
 
     #[derive(Properties)]
@@ -143,8 +142,8 @@ mod imp {
 
             wp_om.add_interest({
                 let interest = wp::registry::ObjectInterest::new(wp::pw::Node::static_type());
-                let variant =
-                    glib::Variant::from_str("('Stream/Output/Audio', 'Stream/Input/Audio', 'Audio/Source', 'Audio/Sink')").expect("variant");
+                let variant = glib::Variant::tuple_from_iter(["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Sink"].map(ToVariant::to_variant));
+
                 interest.add_constraint(
                     wp::registry::ConstraintType::PwGlobalProperty,
                     "media.class",
