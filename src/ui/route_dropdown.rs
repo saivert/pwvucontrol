@@ -81,7 +81,9 @@ mod imp {
             self.nodeobject.replace(new_nodeobject.cloned());
 
             if let Some(nodeobject) = new_nodeobject {
-                let deviceobject = nodeobject.get_device().expect("device");
+                let Some(deviceobject) = nodeobject.get_device() else {
+                    return;
+                };
 
                 self.block_signal.set(true);
                 pwvucontrol_info!("self.route_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
@@ -178,13 +180,14 @@ mod imp {
             let widget = self.obj();
             let selected_handler = closure_local!(
                 @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
-                wp::info!("selected");
+                pwvucontrol_info!("Inside selected handler");
                 if widget.imp().block_signal.get() {
+                    pwvucontrol_info!("Early return from selected handler due to being blocked");
                     return;
                 }
 
                 if let Some(nodeobject) = widget.nodeobject() {
-                    pwvucontrol_critical!("Had set profile to {}", dropdown.selected());
+                    pwvucontrol_critical!("Setting route to {}", dropdown.selected());
 
                     if let Some(routeobject) = dropdown.selected_item().and_downcast::<PwRouteObject>() {
                         nodeobject.set_route(&routeobject);
