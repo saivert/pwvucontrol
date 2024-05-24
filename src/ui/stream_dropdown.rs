@@ -11,13 +11,13 @@ use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
-    use crate::{backend::NodeType, pwvucontrol_warning};
+    use crate::{backend::NodeType, pwvucontrol_info, pwvucontrol_warning};
 
     use super::*;
 
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
-    #[properties(wrapper_type = super::PwOutputDropDown)]
-    #[template(resource = "/com/saivert/pwvucontrol/gtk/output-dropdown.ui")]
+    #[properties(wrapper_type = super::PwStreamDropDown)]
+    #[template(resource = "/com/saivert/pwvucontrol/gtk/stream-dropdown.ui")]
     pub struct PwStreamDropDown {
         #[property(get, set = Self::set_nodeobj, nullable)]
         pub(super) nodeobj: RefCell<Option<PwNodeObject>>,
@@ -31,8 +31,8 @@ mod imp {
 
     #[glib::object_subclass]
     impl ObjectSubclass for PwStreamDropDown {
-        const NAME: &'static str = "PwOutputDropDown";
-        type Type = super::PwOutputDropDown;
+        const NAME: &'static str = "PwStreamDropDown";
+        type Type = super::PwStreamDropDown;
         type ParentType = gtk::Widget;
 
 
@@ -65,6 +65,7 @@ mod imp {
             self.dropdown_model.replace(WithDefaultListModel::new(Some(&model)));
             self.outputdevice_dropdown.set_model(Some(&*self.dropdown_model.borrow()));
 
+            self.nodeobj.replace(Some(nodeobj.clone()));
         }
     }
 
@@ -136,13 +137,15 @@ mod imp {
             let widget = self.obj();
             let selected_handler = closure_local!(
                 @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
-                wp::info!("selected-item");
+                pwvucontrol_info!("selected-item");
                 let nodeobj = widget.imp().nodeobj.borrow();
                 if nodeobj.is_none() {
+                    pwvucontrol_info!("no nodeobj");
                     return;
                 }
                 let nodeobj = nodeobj.as_ref().expect("nodeobj set on PwOutputDropDown");
                 if widget.imp().block_signal.get() {
+                    pwvucontrol_info!("signal blocked");
                     return;
                 }
                 if dropdown.selected() == 0 {
@@ -151,6 +154,7 @@ mod imp {
                 }
                 if let Some(item) = dropdown.selected_item() {
                     if let Some(item) = item.downcast_ref::<PwNodeObject>() {
+                        pwvucontrol_info!("setting item {:?}", item.name());
                         nodeobj.set_default_target(item);
                     }
                 }
@@ -164,10 +168,10 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwOutputDropDown(ObjectSubclass<imp::PwStreamDropDown>) @extends gtk::Widget;
+    pub struct PwStreamDropDown(ObjectSubclass<imp::PwStreamDropDown>) @extends gtk::Widget;
 }
 
-impl PwOutputDropDown {
+impl PwStreamDropDown {
 
     pub fn new(nodeobj: Option<&PwNodeObject>) -> Self {
         glib::Object::builder()
@@ -192,7 +196,7 @@ impl PwOutputDropDown {
     }
 }
 
-impl Default for PwOutputDropDown {
+impl Default for PwStreamDropDown {
     fn default() -> Self {
         Self::new(None)
     }

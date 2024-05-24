@@ -51,7 +51,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "tag": "0.4.14",
+                    "tag": "0.4.16",
                     "url" : "https://gitlab.freedesktop.org/pipewire/wireplumber.git"
                 }
             ]
@@ -62,9 +62,8 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
-                    "branch": "main",
-                    "url" : "https://github.com/saivert/pwvucontrol.git"
+                    "type" : "dir",
+                    "path" : "/home/saivert/Projects/pwvucontrol"
                 }
             ]
         }

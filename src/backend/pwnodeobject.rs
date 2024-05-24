@@ -351,7 +351,7 @@ impl PwNodeObject {
                     pwvucontrol_info!("For {} bound id {}, Got rate {rate}, format {format}, channels {channels}", node.name().unwrap_or_default(), node.bound_id());
 
                     let t_format = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioFormat").expect("audio format type");
-                    let formatname = t_format.values().find(|x| x.number() == format).and_then(|x|x.short_name()).unwrap();
+                    let formatname = t_format.values().into_iter().find(|x| x.number() == format).and_then(|x|x.short_name()).unwrap();
 
                     widget.set_formatstr(format!("{}ch {}Hz {}", channels, rate, formatname));
 

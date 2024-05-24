@@ -9,8 +9,7 @@ use glib::clone;
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
-use wireplumber as wp;
-use wp::pw::ProxyExt;
+
 mod imp {
     use super::*;
 
@@ -25,7 +24,6 @@ mod imp {
         pub profile_dropdown: TemplateChild<gtk::DropDown>,
 
         pub(super) block_signal: Cell<bool>,
-        //pub(super) stringlist: RefCell<gtk::StringList>,
     }
 
     #[glib::object_subclass]
@@ -44,60 +42,34 @@ mod imp {
     }
 
     impl PwProfileDropDown {
-        // NOTE: Commented code is for when using a separate stringlist as model for the dropdown to decouple it from the
-        // listmodel of the Device object as one of two strategies for breaking feedback loop.
-        //
-        // pub fn set_deviceobject(&self, new_deviceobject: Option<&PwDeviceObject>) {
-        //     self.deviceobject.replace(new_deviceobject.cloned());
-
-        //     if let Some(deviceobject) = new_deviceobject {
-        //         self.update_profiles();
-
-        //         deviceobject.connect_local("profiles-changed", false,
-        //             clone!(@weak self as widget => @default-return None, move |_| widget.update_profiles())
-        //         );
-
-        //         deviceobject.connect_profile_index_notify(
-        //             clone!(@weak self as widget => move |_| widget.update_selected()),
-        //         );
-        //     }
-        // }
-
-        // pub fn update_profiles(&self) -> Option<glib::Value> {
-        //     pwvucontrol_info!("update_profiles");
-        //     self.block_signal.set(true);
-
-        //     let deviceobject = self.deviceobject.borrow();
-        //     let deviceobject = deviceobject.as_ref().unwrap();
-
-        //     let mut strings = Vec::from_iter(
-        //         deviceobject
-        //             .get_profiles()
-        //             .iter()
-        //             .map(|x| (*x.0, x.1.to_owned())),
-        //     );
-        //     strings.sort();
-
-        //     let a = Vec::from_iter(strings.iter().map(|x| x.1.as_str()));
-        //     let new_stringlist = gtk::StringList::new(&a);
-
-        //     self.profile_dropdown.set_model(Some(&new_stringlist));
-        //     self.stringlist.replace(new_stringlist);
-
-        //     self.profile_dropdown
-        //         .set_selected(deviceobject.profile_index());
-
-        //     self.block_signal.set(false);
-
-        //     None
-        // }
-
         pub fn update_selected(&self) {
             let deviceobject = self.deviceobject.borrow();
             let deviceobject = deviceobject.as_ref().unwrap();
 
+            if self.profile_dropdown.model().is_none() {
+                return;
+            }
+
             pwvucontrol_info!("update_selected with index {}", deviceobject.profile_index());
-            self.obj().set_selected_no_send(deviceobject.profile_index());
+            if let Some(index) = self.get_model_index_from_profile_index(deviceobject.profile_index()) {
+                self.obj().set_selected_no_send(index);
+            }
+        }
+
+        fn get_model_index_from_profile_index(&self, index: u32) -> Option<u32> {
+            let Some(model) = self.profile_dropdown.model() else {
+                return None;
+            };
+
+            for (i, obj) in (0u32..).zip(model.iter::<glib::Object>()) {
+                if let Some(profile) = obj.ok().and_downcast::<PwProfileObject>() {
+                    if profile.index() == index {
+                        return Some(i);
+                    }
+                }
+            }
+
+            None
         }
 
         pub fn set_deviceobject(&self, new_deviceobject: Option<&PwDeviceObject>) {
@@ -105,12 +77,8 @@ mod imp {
 
             if let Some(deviceobject) = new_deviceobject {
                 self.block_signal.set(true);
-                pwvucontrol_info!("self.profile_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
                 self.profile_dropdown.set_model(Some(&deviceobject.profilemodel()));
-                pwvucontrol_info!("self.profile_dropdown.set_selected({});", deviceobject.profile_index());
-
-                self.profile_dropdown.set_selected(deviceobject.profile_index());
-
+                self.update_selected();
                 self.block_signal.set(false);
 
                 deviceobject.connect_local(
@@ -122,11 +90,13 @@ mod imp {
                         None
                     }),
                 );
+
                 deviceobject.connect_local(
                     "post-update-profile",
                     false,
                     clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(false);
+                        pwvucontrol_info!("About to call widget.update_selected() inside post-update-route handler");
                         widget.update_selected();
 
                         None
@@ -190,23 +160,30 @@ mod imp {
             list_factory.connect_bind(clone!(@weak dropdown => move |_, item| bind_handler(item, &dropdown)));
             list_factory.connect_unbind(|_, item| unbind_handler(item));
 
+            let expression = gtk::PropertyExpression::new(PwProfileObject::static_type(), gtk::Expression::NONE, "description");
+            self.profile_dropdown.set_expression(Some(expression));
+            self.profile_dropdown.set_enable_search(true);
+            self.profile_dropdown.set_search_match_mode(gtk::StringFilterMatchMode::Substring);
+
             self.profile_dropdown.set_factory(Some(&factory));
             self.profile_dropdown.set_list_factory(Some(&list_factory));
-
-            self.profile_dropdown.set_enable_search(true);
 
             let widget = self.obj();
             let selected_handler = closure_local!(
                 @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
-                wp::info!("selected");
+                pwvucontrol_info!("Inside selected handler");
                 if widget.imp().block_signal.get() {
+                    pwvucontrol_info!("Early return from selected handler due to being blocked");
                     return;
                 }
 
                 if let Some(deviceobject) = widget.deviceobject() {
-                    pwvucontrol_critical!("Had set profile to {}", dropdown.selected());
 
-                    deviceobject.set_profile(dropdown.selected() as i32);
+                    if let Some(item) = dropdown.selected_item().and_downcast::<PwProfileObject>() {
+                        pwvucontrol_critical!("Setting profile to dropdown index = {} profile index = {}", dropdown.selected(), item.index());
+                        deviceobject.set_profile(item.index() as i32);
+                    }
+
                 }
             });
             self.profile_dropdown.connect_closure("notify::selected", true, selected_handler);

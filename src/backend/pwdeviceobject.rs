@@ -117,9 +117,7 @@ pub mod imp {
             obj.update_icon_name();
             obj.update_profiles();
 
-            if let Some(index) = obj.get_current_profile_index() {
-                obj.set_profile_index(index as u32);
-            }
+            self.obj().update_current_profile_index();
 
             obj.update_routes();
 
@@ -137,9 +135,7 @@ pub mod imp {
                         obj.update_profiles();
                     },
                     "Profile" => {
-                        if let Some(index) = obj.get_current_profile_index() {
-                            obj.set_profile_index(index as u32);
-                        }
+                        obj.update_current_profile_index();
                     },
                     "EnumRoute" => {
                         obj.update_routes();
@@ -180,10 +176,6 @@ impl PwDeviceObject {
                 let available_key = keys.find_value_from_short_name("available").expect("available key");
 
                 if let Ok(Some(iter)) = res {
-                    let removed = widget.profilemodel().n_items();
-
-                    widget.emit_by_name::<()>("pre-update-profile", &[]);
-
                     let mut profiles: Vec<PwProfileObject> = Vec::new();
 
                     for a in iter {
@@ -198,23 +190,17 @@ impl PwDeviceObject {
 
                         profiles.push(PwProfileObject::new(index as u32, &description, available));
                     }
-                    widget.profilemodel().splice(0, removed as u32, &profiles);
-
-                    // Set profile_index property without notify by setting internal storage directly
-                    widget.imp().profile_index.set(widget.get_current_profile_index().unwrap() as u32);
-
-                    // Notify update of list model
+                    widget.emit_by_name::<()>("pre-update-profile", &[]);
+                    widget.profilemodel().splice(0, widget.profilemodel().n_items(), &profiles);
                     widget.emit_by_name::<()>("post-update-profile", &[]);
-                } else {
-                    if let Err(e) = res {
-                        dbg!(e);
-                    }
+                } else if let Err(e) = res {
+                    dbg!(e);
                 }
             }),
         );
     }
 
-    pub(crate) fn get_current_profile_index(&self) -> Option<i32> {
+    pub(crate) fn update_current_profile_index(&self) {
         let device = self.wpdevice();
 
         let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Profile").expect("id table");
@@ -232,11 +218,9 @@ impl PwDeviceObject {
                 let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
                 pwvucontrol_info!("Current profile #{} {}", index, description);
 
-                return Some(index);
+                self.set_profile_index(index as u32);
             }
         }
-
-        None
     }
 
     pub(crate) fn set_profile(&self, index: i32) {
@@ -269,7 +253,6 @@ impl PwDeviceObject {
 
                 if let Ok(Some(iter)) = res {
                     let removed = widget.imp().routemodel.n_items();
-                    widget.emit_by_name::<()>("pre-update-route", &[]);
 
                     let mut routes: Vec<PwRouteObject> = Vec::new();
 
@@ -289,12 +272,10 @@ impl PwDeviceObject {
 
                         routes.push(PwRouteObject::new(index as u32, &description, available, direction, &profiles_vec));
                     }
-                    widget.imp().routemodel.splice(0, removed as u32, &routes);
-
-                    // Set route_index property without notify by setting internal storage directly
-                    widget.update_current_route_index();
-
                     // Notify update of list model
+                    widget.emit_by_name::<()>("pre-update-route", &[]);
+                    widget.imp().routemodel.splice(0, removed as u32, &routes);
+                    widget.update_current_route_index();
                     widget.emit_by_name::<()>("post-update-route", &[]);
                 } else {
                     if let Err(e) = res {
@@ -316,13 +297,9 @@ impl PwDeviceObject {
         let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
         let index_key = keys.find_value_from_short_name("index").expect("index key");
         let description_key = keys.find_value_from_short_name("description").expect("decription key");
+        let direction_key = keys.find_value_from_short_name("direction").expect("direction key");
 
-        let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Route", "Route");
-        podbuilder.add_property("direction");
-        podbuilder.add_id(direction.into());
-        let filter_pod = podbuilder.end().expect("pod");
-
-        if let Some(params) = device.enum_params_sync("Route", Some(&filter_pod)) {
+        if let Some(params) = device.enum_params_sync("Route", None) {
             for a in params {
                 let pod: wp::spa::SpaPod = a.get().unwrap();
                 if !pod.is_object() {
@@ -335,13 +312,21 @@ impl PwDeviceObject {
                     .expect("Description key")
                     .string()
                     .expect("String");
+                let direction_from_pod = pod
+                    .find_spa_property(&direction_key)
+                    .expect("direction key")
+                    .id()
+                    .expect("Id");
 
-                pwvucontrol_info!("Current route #{} {}", index, description);
+                if direction_from_pod != direction as u32 {
+                    continue;
+                }
+                pwvucontrol_debug!("Current route #{} {}", index, description);
 
                 if let Some(modelindex) = self.get_model_index_from_route_index(direction, index) {
                     match direction {
-                        RouteDirection::Input => self.set_route_index_input(modelindex),
-                        RouteDirection::Output => self.set_route_index_output(modelindex),
+                        RouteDirection::Input => if self.route_index_input() != modelindex { self.set_route_index_input(modelindex) },
+                        RouteDirection::Output => if self.route_index_output() != modelindex { self.set_route_index_output(modelindex) },
                         _ => unreachable!()
                     }
                 } else {
@@ -354,15 +339,10 @@ impl PwDeviceObject {
     fn get_model_index_from_route_index(&self, direction: RouteDirection, routeindex: i32) -> Option<u32> {
         let routemodel = self.get_route_model_for_direction(direction);
 
-        pwvucontrol_info!("{direction:?} routemodel.n_items = {}, routeindex = {routeindex}", routemodel.n_items());
-        for (i, x) in routemodel.iter::<PwRouteObject>().map_while(Result::ok).enumerate() {
-            pwvucontrol_info!("{direction:?} #{i} item.index = {}, item.description = {}", x.index(), x.description());
-        }
-
         for (i, o) in routemodel.iter::<PwRouteObject>().enumerate() {
             if let Ok(obj) = o {
                 //let b: PwRouteObject = b.downcast().expect("PwRouteObject");
-                if obj.index() as u32 == routeindex as u32 {
+                if obj.index() == routeindex as u32 {
                     return Some(i as u32);
                 }
             } else {

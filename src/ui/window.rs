@@ -5,7 +5,7 @@ use crate::{
     application::PwvucontrolApplication,
     backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
     config::{APP_ID, PROFILE},
-    ui::{devicebox::PwDeviceBox, PwOutputBox, PwSinkBox, PwVolumeBox},
+    ui::{devicebox::PwDeviceBox, PwStreamBox, PwSinkBox, PwVolumeBox},
 };
 use adw::subclass::prelude::*;
 use glib::clone;
@@ -97,7 +97,7 @@ mod imp {
             self.playbacklist.bind_model(
                 Some(&manager.stream_output_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
-                    PwOutputBox::new(
+                    PwStreamBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
@@ -108,7 +108,7 @@ mod imp {
             self.recordlist.bind_model(
                 Some(&manager.stream_input_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
-                    PwOutputBox::new(
+                    PwStreamBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )

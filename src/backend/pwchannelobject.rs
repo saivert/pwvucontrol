@@ -68,6 +68,7 @@ impl PwChannelObject {
         let channel = node_object.format().unwrap().positions[index as usize];
         let channelname = t_audiochannel
             .values()
+            .into_iter()
             .find(|x| x.number() == channel)
             .and_then(|x| x.short_name())
             .unwrap();

@@ -3,7 +3,7 @@
 <interface>
     <requires lib="gtk" version="4.0" />
     <requires lib="Adw" version="1.0" />
-    <template class="PwOutputBox" parent="PwVolumeBox">
+    <template class="PwStreamBox" parent="PwVolumeBox">
         <child type="extra">
             <object class="GtkBox">
                 <property name="orientation">horizontal</property>
@@ -16,7 +16,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="PwOutputDropDown" id="output_dropdown">
+                    <object class="PwStreamDropDown" id="output_dropdown">
                     </object>
                 </child>
             </object>

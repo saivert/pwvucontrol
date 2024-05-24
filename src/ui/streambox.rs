@@ -3,7 +3,7 @@
 use crate::{
     backend::{PwNodeObject, PwvucontrolManager},
     macros::*,
-    ui::{PwOutputDropDown, PwVolumeBox, PwVolumeBoxImpl},
+    ui::{PwStreamDropDown, PwVolumeBox, PwVolumeBoxImpl},
 };
 use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
@@ -15,16 +15,16 @@ mod imp {
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate)]
-    #[template(resource = "/com/saivert/pwvucontrol/gtk/outputbox.ui")]
+    #[template(resource = "/com/saivert/pwvucontrol/gtk/streambox.ui")]
     pub struct PwStreamBox {
         #[template_child]
-        pub output_dropdown: TemplateChild<PwOutputDropDown>,
+        pub output_dropdown: TemplateChild<PwStreamDropDown>,
     }
 
     #[glib::object_subclass]
     impl ObjectSubclass for PwStreamBox {
-        const NAME: &'static str = "PwOutputBox";
-        type Type = super::PwOutputBox;
+        const NAME: &'static str = "PwStreamBox";
+        type Type = super::PwStreamBox;
         type ParentType = PwVolumeBox;
 
         fn class_init(klass: &mut Self::Class) {
@@ -79,12 +79,12 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwOutputBox(ObjectSubclass<imp::PwStreamBox>)
+    pub struct PwStreamBox(ObjectSubclass<imp::PwStreamBox>)
         @extends gtk::Widget, gtk::ListBoxRow, PwVolumeBox,
         @implements gtk::Actionable;
 }
 
-impl PwOutputBox {
+impl PwStreamBox {
     pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
         glib::Object::builder().property("node-object", node_object).build()
     }

@@ -3,7 +3,7 @@
 <interface>
     <requires lib="gtk" version="4.0" />
     <requires lib="Adw" version="1.0" />
-    <template class="PwOutputDropDown" parent="GtkWidget">
+    <template class="PwStreamDropDown" parent="GtkWidget">
         <property name="layout-manager">
             <object class="GtkBinLayout" />
         </property>
