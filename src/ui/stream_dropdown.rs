@@ -8,7 +8,6 @@ use crate::{
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
-use wireplumber as wp;
 
 mod imp {
     use crate::{backend::NodeType, pwvucontrol_info, pwvucontrol_warning};

@@ -196,6 +196,8 @@ impl PwvucontrolWindow {
     fn save_window_size(&self) -> Result<(), glib::BoolError> {
         let settings = &self.imp().settings;
 
+        
+
         let size = self.default_size();
 
         settings.set_int("window-width", size.0)?;

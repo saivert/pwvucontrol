@@ -111,21 +111,6 @@ impl PwStreamBox {
 
 
         if let Some(deftarget) = item.default_target() {
-            // let model: gio::ListModel = imp
-            //     .outputdevice_dropdown
-            //     .model()
-            //     .expect("Model from dropdown")
-            //     .downcast()
-            //     .unwrap();
-            // let pos = model.iter::<glib::Object>().enumerate().find_map(|o| {
-            //     if let Ok(Ok(node)) = o.1.map(|x| x.downcast::<PwNodeObject>()) {
-            //         if node.boundid() == deftarget.boundid() {
-            //             return Some(o.0);
-            //         }
-            //     }
-            //     None
-            // });
-
             if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
                 pwvucontrol_info!(
                     "switching to preferred target pos={pos} boundid={} serial={}",
@@ -136,22 +121,6 @@ impl PwStreamBox {
             }
         } else {
             output_dropdown.set_selected_no_send(0);
-
-            // let id = self.imp().default_node.get();
-            // pwvucontrol_info!("default_node is {id}");
-            // if id != u32::MAX {
-            //     if let Some(pos) = sinkmodel.get_node_pos_from_id(id) {
-            //         pwvucontrol_info!("switching to default target");
-            //         if true
-            //         /* imp.outputdevice_dropdown.selected() != pos */
-            //         {
-            //             pwvucontrol_info!("actually switching to default target");
-            //             imp.outputdevice_dropdown_block_signal.set(true);
-            //             imp.outputdevice_dropdown.set_selected(pos);
-            //             imp.outputdevice_dropdown_block_signal.set(false);
-            //         }
-            //     }
-            // }
         }
     }
 }
