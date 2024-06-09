@@ -62,8 +62,9 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "dir",
-                    "path" : "/home/saivert/Projects/pwvucontrol"
+                    "type" : "git",
+                    "branch": "main",
+                    "url" : "https://github.com/saivert/pwvucontrol.git"
                 }
             ]
         }
