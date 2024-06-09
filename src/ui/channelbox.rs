@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::PwChannelObject;
+use crate::{backend::PwChannelObject, ui::PwvucontrolWindow};
 use std::cell::RefCell;
 use gtk::{prelude::*, subclass::prelude::*};
+use glib::clone;
 
 mod imp {
     use super::*;
@@ -66,6 +67,30 @@ mod imp {
             item.bind_property("name", &self.label.get(), "label")
                 .sync_create()
                 .build();
+
+            fn update_overamplification(volume_scale: &gtk::Scale) {
+                let window: PwvucontrolWindow = PwvucontrolWindow::default();
+                let enable_overamplification = window.imp().settings.boolean("enable-overamplification");
+                
+                volume_scale.clear_marks();
+                volume_scale.add_mark(0.0, gtk::PositionType::Bottom, Some("Silence"));
+                volume_scale.add_mark(1.0, gtk::PositionType::Bottom, Some("100%"));
+    
+
+                if enable_overamplification {
+                    volume_scale.add_mark(1.525, gtk::PositionType::Bottom, Some("150%"));
+                    volume_scale.set_range(0.0, 1.525);
+                } else {
+                    volume_scale.set_range(0.0, 1.0);
+                }
+            }
+
+            update_overamplification(&self.scale);
+
+            let window = PwvucontrolWindow::default();
+            window.imp().settings.connect_changed(Some("enable-overamplification"), clone!(@weak self as widget => move |_,_| {
+                update_overamplification(&widget.scale);
+            }));
         }
 
 
