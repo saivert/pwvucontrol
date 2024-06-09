@@ -294,6 +294,10 @@
   <menu id="primary_menu">
     <section>
       <item>
+        <attribute name="label" translatable="yes">_Enable over-amplification</attribute>
+        <attribute name="action">win.enable-overamplification</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">win.show-help-overlay</attribute>
       </item>

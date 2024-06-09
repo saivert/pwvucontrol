@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{backend::PwChannelObject, backend::PwNodeObject, backend::PwvucontrolManager, ui::LevelbarProvider, ui::PwChannelBox};
+use crate::{backend::{PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwvucontrolWindow}};
 
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
@@ -135,6 +135,30 @@ mod imp {
                 .transform_to(linear_to_cubic)
                 .transform_from(cubic_to_linear)
                 .build();
+
+            fn update_overamplification(volume_scale: &gtk::Scale) {
+                let window: PwvucontrolWindow = PwvucontrolWindow::default();
+                let enable_overamplification = window.imp().settings.boolean("enable-overamplification");
+                
+                volume_scale.clear_marks();
+                volume_scale.add_mark(0.0, gtk::PositionType::Bottom, Some("Silence"));
+                volume_scale.add_mark(1.0, gtk::PositionType::Bottom, Some("100%"));
+    
+
+                if enable_overamplification {
+                    volume_scale.add_mark(1.525, gtk::PositionType::Bottom, Some("150%"));
+                    volume_scale.set_range(0.0, 1.525);
+                } else {
+                    volume_scale.set_range(0.0, 1.0);
+                }
+            }
+
+            update_overamplification(&self.volume_scale);
+
+            let window = PwvucontrolWindow::default();
+            window.imp().settings.connect_changed(Some("enable-overamplification"), clone!(@weak self as widget => move |_,_| {
+                update_overamplification(&widget.volume_scale);
+            }));
 
             let manager = PwvucontrolManager::default();
 

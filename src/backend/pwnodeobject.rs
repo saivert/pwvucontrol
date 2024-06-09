@@ -7,10 +7,12 @@ use wp::{
     registry::{Constraint, ConstraintType, Interest}
 };
 use std::cell::{Cell, RefCell};
-use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone};
+use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone, Cast};
 use once_cell::sync::{Lazy, OnceCell};
 use gtk::{gio, prelude::ListModelExt};
 use super::{PwDeviceObject, PwRouteObject, PwChannelObject, PwvucontrolManager};
+use wp::registry::ObjectManager;
+
 use crate::macros::*;
 
 mod mixerapi;
@@ -83,6 +85,8 @@ pub mod imp {
         pub(super) wpnode: OnceCell<wp::pw::Node>,
 
         pub(super) block: Cell<bool>,
+
+        pub(super) om: RefCell<ObjectManager>,
     }
 
     impl Default for PwNodeObject {
@@ -104,6 +108,7 @@ pub mod imp {
                 channellock: Default::default(),
                 wpnode: OnceCell::default(),
                 block: Default::default(),
+                om: Default::default(),
                 hidden: Default::default(),
             }
         }
@@ -205,6 +210,27 @@ pub mod imp {
             obj.update_volume_using_mixerapi();
             obj.update_icon_name();
 
+            let om = self.om.borrow();
+
+            om.add_interest([Constraint::compare(ConstraintType::PwProperty, "link.output.node", node.bound_id(), true)]
+            .iter().collect::<Interest<wp::pw::Link>>());
+
+            if let Ok(Some(device_id)) = node.device_id() {
+                om.add_interest([Constraint::compare(ConstraintType::PwGlobalProperty, "device.id", device_id, true)]
+                .iter()
+                .collect::<Interest<wp::pw::Device>>());
+            }
+
+
+            om.connect_object_added(clone!(@weak self as widget => move |_om, obj| {
+                if let Some(link) = obj.downcast_ref::<wp::pw::Link>() {
+                    let linked_node_id: u32 = link.pw_property("link.input.node").expect("link.input.node property");
+                    let linked_node = PwvucontrolManager::default().get_node_by_id(linked_node_id);
+                    pwvucontrol_info!("Node {} linked to node id {linked_node_id} ({:?})", widget.obj().name(), linked_node.map(|x|x.name()));
+                }
+            }));
+    
+            PwvucontrolManager::default().wp_core().install_object_manager(&om);
         }
     }
 
@@ -241,7 +267,7 @@ impl PwNodeObject {
         let props = wp_node.global_properties().expect("Node has no properties");
 
         let name_gstr = match self.nodetype() {
-            NodeType::Sink => {
+            NodeType::Sink | NodeType::Source => {
                 props
                 .get("node.description")
                 .or_else(|| props.get("node.nick"))
@@ -486,6 +512,7 @@ impl PwNodeObject {
     }
 
     pub(crate) fn get_device(&self) -> Option<PwDeviceObject> {
+        
         if let Ok(Some(device_id)) = self.wpnode().device_id() {
             let manager = PwvucontrolManager::default();
             return manager.get_device_by_id(device_id);

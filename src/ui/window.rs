@@ -153,6 +153,9 @@ mod imp {
                 }
             });
 
+            let overamplification_action = self.settings.create_action("enable-overamplification");
+            self.obj().add_action(&overamplification_action);
+
             self.obj().load_window_state();
         }
     }

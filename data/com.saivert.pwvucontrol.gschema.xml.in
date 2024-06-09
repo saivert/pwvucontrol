@@ -16,5 +16,10 @@
             <summary>Default window maximized behaviour</summary>
             <description></description>
         </key>
+        <key name="enable-overamplification" type="b">
+            <default>false</default>
+            <summary>Enable over-amplification</summary>
+            <description></description>
+        </key>
 	</schema>
 </schemalist>
