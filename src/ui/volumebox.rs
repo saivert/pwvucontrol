@@ -175,16 +175,23 @@ mod imp {
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
 
-            if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
-                self.levelbarprovider.set(provider).expect("Provider not set already");
+            // Monitoring ourselves cause an infinite loop.
+            if item.name() != "pwvucontrol-peak-detect" {
 
-                self.timeoutid.set(Some(glib::timeout_add_local(
-                    std::time::Duration::from_millis(25),
-                    clone!(@weak self as obj => @default-panic, move || {
-                        obj.level_bar.set_value(obj.level.get() as f64);
-                        ControlFlow::Continue
-                    }),
-                )));
+                if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
+                    self.levelbarprovider.set(provider).expect("Provider not set already");
+
+                    self.timeoutid.set(Some(glib::timeout_add_local(
+                        std::time::Duration::from_millis(25),
+                        clone!(@weak self as obj => @default-panic, move || {
+                            obj.level_bar.set_value(obj.level.get() as f64);
+                            ControlFlow::Continue
+                        }),
+                    )));
+                    
+                }
+            } else {
+                self.level_bar.set_visible(false);
             }
         }
 
