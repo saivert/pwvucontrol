@@ -173,33 +173,35 @@ mod imp {
             wp_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
                 let devicemodel = &imp.device_model;
                 if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                    let mut hidden: bool = false;
                     // Hide ourselves.
                     if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
-                        return;
+                        hidden = true;
                     }
 
                     // Hide any playback from pavucontrol (mainly volume control notification sound).
                     if node.name().unwrap_or_default() == "pavucontrol" {
-                        return;
+                        hidden = true;
                     }
 
                     // Hide any notification sounds.
                     // The presence of the event.id property means most likely this is an event sound.
                     if node.pw_property::<String>("event.id").is_ok() {
-                        return;
+                        hidden = true;
                     }
                     // Or media.role being Notification.
                     if node.pw_property::<String>("media.role").unwrap_or_default() == "Notification" {
-                        return;
+                        hidden = true;
                     }
 
                     // Hide applications that only record for peak meter.
                     if node.pw_property::<String>("stream.monitor").is_ok() {
-                        return;
+                        hidden = true;
                     }
 
                     pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                     let pwobj = PwNodeObject::new(node);
+                    pwobj.set_hidden(hidden);
                     let model = &imp.node_model;
                     model.append(&pwobj);
                 } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {

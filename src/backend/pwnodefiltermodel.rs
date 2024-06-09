@@ -1,15 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{closure_local, subclass::prelude::*, Properties};
+use glib::{closure_local, subclass::prelude::*, Properties, SignalHandlerId};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell, OnceCell};
 use super::{NodeType, PwNodeObject};
 
 mod imp {
-    use glib::SignalHandlerId;
-
-    use crate::backend::PwNodeObject;
-
     use super::*;
 
     #[derive(Debug, Properties, Default)]
@@ -44,7 +40,7 @@ mod imp {
 
             let filter = gtk::CustomFilter::new(move |obj| {
                 let node: &PwNodeObject = obj.downcast_ref().expect("PwNodeObject");
-                node.nodetype() == nodetype
+                node.nodetype() == nodetype && !node.hidden()
             });
 
             self.filtered_model.set(gtk::FilterListModel::new(None::<gio::ListModel>, Some(filter))).expect("filtered model not set");
@@ -65,7 +61,7 @@ mod imp {
     }
 
     impl PwNodeFilterModel {
-        pub fn set_model(&self, new_model: Option<gio::ListModel>) {
+        fn set_model(&self, new_model: Option<gio::ListModel>) {
             let filtered_model = self.filtered_model.get().expect("Filtered model");
             let removed = filtered_model.n_items();
             let widget = self.obj();
@@ -90,7 +86,7 @@ mod imp {
             }
         }
 
-        pub fn disconnect(&self) {
+        fn disconnect(&self) {
             let filtered_model = self.filtered_model.get().expect("Filtered model");
             filtered_model.set_model(gio::ListModel::NONE);
             if let Some(id) = self.signalid.take() {

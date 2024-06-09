@@ -64,6 +64,8 @@ pub mod imp {
         mute: Cell<bool>,
         #[property(get, set)]
         iconname: RefCell<String>,
+        #[property(get, set)]
+        hidden: Cell<bool>,
 
         pub(super) channel_volumes: RefCell<Vec<f32>>,
         #[property(get, builder(NodeType::Undefined))]
@@ -101,7 +103,8 @@ pub mod imp {
                 format: Default::default(),
                 channellock: Default::default(),
                 wpnode: OnceCell::default(),
-                block: Default::default()
+                block: Default::default(),
+                hidden: Default::default(),
             }
         }
     }
