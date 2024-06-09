@@ -15,14 +15,14 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:gnome-45
       options: --privileged
     steps:
-    - uses: actions/checkout@v3
-    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.1
+    - uses: actions/checkout@v4
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6.3
       with:
         bundle: pwvucontrol.flatpak
         manifest-path: build-aux/com.saivert.pwvucontrol.json
         cache-key: flatpak-builder-${{ github.sha }}
     - name: Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: pwvucontrol.flatpak
