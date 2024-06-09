@@ -54,15 +54,15 @@ mod imp {
 
             glib::idle_add_local_once(clone!(@weak self as widget => move || {
                 widget.obj().default_node_changed();
+
+                // TODO: Hack! Associated PwDeviceObject for a sink type PwNodeObject may not have been added to model yet at this time.
+                // Delay the set_nodeobject call as workaround for now.
+                if let Some(node) = widget.obj().node_object() {
+                    widget.route_dropdown.set_nodeobject(Some(node));
+                }
             }));
 
-            let obj = self.obj();
-            let parent: &PwVolumeBox = obj.upcast_ref();
-            let node = parent.node_object().expect("nodeobj");
-
-            pwvucontrol_info!("sinkbox set_nodeobject {}", node.name());
-
-            self.route_dropdown.set_nodeobject(Some(node));
+            pwvucontrol_info!("sinkbox set_nodeobject {}", self.obj().node_object().expect("Node object").name());
         }
     }
     impl WidgetImpl for PwSinkBox {}
