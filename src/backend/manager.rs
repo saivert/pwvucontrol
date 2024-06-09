@@ -141,7 +141,7 @@ mod imp {
                 .expect("loadig mixer-api plugin");
 
             wp_om.add_interest({
-                let interest = wp::registry::ObjectInterest::new(wp::pw::Node::static_type());
+                let interest: Interest<wp::pw::Node> = wp::registry::Interest::new();
                 let variant = glib::Variant::tuple_from_iter(["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Sink"].map(ToVariant::to_variant));
 
                 interest.add_constraint(
@@ -155,7 +155,7 @@ mod imp {
             });
 
             wp_om.add_interest({
-                let interest = wp::registry::ObjectInterest::new(wp::pw::Device::static_type());
+                let interest: Interest<wp::pw::Device> = wp::registry::Interest::new();
                 interest.add_constraint(
                     wp::registry::ConstraintType::PwGlobalProperty,
                     "media.class",
