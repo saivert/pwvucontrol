@@ -58,7 +58,10 @@ impl PwNodeObject {
                         *v = max;
                     }
                 }
-                self.set_channel_volumes_vec(&channel_volumes);
+                if let Some(cv) = self.make_channel_volumes_variant(&self.channel_volumes_vec()) {
+                    variant.insert("channelVolumes", cv);
+                }
+                self.set_channel_volumes_vec_no_send(&channel_volumes);
             }
             PropertyChanged::ChannelVolumes => {
                 if let Some(cv) = self.make_channel_volumes_variant(&self.channel_volumes_vec()) {

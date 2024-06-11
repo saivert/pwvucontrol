@@ -465,12 +465,16 @@ impl PwNodeObject {
     }
 
     pub(crate) fn set_channel_volumes_vec(&self, values: &[f32]) {
-        *(self.imp().channel_volumes.borrow_mut()) = values.to_owned();
-
-        self.update_channel_objects();
+        self.set_channel_volumes_vec_no_send(values);
         if !self.imp().block.get() {
             self.send_volume_using_mixerapi(PropertyChanged::ChannelVolumes);
         }
+    }
+
+    pub(crate) fn set_channel_volumes_vec_no_send(&self, values: &[f32]) {
+        *(self.imp().channel_volumes.borrow_mut()) = values.to_owned();
+
+        self.update_channel_objects();
     }
 
     pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
