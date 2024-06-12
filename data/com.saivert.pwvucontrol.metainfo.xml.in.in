@@ -3,8 +3,7 @@
 <component type="desktop-application">
   <id>@app-id@</id>
   <metadata_license>CC0</metadata_license>
-  <!-- Insert your license of choice here -->
-  <!-- <project_license>MIT</project_license> -->
+  <project_license>GPL-3.0-only</project_license>
   <name>pwvucontrol</name>
   <summary>Volume control for pipewire</summary>
   <description>
@@ -15,7 +14,7 @@
   </categories>
   <screenshots>
     <screenshot type="default">
-      <image>https://saivert.com/files/pwvucontrol%202023-07-26%2019-16-08.png</image>
+      <image>https://github.com/saivert/pwvucontrol/blob/0023790e57e1de5e3a65445cc0ce40be96477daf/screenshot.png</image>
       <caption>Main window</caption>
     </screenshot>
   </screenshots>
@@ -23,6 +22,14 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
+    <release version="0.4.2" date="2023-12-21">
+      <description>
+        <p>Changelog since 0.3.1</p>
+        <ul>
+          <li>Added support for over-amplification. Enable via hamburger menu.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.3.1" date="2023-12-21">
       <description>
         <p>Changelog since 0.2.0</p>

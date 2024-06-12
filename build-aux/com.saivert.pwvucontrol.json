@@ -63,7 +63,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "branch": "main",
+                    "tag": "0.4.2",
                     "url" : "https://github.com/saivert/pwvucontrol.git"
                 }
             ]
