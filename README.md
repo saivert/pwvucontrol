@@ -35,8 +35,6 @@ Use meson to build.
 
 
 ## Help needed
-I need a nice icon in SVG!
-
 Flatpak is on the GitHub releases page. I need help getting it on Flathub.
 
 Help with making code robust.
