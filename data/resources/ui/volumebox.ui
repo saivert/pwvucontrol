@@ -80,6 +80,7 @@
                                     <class name="expander-row-arrow" />
                                 </style>
                                 <property name="icon-name">audio-volume-muted-symbolic</property>
+                                <property name="tooltip_text" translatable="1">Mute audio</property>
                             </object>
                         </child>
 
@@ -93,6 +94,7 @@
                                     <class name="expander-row-arrow" />
                                 </style>
                                 <property name="icon-name">pan-down-symbolic</property>
+                                <property name="tooltip_text" translatable="1">Lock channels together</property>
                             </object>
                         </child>
 
