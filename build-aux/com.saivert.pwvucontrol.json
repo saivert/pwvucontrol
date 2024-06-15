@@ -19,7 +19,9 @@
     "build-options": {
         "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm16/bin",
         "prepend-ld-library-path": "/usr/lib/sdk/llvm16/lib",
-
+        "build-args" : [
+            "--share=network"
+        ],
         "env": {
             "RUST_BACKTRACE": "1",
             "RUST_LOG": "pwvucontrol=debug",
@@ -70,9 +72,8 @@
             "buildsystem": "meson",
             "sources": [
                 {
-                    "type": "archive",
-                    "sha256": "4984a06bddfeec1e62dbd45f84bc79e53b2e469b07bba3f7170131c7803115d7",
-                    "url": "https://saivert.com/files/pwvucontrol-0.4.2.tar.xz"
+                    "type": "dir",
+                    "path": ".."
                 }
             ]
         }
