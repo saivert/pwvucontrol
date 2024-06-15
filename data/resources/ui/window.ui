@@ -158,7 +158,7 @@
                         <property name="visible">true</property>
                         <property name="name">inputdevices</property>
                         <property name="title" translatable="yes">Input Devices</property>
-                        <property name="icon-name">soundcard-symbolic</property>
+                        <property name="icon-name">input-symbolic</property>
                         <property name="child">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
@@ -199,7 +199,7 @@
                         <property name="visible">true</property>
                         <property name="name">outputdevices</property>
                         <property name="title" translatable="yes">Output Devices</property>
-                        <property name="icon-name">soundcard-symbolic</property>
+                        <property name="icon-name">output-symbolic</property>
                         <property name="child">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
