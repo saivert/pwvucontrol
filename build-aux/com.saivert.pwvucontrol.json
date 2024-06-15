@@ -46,9 +46,6 @@
     "modules": [
         "flatpak-shared-modules/lua5.4/lua-5.4.json",
         {
-            "name": "lua"
-        },
-        {
             "name": "wireplumber",
             "builddir": true,
             "buildsystem": "meson",
