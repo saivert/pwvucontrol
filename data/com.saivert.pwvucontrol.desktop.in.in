@@ -4,5 +4,6 @@ Exec=pwvucontrol
 Icon=@icon@
 Terminal=false
 Type=Application
-Categories=GTK;
+Categories=Audio;System
+Keywords=GTK
 StartupNotify=true
