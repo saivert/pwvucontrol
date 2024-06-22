@@ -2,9 +2,18 @@
 
 ## Flatpak
 
-[Get them from releases page](https://github.com/saivert/pwvucontrol/releases)
 
-There is a flatpak-builder manifest in the build-aux directory. I'm planning on getting it on flathub but I need help crossing the finish line here.
+The recommended way of installing pwvucontrol is through Flatpak. If you don't have
+Flatpak installed, you can get it from [the Flatpak website](https://flatpak.org/setup).
+
+You can install stable builds of pwvucontrol from [Flathub](https://flathub.org)
+by using this command:
+
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    flatpak install flathub com.saivert.pwvucontrol
+
+<a href="https://flathub.org/apps/com.saivert.pwvucontrol"><img src="https://flathub.org/assets/badges/flathub-badge-en.png" width="200"/></a>
+
 
 ## General info
 
@@ -35,8 +44,6 @@ Use meson to build.
 
 
 ## Help needed
-Flatpak is on the GitHub releases page. I need help getting it on Flathub.
-
 Help with making code robust.
 
 UI ideas and mockups welcome!
