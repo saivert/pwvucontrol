@@ -55,7 +55,7 @@ mod imp {
             let nodeobject = self.nodeobject.borrow();
             let nodeobject = nodeobject.as_ref().unwrap();
 
-            let Some(deviceobject) = nodeobject.get_device() else {
+            let Some(deviceobject) = nodeobject.device() else {
                 return None;
             };
             match nodeobject.nodetype() {
@@ -69,7 +69,7 @@ mod imp {
             let nodeobject = self.nodeobject.borrow();
             let nodeobject = nodeobject.as_ref().unwrap();
 
-            let deviceobject = nodeobject.get_device().expect("device");
+            let deviceobject = nodeobject.device().expect("device");
             match nodeobject.nodetype() {
                 NodeType::Source => Some(deviceobject.routemodel_input()),
                 NodeType::Sink => Some(deviceobject.routemodel_output()),
@@ -81,9 +81,7 @@ mod imp {
             self.nodeobject.replace(new_nodeobject.cloned());
 
             if let Some(nodeobject) = new_nodeobject {
-                let Some(deviceobject) = nodeobject.get_device() else {
-                    return;
-                };
+                let deviceobject = nodeobject.device().expect("nodeobject with associated device on PwRouteDropDown");
 
                 self.block_signal.set(true);
                 pwvucontrol_info!("self.route_dropdown.set_model({});", deviceobject.wpdevice().bound_id());

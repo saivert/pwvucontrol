@@ -87,6 +87,9 @@ pub mod imp {
         pub(super) block: Cell<bool>,
 
         pub(super) om: RefCell<ObjectManager>,
+
+        #[property(get)]
+        pub(super) device: RefCell<Option<PwDeviceObject>>,
     }
 
     impl Default for PwNodeObject {
@@ -110,6 +113,7 @@ pub mod imp {
                 block: Default::default(),
                 om: Default::default(),
                 hidden: Default::default(),
+                device: Default::default(),
             }
         }
     }
@@ -216,21 +220,38 @@ pub mod imp {
             .iter().collect::<Interest<wp::pw::Link>>());
 
             if let Ok(Some(device_id)) = node.device_id() {
-                om.add_interest([Constraint::compare(ConstraintType::PwGlobalProperty, "device.id", device_id, true)]
+                om.add_interest([Constraint::compare(ConstraintType::GProperty, "bound-id", device_id, true)]
                 .iter()
                 .collect::<Interest<wp::pw::Device>>());
             }
 
-
-            om.connect_object_added(clone!(@weak self as widget => move |_om, obj| {
+            om.connect_object_added(clone!(@weak self as nodeobject => move |_om, obj| {
                 if let Some(link) = obj.downcast_ref::<wp::pw::Link>() {
                     let linked_node_id: u32 = link.pw_property("link.input.node").expect("link.input.node property");
                     let linked_node = PwvucontrolManager::default().get_node_by_id(linked_node_id);
-                    pwvucontrol_info!("Node {} linked to node id {linked_node_id} ({:?})", widget.obj().name(), linked_node.map(|x|x.name()));
+                    pwvucontrol_info!("Node {} linked to node id {linked_node_id} ({:?})", nodeobject.obj().name(), linked_node.map(|x|x.name()));
+                } else if let Some(device) = obj.downcast_ref::<wp::pw::Device>() {
+                    let device_name: String = device.pw_property("device.description").unwrap();
+                    let manager = PwvucontrolManager::default();
+                    nodeobject.device.set(manager.get_device_by_id(device.bound_id()));
+                    nodeobject.obj().notify_device();
+                    pwvucontrol_info!("Node {} linked to device {device_name}", nodeobject.obj().name());
                 }
             }));
     
             PwvucontrolManager::default().wp_core().install_object_manager(&om);
+
+            // let manager = PwvucontrolManager::default();
+            // manager.device_model().connect_items_changed(clone!(@weak self as nodeobject => move |liststore, _position, _removed, _added| {
+            //     for device in liststore.iter::<PwDeviceObject>().map_while(Result::ok) {
+            //         let node = nodeobject.wpnode.get().expect("node");
+            //         if let Ok(Some(id)) = node.device_id() {
+            //             if id == device.wpdevice().bound_id() {
+            //                 nodeobject.device.set(Some(device.clone()));
+            //             }
+            //         }
+            //     }
+            // }));
         }
     }
 
@@ -327,7 +348,7 @@ impl PwNodeObject {
         }
     }
 
-    pub(crate) fn update_format(&self) {
+    fn update_format(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
         node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(@weak self as widget, @weak node => move |res| {
@@ -493,7 +514,7 @@ impl PwNodeObject {
         }
     }
 
-    pub(crate) fn set_format(&self, format: AudioFormat) {
+    fn set_format(&self, format: AudioFormat) {
         self.imp().format.set(Some(format));
 
         self.emit_by_name::<()>("format", &[]);
@@ -515,19 +536,10 @@ impl PwNodeObject {
         };
     }
 
-    pub(crate) fn get_device(&self) -> Option<PwDeviceObject> {
-        
-        if let Ok(Some(device_id)) = self.wpnode().device_id() {
-            let manager = PwvucontrolManager::default();
-            return manager.get_device_by_id(device_id);
-        }
-        None
-    }
-
     pub(crate) fn set_route(&self, routeobj: &PwRouteObject) {
         let index = routeobj.index();
         if let Ok(Some(card_profile_device)) = self.wpnode().device_index() {
-            if let Some(device) = self.get_device() {
+            if let Some(device) = self.device() {
                 device.set_route(index, card_profile_device as i32);
 
                 let profiles = routeobj.get_profiles();

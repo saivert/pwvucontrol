@@ -52,15 +52,22 @@ mod imp {
                 widget.obj().default_node_changed();
             }));
 
-            glib::idle_add_local_once(clone!(@weak self as widget => move || {
-                widget.obj().default_node_changed();
+            // Only set nodeobject once it has a device associated.
+            if let Some(node) = obj.node_object() {
+                node.connect_device_notify(clone!(@weak self as widget => move |nodeobject| {
+                    widget.route_dropdown.set_nodeobject(Some(nodeobject));
+                }));
+            }
 
-                // TODO: Hack! Associated PwDeviceObject for a sink type PwNodeObject may not have been added to model yet at this time.
-                // Delay the set_nodeobject call as workaround for now.
-                if let Some(node) = widget.obj().node_object() {
-                    widget.route_dropdown.set_nodeobject(Some(node));
-                }
-            }));
+            // glib::idle_add_local_once(clone!(@weak self as widget => move || {
+            //     widget.obj().default_node_changed();
+
+            //     // TODO: Hack! Associated PwDeviceObject for a sink type PwNodeObject may not have been added to model yet at this time.
+            //     // Delay the set_nodeobject call as workaround for now.
+            //     if let Some(node) = widget.obj().node_object() {
+            //         widget.route_dropdown.set_nodeobject(Some(node));
+            //     }
+            // }));
 
             pwvucontrol_info!("sinkbox set_nodeobject {}", self.obj().node_object().expect("Node object").name());
         }
