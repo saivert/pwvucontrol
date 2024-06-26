@@ -66,12 +66,8 @@ impl PwChannelObject {
         let t_audiochannel =
             wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
         let channel = node_object.format().unwrap().positions[index as usize];
-        let channelname = t_audiochannel
-            .values()
-            .into_iter()
-            .find(|x| x.number() == channel)
-            .and_then(|x| x.short_name())
-            .unwrap();
+
+        let channelname = t_audiochannel.find_value(channel).expect("channel short name").short_name();
 
         glib::Object::builder()
             .property("index", index)
