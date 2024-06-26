@@ -353,11 +353,6 @@ impl PwNodeObject {
 
         node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(@weak self as widget, @weak node => move |res| {
             if let Ok(Some(iter)) = res {
-                let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Format").expect("id table");
-                let channels_key = keys.find_value_from_short_name("channels").expect("channels key");
-                let rate_key = keys.find_value_from_short_name("rate").expect("channels key");
-                let format_key = keys.find_value_from_short_name("format").expect("format key");
-                let position_key = keys.find_value_from_short_name("position").expect("position key");
 
                 for a in iter {
                     let pod: wp::spa::SpaPod = a.get().unwrap();
@@ -373,24 +368,24 @@ impl PwNodeObject {
                         }
                     }
 
-                    let choice = pod.find_spa_property(&format_key).expect("Format!");
+                    let choice = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_format).expect("Format!");
                     let format = get_pod_maybe_choice(choice).id().expect("Format id");
                     if format == 0 {
                         pwvucontrol_warning!("Format is 0, ignoring...");
                         return;
                     }
 
-                    let channels = match pod.find_spa_property(&channels_key) {
+                    let channels = match pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_channels) {
                         Some(pod) => get_pod_maybe_choice(pod).int().expect("Channels int"),
                         None => 0
                     };
 
-                    let rate = match pod.find_spa_property(&rate_key) {
+                    let rate = match pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_rate) {
                         Some(pod) => get_pod_maybe_choice(pod).int().expect("Rate int"),
                         None => 0
                     };
 
-                    let choice = pod.find_spa_property(&position_key).expect("Position!");
+                    let choice = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_position).expect("Position!");
                     let positionpod = get_pod_maybe_choice(choice);
                     let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
                     let mut a = [0u32;64];
@@ -424,20 +419,16 @@ impl PwNodeObject {
             .enum_params_sync("Props", None)
             .expect("getting params");
 
-        let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Props").expect("id table");
-        let volume_key = keys.find_value_from_short_name("volume").expect("volume key");
-        let monitorvolumes_key = keys.find_value_from_short_name("monitorVolumes").expect("monitorVolumes key");
-
         for a in params {
             let pod: wp::spa::SpaPod = a.get().unwrap();
             if pod.is_object() {
-                if let Some(val) = pod.find_spa_property(&volume_key) {
+                if let Some(val) = pod.find_spa_property(&wp::spa::ffi::SPA_PROP_volume) {
                     if let Some(volume) = val.float() {
                         self.set_mainvolume(volume);
                     }
                 }
 
-                if let Some(val) = pod.find_spa_property(&monitorvolumes_key) {
+                if let Some(val) = pod.find_spa_property(&wp::spa::ffi::SPA_PROP_monitorVolumes) {
                     if val.is_array() {
                         let volume = val.array_iterator::<f32>().max_by(f32::total_cmp);
                         self.set_monitorvolume(volume.unwrap_or_default());

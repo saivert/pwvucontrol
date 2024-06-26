@@ -1,3 +1,5 @@
+use wireplumber::spa::SpaPod;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, glib::Enum, Default)]
 #[enum_type(name = "RouteDirection")]
 pub enum RouteDirection {
@@ -14,6 +16,12 @@ impl From<u32> for RouteDirection {
             1 => RouteDirection::Output,
             _ => RouteDirection::Unknown,
         }
+    }
+}
+
+impl<'a> From<&'a SpaPod> for RouteDirection {
+    fn from(value: &'a SpaPod) -> Self {
+        value.id().map_or(RouteDirection::Unknown, |x| x.into())
     }
 }
 

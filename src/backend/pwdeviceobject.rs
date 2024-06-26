@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::backend::PwProfileObject;
+use crate::backend::{ParamAvailability, PwProfileObject};
 use glib::{
     self, clone,
     subclass::{prelude::*, Signal},
@@ -170,10 +170,6 @@ impl PwDeviceObject {
             None,
             gtk::gio::Cancellable::NONE,
             clone!(@weak self as widget => move |res| {
-                let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Profile").expect("id table");
-                let index_key = keys.find_value_from_short_name("index").expect("index key");
-                let description_key = keys.find_value_from_short_name("description").expect("decription key");
-                let available_key = keys.find_value_from_short_name("available").expect("available key");
 
                 if let Ok(Some(iter)) = res {
                     let mut profiles: Vec<PwProfileObject> = Vec::new();
@@ -184,9 +180,9 @@ impl PwDeviceObject {
                             continue;
                         }
 
-                        let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
-                        let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
-                        let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
+                        let index: i32 = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_index).expect("Profile index");
+                        let description: String = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_description).expect("Profile description");
+                        let available = pod.find_spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_available).expect("Profile availability").id().expect("Id");
 
                         profiles.push(PwProfileObject::new(index as u32, &description, available));
                     }
@@ -203,10 +199,6 @@ impl PwDeviceObject {
     pub(crate) fn update_current_profile_index(&self) {
         let device = self.wpdevice();
 
-        let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Profile").expect("id table");
-        let index_key = keys.find_value_from_short_name("index").expect("index key");
-        let description_key = keys.find_value_from_short_name("description").expect("decription key");
-
         if let Some(params) = device.enum_params_sync("Profile", None) {
             for a in params {
                 let pod: wp::spa::SpaPod = a.get().unwrap();
@@ -214,8 +206,8 @@ impl PwDeviceObject {
                     continue;
                 }
 
-                let index = pod.find_spa_property(&index_key).expect("Index!").int().expect("Int");
-                let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
+                let index: i32 = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_index).expect("Profile index");
+                let description: String = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_description).expect("Profile description");
                 pwvucontrol_info!("Current profile #{} {}", index, description);
 
                 self.set_profile_index(index as u32);
@@ -244,12 +236,6 @@ impl PwDeviceObject {
             None,
             gtk::gio::Cancellable::NONE,
             clone!(@weak self as widget => move |res| {
-                let keys = wp::spa::SpaIdTable::from_name("Spa:Pod:Object:Param:Route").expect("id table");
-                let index_key = keys.find_value_from_short_name("index").expect("index key");
-                let description_key = keys.find_value_from_short_name("description").expect("decription key");
-                let available_key = keys.find_value_from_short_name("available").expect("available key");
-                let direction_key = keys.find_value_from_short_name("direction").expect("direction key");
-                let profiles_key = keys.find_value_from_short_name("profiles").expect("profiles key");
 
                 if let Ok(Some(iter)) = res {
                     let removed = widget.imp().routemodel.n_items();
@@ -262,11 +248,11 @@ impl PwDeviceObject {
                             continue;
                         }
 
-                        let index = pod.find_spa_property(&index_key).expect("Index").int().expect("Int");
-                        let description = pod.find_spa_property(&description_key).expect("Format!").string().expect("String");
-                        let available = pod.find_spa_property(&available_key).expect("Availability!").id().expect("Id");
-                        let direction = pod.find_spa_property(&direction_key).expect("Direction!").id().expect("Id");
-                        let profiles = pod.find_spa_property(&profiles_key).expect("Profiles!");
+                        let index: i32 = pod.spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_index).expect("Route index");
+                        let description: String = pod.spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_description).expect("Route description");
+                        let direction: RouteDirection = pod.spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_direction).expect("Route direction");
+                        let available: ParamAvailability = pod.spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_available).expect("Route available");
+                        let profiles = pod.find_spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_profiles).expect("Profiles!");
                         assert!(profiles.is_array());
                         let profiles_vec: Vec<u32> =  profiles.array_iterator::<i32>().map(|x| x as u32).collect();
 

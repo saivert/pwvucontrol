@@ -46,12 +46,12 @@ glib::wrapper! {
 }
 
 impl PwRouteObject {
-    pub(crate) fn new(index: u32, description: &str, availability: u32, direction: u32, profiles: &[u32]) -> Self {
+    pub(crate) fn new(index: u32, description: &str, availability: ParamAvailability, direction: RouteDirection, profiles: &[u32]) -> Self {
         let new: PwRouteObject = glib::Object::builder()
         .property("index", index)
         .property("description", format!("{description} ({index})"))
-        .property("availability", ParamAvailability::from(availability))
-        .property("direction", RouteDirection::from(direction))
+        .property("availability", availability)
+        .property("direction", direction)
         .build();
 
         new.set_profiles(profiles);
