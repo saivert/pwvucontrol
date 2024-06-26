@@ -118,6 +118,7 @@ mod imp {
             self.outputdevice_dropdown.set_list_factory(default_dropdown_factory.as_ref());
 
             self.outputdevice_dropdown.set_enable_search(true);
+            self.outputdevice_dropdown.set_search_match_mode(gtk::StringFilterMatchMode::Substring);
 
 
             self.outputdevice_dropdown
