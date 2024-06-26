@@ -347,8 +347,8 @@ impl PwDeviceObject {
         podbuilder.add_int(index as i32);
         podbuilder.add_property("device");
         podbuilder.add_int(device_index);
-        // podbuilder.add_property("save");
-        // podbuilder.add_boolean(true);
+        podbuilder.add_property("save");
+        podbuilder.add_boolean(true);
 
         if let Some(pod) = podbuilder.end() {
             device.set_param("Route", 0, pod);
