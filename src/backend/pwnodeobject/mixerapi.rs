@@ -25,8 +25,7 @@ impl PwNodeObject {
     }
 
     pub(crate) fn send_volume_using_mixerapi(&self, what: PropertyChanged) {
-        let imp = self.imp();
-        let node = imp.wpnode.get().expect("node in send_volume");
+        let node = self.wpnode();
         let manager = PwvucontrolManager::default();
         let mixerapi = manager.mixer_api();
         let bound_id = node.bound_id();
@@ -58,7 +57,7 @@ impl PwNodeObject {
                         *v = max;
                     }
                 }
-                if let Some(cv) = self.make_channel_volumes_variant(&self.channel_volumes_vec()) {
+                if let Some(cv) = self.make_channel_volumes_variant(&channel_volumes) {
                     variant.insert("channelVolumes", cv);
                 }
                 self.set_channel_volumes_vec_no_send(&channel_volumes);
