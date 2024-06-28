@@ -1,0 +1,126 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the pwvucontrol package.
+#
+# Heimen Stoffels <vistausss@fastmail.com>, 2024.
+msgid ""
+msgstr ""
+"Project-Id-Version: pwvucontrol\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-02 21:07+0200\n"
+"PO-Revision-Date: 2024-06-28 22:07+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
+"Language-Team: Dutch <>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 22.12.3\n"
+
+#. Insert your license of choice here
+#. <project_license>MIT</project_license>
+#: data/com.saivert.pwvucontrol.desktop.in.in:3
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
+msgid "pwvucontrol"
+msgstr "pwvucontrol"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:9
+msgid "Volume control for pipewire"
+msgstr "Pipewire-volumebediening"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:11
+msgid "A native volume control app made with GTK + Rust."
+msgstr "Een platform-eigen volumebediening, gemaakt met GTK en Rust."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:16
+msgid "Main window"
+msgstr "Hoofdvenster"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:33
+msgid "Nicolai Syvertsen"
+msgstr "Nicolai Syvertsen"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:6
+#: data/com.saivert.pwvucontrol.gschema.xml.in:7
+msgid "Default window width"
+msgstr "Standaard vensterbreedte"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:11
+#: data/com.saivert.pwvucontrol.gschema.xml.in:12
+msgid "Default window height"
+msgstr "Standaard vensterhoogte"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:16
+msgid "Default window maximized behaviour"
+msgstr "Standaard (niet) maximaliseren"
+
+#: data/resources/ui/window.ui:57
+msgid "Pipewire Volume Control"
+msgstr "Pipewire-volumebediening"
+
+#: data/resources/ui/window.ui:75
+msgid "Playback"
+msgstr "Afspelen"
+
+#: data/resources/ui/window.ui:124
+msgid "Recording"
+msgstr "Opname"
+
+#: data/resources/ui/window.ui:176
+msgid "Output Devices"
+msgstr "Uitvoerapparaten"
+
+#: data/resources/ui/window.ui:243
+msgid "_Preferences"
+msgstr "_Voorkeuren"
+
+#: data/resources/ui/window.ui:247
+msgid "_Keyboard Shortcuts"
+msgstr "_Sneltoetsen"
+
+#: data/resources/ui/window.ui:251
+msgid "_About Pwvucontrol"
+msgstr "_Over pwvucontrol"
+
+#: data/resources/ui/help-overlay.ui:11
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Algemeen"
+
+#: data/resources/ui/help-overlay.ui:14
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Sneltoetsen tonen"
+
+#: data/resources/ui/help-overlay.ui:20
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Afsluiten"
+
+#: data/resources/ui/volumebox.ui:70
+msgid "on"
+msgstr "op"
+
+#: data/resources/ui/volumebox.ui:87
+msgid "Intel HDA"
+msgstr "Intel HDA"
+
+#: data/resources/ui/volumebox.ui:88
+msgid "HDMI Audio"
+msgstr "Hdmi-audio"
+
+#: data/resources/ui/volumebox.ui:89
+msgid "Headphones"
+msgstr "Koptelefoon"
+
+#: data/resources/ui/volumebox.ui:188
+msgid "Lock channels"
+msgstr "Kanalen vastzetten"
+
+#: data/resources/ui/volumebox.ui:201
+msgid "Main"
+msgstr "Algemeen"
+
+#: src/main.rs:80
+msgid "Could not load resources"
+msgstr "De bronnen kunnen niet worden geladen"
