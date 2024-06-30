@@ -202,6 +202,7 @@
                             <object class="PwVolumeScale" id="mainvolumescale">
                                 <property name="hexpand">1</property>
                                 <property name="hexpand-set">1</property>
+                                <property name="show-ticks">0</property>
                             </object>
                         </child>
                     </object>
@@ -220,6 +221,7 @@
                             <object class="PwVolumeScale" id="monitorvolumescale">
                                 <property name="hexpand">1</property>
                                 <property name="hexpand-set">1</property>
+                                <property name="show-ticks">0</property>
                             </object>
                         </child>
                     </object>

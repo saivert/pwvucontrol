@@ -20,10 +20,13 @@ mod imp {
         #[property(get, set = Self::set_volume)]
         pub volume: Cell<f32>,
 
-        #[property(get, set = Self::set_use_overamplification)]
+        #[property(get, set = Self::set_show_ticks, default=true)]
+        pub show_ticks: Cell<bool>,
+
+        #[property(get, construct_only)]
         pub use_overamplification: Cell<bool>,
 
-        #[property(get, set = Self::set_overamplification)]
+        #[property(set = Self::set_overamplification)]
         pub overamplification: Cell<bool>,
     }
 
@@ -63,13 +66,19 @@ mod imp {
                 .transform_from(cubic_to_linear)
                 .build();
 
-            let window = PwvucontrolWindow::default();
-            window
-                .imp()
-                .settings
-                .bind("enable-overamplification", self.obj().as_ref(), "overamplification")
-                .get_only()
-                .build();
+            if self.use_overamplification.get() {
+                let window = PwvucontrolWindow::default();
+                window
+                    .imp()
+                    .settings
+                    .bind("enable-overamplification", self.obj().as_ref(), "overamplification")
+                    .get_only()
+                    .build();
+            }
+
+            self.show_ticks.set(true);
+
+            self.update_ui();
         }
     }
     impl WidgetImpl for PwVolumeScale {}
@@ -91,15 +100,6 @@ mod imp {
             self.value.set_label(&value_string);
         }
 
-        fn set_use_overamplification(&self, value: bool) {
-            if self.use_overamplification.get() == value {
-                return;
-            }
-            self.use_overamplification.set(value);
-
-            self.update_ui();
-        }
-
         fn set_overamplification(&self, value: bool) {
             if self.overamplification.get() == value {
                 return;
@@ -109,16 +109,29 @@ mod imp {
             self.update_ui();
         }
 
+        fn set_show_ticks(&self, value: bool) {
+            if self.show_ticks.get() == value {
+                return;
+            }
+            self.show_ticks.set(value);
+
+            self.update_ui();
+        }
+
         fn update_ui(&self) {
             let overamplification = self.use_overamplification.get() && self.overamplification.get();
 
             let volume_scale = self.scale.get();
             volume_scale.clear_marks();
-            volume_scale.add_mark(0.0, gtk::PositionType::Bottom, Some(&gettext("Silence")));
-            volume_scale.add_mark(1.0, gtk::PositionType::Bottom, Some(&gettext("100%")));
+            if self.show_ticks.get() {
+                volume_scale.add_mark(0.0, gtk::PositionType::Bottom, Some(&gettext("Silence")));
+                volume_scale.add_mark(1.0, gtk::PositionType::Bottom, Some(&gettext("100%")));
+            }
 
             if overamplification {
-                volume_scale.add_mark(1.525, gtk::PositionType::Bottom, Some(&gettext("150%")));
+                if self.show_ticks.get() {
+                    volume_scale.add_mark(1.525, gtk::PositionType::Bottom, Some(&gettext("150%")));
+                }
                 volume_scale.set_range(0.0, 1.525);
             } else {
                 volume_scale.set_range(0.0, 1.0);
