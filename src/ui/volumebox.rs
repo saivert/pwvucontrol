@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{backend::{PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwvucontrolWindow}};
-
+use crate::{backend::{PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale}};
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
 use once_cell::sync::OnceCell;
@@ -33,7 +32,7 @@ mod imp {
         #[template_child]
         pub subtitle_label: TemplateChild<gtk::Label>,
         #[template_child]
-        pub volume_scale: TemplateChild<gtk::Scale>,
+        pub volume_scale: TemplateChild<PwVolumeScale>,
         #[template_child]
         pub level_bar: TemplateChild<gtk::LevelBar>,
         #[template_child]
@@ -47,9 +46,9 @@ mod imp {
         #[template_child]
         pub channellock: TemplateChild<gtk::ToggleButton>,
         #[template_child]
-        pub mainvolumescale: TemplateChild<gtk::Scale>,
+        pub mainvolumescale: TemplateChild<PwVolumeScale>,
         #[template_child]
-        pub monitorvolumescale: TemplateChild<gtk::Scale>,
+        pub monitorvolumescale: TemplateChild<PwVolumeScale>,
         #[template_child]
         pub container: TemplateChild<gtk::Box>,
     }
@@ -74,13 +73,6 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for PwVolumeBox {
         fn constructed(&self) {
-            fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
-                Some(i.cbrt() as f64)
-            }
-
-            fn cubic_to_linear(_binding: &glib::Binding, i: f64) -> Option<f32> {
-                Some((i * i * i) as f32)
-            }
 
             self.parent_constructed();
 
@@ -100,27 +92,16 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            item.bind_property("volume", &self.volume_scale.adjustment(), "value")
+            item.bind_property("volume", &self.volume_scale.get(), "volume")
                 .sync_create()
                 .bidirectional()
-                .transform_to(linear_to_cubic)
-                .transform_from(cubic_to_linear)
                 .build();
 
             #[rustfmt::skip]
-            item.bind_property("monitorvolume", &self.monitorvolumescale.adjustment(), "value")
+            item.bind_property("monitorvolume", &self.monitorvolumescale.get(), "volume")
                 .sync_create()
                 .bidirectional()
-                .transform_to(linear_to_cubic)
-                .transform_from(cubic_to_linear)
                 .build();
-
-            self.volume_scale.set_format_value_func(|_scale, value| {
-                format!(
-                    "{:>16}",
-                    format!("{:.0}% ({:.2} dB)", value * 100.0, (value * value * value).log10() * 20.0)
-                )
-            });
 
             item.bind_property("formatstr", &self.format.get(), "label").sync_create().build();
 
@@ -129,36 +110,11 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            item.bind_property("mainvolume", &self.mainvolumescale.adjustment(), "value")
+            item.bind_property("mainvolume", &self.mainvolumescale.get(), "volume")
                 .sync_create()
                 .bidirectional()
-                .transform_to(linear_to_cubic)
-                .transform_from(cubic_to_linear)
                 .build();
 
-            fn update_overamplification(volume_scale: &gtk::Scale) {
-                let window: PwvucontrolWindow = PwvucontrolWindow::default();
-                let enable_overamplification = window.imp().settings.boolean("enable-overamplification");
-                
-                volume_scale.clear_marks();
-                volume_scale.add_mark(0.0, gtk::PositionType::Bottom, Some("Silence"));
-                volume_scale.add_mark(1.0, gtk::PositionType::Bottom, Some("100%"));
-    
-
-                if enable_overamplification {
-                    volume_scale.add_mark(1.525, gtk::PositionType::Bottom, Some("150%"));
-                    volume_scale.set_range(0.0, 1.525);
-                } else {
-                    volume_scale.set_range(0.0, 1.0);
-                }
-            }
-
-            update_overamplification(&self.volume_scale);
-
-            let window = PwvucontrolWindow::default();
-            window.imp().settings.connect_changed(Some("enable-overamplification"), clone!(@weak self as widget => move |_,_| {
-                update_overamplification(&widget.volume_scale);
-            }));
 
             let manager = PwvucontrolManager::default();
 

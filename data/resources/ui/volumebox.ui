@@ -111,28 +111,9 @@
                         <property name="spacing">6</property>
 
                         <child>
-                            <object class="GtkScale" id="volume_scale">
-                                <property name="orientation">horizontal</property>
-                                <property name="draw-value">1</property>
-                                <property name="value-pos">right</property>
-                                <property name="adjustment">
-                                    <object class="GtkAdjustment">
-                                        <property name="lower">0</property>
-                                        <property name="upper">1</property>
-                                        <property name="step-increment">0.01</property>
-                                        <property name="page-increment">0.1</property>
-                                        <property name="page-size">0</property>
-                                    </object>
-                                </property>
-                                <property name="digits">3</property>
-                                <!-- <binding name="visible">
-                                    <closure type='gboolean' function='invert_bool'>
-                                        <lookup name='active'>toggle</lookup>
-                                    </closure>
-                                </binding> -->
-
+                            <object class="PwVolumeScale" id="volume_scale">
+                                <property name="use-overamplification">1</property>
                             </object>
-
                         </child>
                         <child>
                             <object class="GtkLevelBar" id="level_bar">
@@ -205,7 +186,7 @@
         <child>
             <object class="GtkBox">
                 <property name="orientation">vertical</property>
-                <property name="width-request">200</property>
+                <property name="width-request">300</property>
                 <child>
                     <object class="GtkBox">
                         <property name="spacing">6</property>
@@ -218,20 +199,9 @@
                             </object>
                         </child>
                         <child>
-                            <object class="GtkScale" id="mainvolumescale">
+                            <object class="PwVolumeScale" id="mainvolumescale">
                                 <property name="hexpand">1</property>
                                 <property name="hexpand-set">1</property>
-
-                                <property name="adjustment">
-                                    <object class="GtkAdjustment">
-                                        <property name="lower">0</property>
-                                        <property name="upper">1</property>
-                                        <property name="step-increment">0.01</property>
-                                        <property name="page-increment">0.1</property>
-                                        <property name="page-size">0</property>
-                                    </object>
-                                </property>
-
                             </object>
                         </child>
                     </object>
@@ -247,20 +217,9 @@
                             </object>
                         </child>
                         <child>
-                            <object class="GtkScale" id="monitorvolumescale">
+                            <object class="PwVolumeScale" id="monitorvolumescale">
                                 <property name="hexpand">1</property>
                                 <property name="hexpand-set">1</property>
-
-                                <property name="adjustment">
-                                    <object class="GtkAdjustment">
-                                        <property name="lower">0</property>
-                                        <property name="upper">1</property>
-                                        <property name="step-increment">0.01</property>
-                                        <property name="page-increment">0.1</property>
-                                        <property name="page-size">0</property>
-                                    </object>
-                                </property>
-
                             </object>
                         </child>
                     </object>

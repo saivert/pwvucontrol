@@ -13,6 +13,7 @@
     <file preprocess="xml-stripblanks" alias="gtk/route-dropdown.ui">ui/route-dropdown.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/devicebox.ui">ui/devicebox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/profilerow.ui">ui/profilerow.ui</file>
+    <file preprocess="xml-stripblanks" alias="gtk/volumescale.ui">ui/volumescale.ui</file>
     <file>ui/levelbar.css</file>
     <file>ui/list.css</file>
   </gresource>

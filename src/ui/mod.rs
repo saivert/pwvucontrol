@@ -10,6 +10,7 @@ mod profile_dropdown;
 mod devicebox;
 mod profilerow;
 mod route_dropdown;
+mod volumescale;
 
 pub use window::PwvucontrolWindow;
 pub use window::PwvucontrolWindowView;
@@ -23,3 +24,4 @@ pub use levelprovider::LevelbarProvider;
 pub use streambox::PwStreamBox;
 pub use profilerow::PwProfileRow;
 pub use route_dropdown::PwRouteDropDown;
+pub use volumescale::PwVolumeScale;

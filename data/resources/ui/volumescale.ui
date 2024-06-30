@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<interface>
+    <requires lib="gtk" version="4.0" />
+    <requires lib="Adw" version="1.0" />
+    <template class="PwVolumeScale" parent="GtkWidget">
+        <property name="layout-manager">
+            <object class="GtkBoxLayout">
+                <property name="orientation">horizontal</property>
+                <property name="spacing">8</property>
+            </object>
+        </property>
+
+        <child>
+            <object class="GtkScale" id="scale">
+                <property name="orientation">horizontal</property>
+                <property name="draw-value">0</property>
+                <property name="hexpand">1</property>
+                <property name="adjustment">
+                    <object class="GtkAdjustment">
+                        <property name="lower">0</property>
+                        <property name="upper">1</property>
+                        <property name="step-increment">0.01</property>
+                        <property name="page-increment">0.1</property>
+                        <property name="page-size">0</property>
+                    </object>
+                </property>
+            </object>
+        </child>
+        <child>
+            <object class="GtkLabel" id="value">
+                <property name="width-chars">15</property>
+            </object>
+        </child>
+    </template>
+</interface>
