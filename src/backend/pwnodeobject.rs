@@ -30,9 +30,6 @@ pub enum NodeType {
 
 #[derive(Copy, Clone, Debug)]
 pub struct AudioFormat {
-    pub channels: i32,
-    pub format: u32,
-    pub rate: i32,
     pub positions: [u32; 64],
 }
 
@@ -400,7 +397,7 @@ impl PwNodeObject {
 
                     widget.set_formatstr(format!("{}ch {}Hz {}", channels, rate, formatname));
 
-                    widget.set_format(AudioFormat { channels, format, rate, positions: a });
+                    widget.set_format(AudioFormat { positions: a });
 
                     // Must be done here since EnumFormat is async
                     widget.update_channelmodel();
