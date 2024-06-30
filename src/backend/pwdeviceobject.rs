@@ -4,7 +4,7 @@ use crate::backend::{ParamAvailability, PwProfileObject};
 use glib::{
     self, clone,
     subclass::{prelude::*, Signal},
-    Object, ObjectExt, ParamSpec, Properties, Value,
+    ParamSpec, Properties, Value,
 };
 use gtk::{gio, prelude::*};
 use wireplumber as wp;
@@ -14,7 +14,8 @@ use wp::{
 };
 
 use crate::macros::*;
-use once_cell::sync::{Lazy, OnceCell};
+use std::sync::OnceLock;
+use std::cell::OnceCell;
 use super::{PwRouteFilterModel, PwRouteObject, RouteDirection};
 use std::cell::{Cell, RefCell};
 
@@ -93,16 +94,15 @@ pub mod imp {
         }
 
         fn signals() -> &'static [Signal] {
-            static SIGNALS: Lazy<Vec<Signal>> = Lazy::new(|| {
+            static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+            SIGNALS.get_or_init(|| {
                 vec![
                     Signal::builder("pre-update-profile").build(),
                     Signal::builder("post-update-profile").build(),
                     Signal::builder("pre-update-route").build(),
                     Signal::builder("post-update-route").build(),
                 ]
-            });
-
-            SIGNALS.as_ref()
+            })
         }
 
         fn constructed(&self) {
@@ -159,7 +159,7 @@ glib::wrapper! {
 
 impl PwDeviceObject {
     pub(crate) fn new(node: &wp::pw::Device) -> Self {
-        Object::builder().property("wpdevice", node).build()
+        glib::Object::builder().property("wpdevice", node).build()
     }
 
     pub(crate) fn update_profiles(&self) {

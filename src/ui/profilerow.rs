@@ -53,7 +53,7 @@ impl PwProfileRow {
         glib::Object::builder().build()
     }
 
-    pub fn setup<Type: glib::IsA<glib::Object>>(&self, item: &gtk::ListItem, list: bool) {
+    pub fn setup<Type: IsA<glib::Object>>(&self, item: &gtk::ListItem, list: bool) {
         let label = self.imp().label.get();
         let unavailable_icon = self.imp().unavailable_icon.get();
 

@@ -6,8 +6,7 @@ use crate::{
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
-use once_cell::sync::OnceCell;
-use std::cell::{Cell, RefCell};
+use std::cell::{Cell, RefCell, OnceCell};
 use wireplumber as wp;
 
 mod imp {

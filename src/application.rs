@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use glib::ExitCode;
-use gtk::{gio, glib, prelude::*, subclass::prelude::*};
-use glib::Properties;
+use gtk::{gio, prelude::*, subclass::prelude::*};
 use adw::subclass::prelude::*;
-use once_cell::unsync::OnceCell;
+use std::cell::OnceCell;
 use crate::{
     config::{APP_ID, VERSION},
     backend::PwvucontrolManager,
@@ -14,7 +13,7 @@ use crate::{
 mod imp {
     use super::*;
 
-    #[derive(Properties)]
+    #[derive(glib::Properties)]
     #[properties(wrapper_type = super::PwvucontrolApplication)]
     pub struct PwvucontrolApplication {
         pub window: OnceCell<PwvucontrolWindow>,

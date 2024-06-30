@@ -2,15 +2,14 @@
 
 use wireplumber as wp;
 use wp::{
-    pw::{GlobalProxyExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt, MetadataExt, FromPipewirePropertyString},
-    spa::SpaPodBuilder,
-    registry::{Constraint, ConstraintType, Interest}
+    pw::{FromPipewirePropertyString, GlobalProxyExt, MetadataExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt}, registry::{Constraint, ConstraintType, Interest}, spa::SpaPodBuilder
 };
 use std::cell::{Cell, RefCell};
-use glib::{self, clone, subclass::{prelude::*, Signal}, ObjectExt, ParamSpec, Properties, Value, CastNone, Cast};
-use once_cell::sync::{Lazy, OnceCell};
-use gtk::{gio, prelude::ListModelExt};
-use super::{PwDeviceObject, PwRouteObject, PwChannelObject, PwvucontrolManager};
+use glib::{clone, subclass::Signal, ParamSpec, Properties, Value};
+use std::sync::OnceLock;
+use std::cell::OnceCell;
+use gtk::{gio, prelude::*, subclass::prelude::*};
+use super::{PwChannelObject, PwDeviceObject, PwRouteObject, PwvucontrolManager};
 use wp::registry::ObjectManager;
 
 use crate::macros::*;
@@ -158,12 +157,12 @@ pub mod imp {
         }
 
         fn signals() -> &'static [Signal] {
-            static SIGNALS: Lazy<Vec<Signal>> =
-                Lazy::new(|| vec![
+            static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
+             SIGNALS.get_or_init(|| {
+                vec![
                     Signal::builder("format").build(),
-                ]);
-
-            SIGNALS.as_ref()
+                ]
+             })
         }
 
 
@@ -624,7 +623,7 @@ trait MetadataExtFix: 'static {
     fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString>;
 }
 
-impl <O: glib::IsA<wp::pw::Metadata>> MetadataExtFix for O {
+impl <O: IsA<wp::pw::Metadata>> MetadataExtFix for O {
     fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString> {
         use glib::translate::ToGlibPtr;
         unsafe {

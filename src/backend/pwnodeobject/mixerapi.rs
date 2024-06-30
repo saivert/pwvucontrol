@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use glib::{subclass::types::ObjectSubclassIsExt, ObjectExt, ToVariant, closure_local};
+use glib::closure_local;
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 

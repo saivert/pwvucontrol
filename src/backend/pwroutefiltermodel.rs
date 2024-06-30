@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use super::{ParamAvailability, PwRouteObject, RouteDirection};
-use glib::{closure_local, subclass::prelude::*, Properties};
+use glib::{closure_local, Properties};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
 use imbl::OrdSet;
@@ -95,7 +95,7 @@ glib::wrapper! {
 }
 
 impl PwRouteFilterModel {
-    pub(crate) fn new(direction: RouteDirection, model: Option<&impl glib::IsA<gio::ListModel>>) -> Self {
+    pub(crate) fn new(direction: RouteDirection, model: Option<&impl IsA<gio::ListModel>>) -> Self {
         glib::Object::builder().property("model", model).property("direction", direction).build()
     }
 }

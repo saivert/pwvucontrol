@@ -3,13 +3,13 @@
 use std::{fmt::Debug, time::Duration};
 
 use glib::{self, clone, ControlFlow};
-use pipewire::{properties, spa, stream::*, Context, Loop};
+use pipewire::{spa, spa::utils::Direction, stream::*, context::Context, loop_::Loop, properties::*};
 use std::os::fd::AsRawFd;
 use crate::ui::PwVolumeBox;
 
 pub struct LevelbarProvider {
     _loop: Loop,
-    _context: Context<pipewire::Loop>,
+    _context: Context,
     stream: Option<Stream>,
     _listener: StreamListener<f32>,
 }
@@ -22,7 +22,7 @@ impl Debug for LevelbarProvider {
 
 impl LevelbarProvider {
     pub fn new(volumebox: &PwVolumeBox, id: u32) -> Result<Self, anyhow::Error> {
-        let loop_ = Loop::new()?;
+        let loop_ = Loop::new(None)?;
         let context = Context::new(&loop_)?;
         let core = context.connect(None)?;
 
@@ -76,7 +76,7 @@ impl LevelbarProvider {
         let fmtpod = create_audio_format_pod(&mut buffer);
 
         stream.connect(
-            pipewire::spa::Direction::Input,
+            Direction::Input,
             Some(id),
             StreamFlags::AUTOCONNECT
                 | StreamFlags::MAP_BUFFERS

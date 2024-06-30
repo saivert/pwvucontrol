@@ -11,8 +11,7 @@ use gtk::{
     prelude::*,
     subclass::prelude::*,
 };
-use once_cell::unsync::OnceCell;
-use std::cell::RefCell;
+use std::cell::{RefCell, OnceCell};
 use wireplumber as wp;
 use wp::{
     plugin::{PluginFeatures, *},
@@ -28,6 +27,7 @@ mod imp {
     pub struct PwvucontrolManager {
         #[property(get)]
         pub wp_core: OnceCell<wp::core::Core>,
+
         pub wp_object_manager: OnceCell<wp::registry::ObjectManager>,
 
         #[property(get)]

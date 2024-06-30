@@ -85,7 +85,7 @@ glib::wrapper! {
 }
 
 impl PwStreamBox {
-    pub(crate) fn new(node_object: &impl glib::IsA<PwNodeObject>) -> Self {
+    pub(crate) fn new(node_object: &impl IsA<PwNodeObject>) -> Self {
         glib::Object::builder().property("node-object", node_object).build()
     }
 

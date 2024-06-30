@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::{closure_local, subclass::prelude::*, Properties, SignalHandlerId};
+use glib::{closure_local, Properties, SignalHandlerId};
 use gtk::{gio, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell, OnceCell};
 use super::{NodeType, PwNodeObject};
@@ -101,7 +101,7 @@ glib::wrapper! {
 }
 
 impl PwNodeFilterModel {
-    pub(crate) fn new(nodetype: NodeType, model: Option<impl glib::IsA<gio::ListModel>>) -> Self
+    pub(crate) fn new(nodetype: NodeType, model: Option<impl IsA<gio::ListModel>>) -> Self
     {
         glib::Object::builder()
         .property("model", &model)

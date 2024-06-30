@@ -5,19 +5,16 @@ edition = "2021"
 
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
-gtk = { version = "0.7.1", package = "gtk4", features = ["v4_12"]}
-glib = { version = "0.18", features = ["log"] }
+gtk = { version = "0.8.2", package = "gtk4", features = ["v4_12"]}
+glib = { version = "0.19", features = ["log"] }
 log = "0.4.11"
 imbl = "3.0.0"
-once_cell = "1.15.0"
-wireplumber = { git = "https://github.com/arcnmx/wireplumber.rs.git", rev = "2c0ee463d029d3562ee66db90554c5af573565c1", features = ["v0_4_16"] }
-#wireplumber = { git = "https://github.com/saivert/wireplumber.rs.git", branch = "use_pipewire_from_git", features = ["v0_4_12"] }
+wireplumber = { git = "https://github.com/arcnmx/wireplumber.rs.git", rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda", features = ["v0_4_16"] }
 futures = "0.3"
 anyhow = "1.0"
-pipewire = "0.7"
-#pipewire = {git = "https://gitlab.freedesktop.org/saivert/pipewire-rs", branch = "misc_fixes", features = ["v0_3_44"]}
+pipewire = "0.8"
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.5"
+version = "0.6"
 features = ["v1_2"]
