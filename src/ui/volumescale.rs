@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use crate::ui::PwvucontrolWindow;
+use gettextrs::gettext;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
-use gettextrs::gettext;
 
 mod imp {
-
-    use crate::ui::PwvucontrolWindow;
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -52,12 +50,13 @@ mod imp {
             fn linear_to_cubic(_binding: &glib::Binding, i: f32) -> Option<f64> {
                 Some(i.cbrt() as f64)
             }
-            
+
             fn cubic_to_linear(_binding: &glib::Binding, i: f64) -> Option<f32> {
                 Some((i.powi(3)) as f32)
             }
 
-            self.obj().bind_property("volume", &self.scale.adjustment(), "value")
+            self.obj()
+                .bind_property("volume", &self.scale.adjustment(), "value")
                 .sync_create()
                 .bidirectional()
                 .transform_to(linear_to_cubic)
@@ -65,7 +64,12 @@ mod imp {
                 .build();
 
             let window = PwvucontrolWindow::default();
-            window.imp().settings.bind("enable-overamplification", self.obj().as_ref(), "overamplification").get_only().build();
+            window
+                .imp()
+                .settings
+                .bind("enable-overamplification", self.obj().as_ref(), "overamplification")
+                .get_only()
+                .build();
         }
     }
     impl WidgetImpl for PwVolumeScale {}
@@ -140,4 +144,3 @@ impl Default for PwVolumeScale {
         Self::new()
     }
 }
-

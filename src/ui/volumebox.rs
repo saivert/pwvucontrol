@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{backend::{PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale}};
+use crate::{
+    backend::{PwChannelObject, PwNodeObject, PwvucontrolManager},
+    ui::{LevelbarProvider, PwChannelBox, PwVolumeScale},
+};
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
 use once_cell::sync::OnceCell;
@@ -73,7 +76,6 @@ mod imp {
     #[glib::derived_properties]
     impl ObjectImpl for PwVolumeBox {
         fn constructed(&self) {
-
             self.parent_constructed();
 
             let item = self.node_object.borrow();
@@ -97,7 +99,6 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            #[rustfmt::skip]
             item.bind_property("monitorvolume", &self.monitorvolumescale.get(), "volume")
                 .sync_create()
                 .bidirectional()
@@ -114,7 +115,6 @@ mod imp {
                 .sync_create()
                 .bidirectional()
                 .build();
-
 
             let manager = PwvucontrolManager::default();
 
@@ -157,7 +157,6 @@ mod imp {
 
             // Monitoring ourselves cause an infinite loop.
             if item.name() != "pwvucontrol-peak-detect" {
-
                 if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                     self.levelbarprovider.set(provider).expect("Provider not set already");
 
@@ -168,7 +167,6 @@ mod imp {
                             ControlFlow::Continue
                         }),
                     )));
-                    
                 }
             } else {
                 self.level_bar.set_visible(false);
@@ -222,7 +220,6 @@ glib::wrapper! {
 }
 
 impl PwVolumeBox {
-
     pub(crate) fn set_level(&self, level: f32) {
         self.imp().level.set(level);
     }
