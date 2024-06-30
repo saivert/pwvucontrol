@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-02 21:07+0200\n"
+"POT-Creation-Date: 2024-06-30 22:23+0200\n"
 "PO-Revision-Date: 2023-06-13 22:28+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,26 +17,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. Insert your license of choice here
-#. <project_license>MIT</project_license>
 #: data/com.saivert.pwvucontrol.desktop.in.in:3
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
 msgid "pwvucontrol"
 msgstr "pwvucontrol"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:9
+#: data/com.saivert.pwvucontrol.desktop.in.in:9
+msgid "GTK"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
 msgstr "Volumkontroll for pipewire"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:11
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:10
 msgid "A native volume control app made with GTK + Rust."
 msgstr "En egen volumkontroll app laget med GTK + Rust."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:16
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:18
 msgid "Main window"
 msgstr "Hovedvindu"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:33
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
+msgid "Changelog since 0.4.2"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+msgid "Added new icons for input and output devices."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
+msgid "Changelog since 0.3.1"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+msgid "Added support for over-amplification. Enable via hamburger menu."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:43
+msgid "Changelog since 0.2.0"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:45
+msgid "Added card tab for selecing sound card profile"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
 msgid "Nicolai Syvertsen"
 msgstr ""
 
@@ -54,73 +80,94 @@ msgstr "Standard vindushøyde"
 msgid "Default window maximized behaviour"
 msgstr "Standard maksimert modus for vindu"
 
-#: data/resources/ui/window.ui:57
+#: data/com.saivert.pwvucontrol.gschema.xml.in:21
+msgid "Enable over-amplification"
+msgstr ""
+
+#: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"
 msgstr "Pipewire volumkontroll"
 
-#: data/resources/ui/window.ui:75
+#: data/resources/ui/window.ui:78
 msgid "Playback"
 msgstr "Avspilling"
 
-#: data/resources/ui/window.ui:124
+#: data/resources/ui/window.ui:119
 msgid "Recording"
 msgstr "Opptak"
 
-#: data/resources/ui/window.ui:176
+#: data/resources/ui/window.ui:160
+#, fuzzy
+msgid "Input Devices"
+msgstr "Utgangsenheter"
+
+#: data/resources/ui/window.ui:201
 msgid "Output Devices"
 msgstr "Utgangsenheter"
 
-#: data/resources/ui/window.ui:243
-msgid "_Preferences"
-msgstr "_Innstillinger"
+#: data/resources/ui/window.ui:242
+msgid "Cards"
+msgstr ""
 
-#: data/resources/ui/window.ui:247
+#: data/resources/ui/window.ui:299
+msgid "_Enable over-amplification"
+msgstr ""
+
+#: data/resources/ui/window.ui:303
 msgid "_Keyboard Shortcuts"
 msgstr "_Hurtigtaster"
 
-#: data/resources/ui/window.ui:251
+#: data/resources/ui/window.ui:307
 msgid "_About Pwvucontrol"
 msgstr "_Om Pwvucontrol"
 
-#: data/resources/ui/help-overlay.ui:11
+#: data/resources/ui/help-overlay.ui:12
 msgctxt "shortcut window"
 msgid "General"
 msgstr "Generelt"
 
-#: data/resources/ui/help-overlay.ui:14
+#: data/resources/ui/help-overlay.ui:15
 msgctxt "shortcut window"
 msgid "Show Shortcuts"
 msgstr "Vis snarveier"
 
-#: data/resources/ui/help-overlay.ui:20
+#: data/resources/ui/help-overlay.ui:22
+msgctxt "shortcut window"
+msgid "Open application menu"
+msgstr ""
+
+#: data/resources/ui/help-overlay.ui:27
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Avslutt"
 
-#: data/resources/ui/volumebox.ui:70
-msgid "on"
-msgstr "på"
-
-#: data/resources/ui/volumebox.ui:87
-msgid "Intel HDA"
-msgstr "Intel HDA"
-
-#: data/resources/ui/volumebox.ui:88
-msgid "HDMI Audio"
-msgstr "HDMI Lyd"
-
-#: data/resources/ui/volumebox.ui:89
-msgid "Headphones"
-msgstr "Hodetelefoner"
-
-#: data/resources/ui/volumebox.ui:188
+#: data/resources/ui/volumebox.ui:160
 msgid "Lock channels"
 msgstr "Lås kanaler"
 
-#: data/resources/ui/volumebox.ui:201
+#: data/resources/ui/volumebox.ui:198
 msgid "Main"
 msgstr "Hoved"
 
-#: src/main.rs:80
+#: data/resources/ui/volumebox.ui:217
+msgid "Monitor"
+msgstr ""
+
+#: src/main.rs:77
 msgid "Could not load resources"
 msgstr "Kan ikke laste ressurser"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Innstillinger"
+
+#~ msgid "on"
+#~ msgstr "på"
+
+#~ msgid "Intel HDA"
+#~ msgstr "Intel HDA"
+
+#~ msgid "HDMI Audio"
+#~ msgstr "HDMI Lyd"
+
+#~ msgid "Headphones"
+#~ msgstr "Hodetelefoner"
