@@ -5,4 +5,8 @@ data/resources/ui/window.ui
 data/resources/ui/help-overlay.ui
 data/resources/ui/channelbox.ui
 data/resources/ui/volumebox.ui
+data/resources/ui/sinkbox.ui
+data/resources/ui/streambox.ui
 src/main.rs
+src/ui/streambox.rs
+src/ui/sinkbox.rs

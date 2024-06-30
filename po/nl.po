@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-30 22:23+0200\n"
+"POT-Creation-Date: 2024-06-30 23:49+0200\n"
 "PO-Revision-Date: 2024-06-28 22:07+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
@@ -97,9 +97,8 @@ msgid "Recording"
 msgstr "Opname"
 
 #: data/resources/ui/window.ui:160
-#, fuzzy
 msgid "Input Devices"
-msgstr "Uitvoerapparaten"
+msgstr "Invoerapparaten"
 
 #: data/resources/ui/window.ui:201
 msgid "Output Devices"
@@ -153,21 +152,22 @@ msgstr "Algemeen"
 msgid "Monitor"
 msgstr ""
 
+#: data/resources/ui/sinkbox.ui:13
+msgid "Port:"
+msgstr ""
+
+#: data/resources/ui/streambox.ui:13
+msgid "on"
+msgstr "op"
+
 #: src/main.rs:77
 msgid "Could not load resources"
 msgstr "De bronnen kunnen niet worden geladen"
 
-#~ msgid "_Preferences"
-#~ msgstr "_Voorkeuren"
+#: src/ui/streambox.rs:107
+msgid "Default ({})"
+msgstr ""
 
-#~ msgid "on"
-#~ msgstr "op"
-
-#~ msgid "Intel HDA"
-#~ msgstr "Intel HDA"
-
-#~ msgid "HDMI Audio"
-#~ msgstr "Hdmi-audio"
-
-#~ msgid "Headphones"
-#~ msgstr "Koptelefoon"
+#: src/ui/streambox.rs:112
+msgid "Default"
+msgstr ""
