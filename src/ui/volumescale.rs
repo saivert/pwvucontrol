@@ -92,10 +92,7 @@ mod imp {
 
             let cubic_volume = volume.cbrt();
 
-            let value_string = format!(
-                "{:>16}",
-                format!("{:.0}% ({:.2} dB)", cubic_volume * 100.0, (cubic_volume.powi(3)).log10() * 20.0)
-            );
+            let value_string = format!("{:.0}% ({:.2} dB)", cubic_volume * 100.0, (cubic_volume.powi(3)).log10() * 20.0);
 
             self.value.set_label(&value_string);
         }
