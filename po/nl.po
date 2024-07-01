@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-30 23:49+0200\n"
+"POT-Creation-Date: 2024-07-01 20:03+0200\n"
 "PO-Revision-Date: 2024-06-28 22:07+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
@@ -39,30 +39,44 @@ msgid "Main window"
 msgstr "Hoofdvenster"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-msgid "Changelog since 0.4.2"
+msgid "Changelog since 0.4.3"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+msgid "Added dutch translation."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+msgid ""
+"Application icons are now hidden in Flatpak build to keep permissions "
+"reduced."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+msgid "Changelog since 0.4.2"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid "Added new icons for input and output devices."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.3.1"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:43
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
 msgid "Changelog since 0.2.0"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:45
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Added card tab for selecing sound card profile"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:69
 msgid "Nicolai Syvertsen"
 msgstr "Nicolai Syvertsen"
 
@@ -140,6 +154,10 @@ msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Afsluiten"
 
+#: data/resources/ui/volumebox.ui:142
+msgid "_Advanced"
+msgstr ""
+
 #: data/resources/ui/volumebox.ui:160
 msgid "Lock channels"
 msgstr "Kanalen vastzetten"
@@ -170,4 +188,16 @@ msgstr ""
 
 #: src/ui/streambox.rs:112
 msgid "Default"
+msgstr ""
+
+#: src/ui/volumescale.rs:127
+msgid "Silence"
+msgstr ""
+
+#: src/ui/volumescale.rs:128
+msgid "100%"
+msgstr ""
+
+#: src/ui/volumescale.rs:133
+msgid "150%"
 msgstr ""

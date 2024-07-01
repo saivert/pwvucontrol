@@ -139,7 +139,7 @@
 
                                         <child type="start">
                                             <object class="GtkMenuButton">
-                                                <property name="label">_Advanced</property>
+                                                <property name="label" translatable="yes">_Advanced</property>
                                                 <property name="use-underline">1</property>
                                                 <property name="popover">advancedvolumes</property>
                                             </object>

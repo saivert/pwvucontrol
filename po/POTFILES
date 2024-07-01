@@ -10,3 +10,4 @@ data/resources/ui/streambox.ui
 src/main.rs
 src/ui/streambox.rs
 src/ui/sinkbox.rs
+src/ui/volumescale.rs
