@@ -67,10 +67,22 @@
             "name": "pwvucontrol",
             "builddir": true,
             "buildsystem": "meson",
+            "config-opts": [
+                "-Dsandboxed=true"
+            ],
             "sources": [
                 {
                     "type": "dir",
-                    "path": ".."
+                    "path": "..",
+                    "skip": [
+                        ".flatpak-builder",
+                        ".git",
+                        "builddir",
+                        ".github",
+                        "flatpak-build",
+                        "myrepo",
+                        "target"
+                    ]
                 }
             ]
         }

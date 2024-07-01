@@ -25,6 +25,10 @@ else
   message('Building in debug mode')
 endif
 
+if get_option('sandboxed')
+  cargo_options += ['-Fsandboxed']
+endif
+
 cargo_env = [
   'CARGO_HOME=' + meson.project_build_root() / 'cargo-home',
   'CODEGEN_BUILD_DIR=' + meson.current_build_dir()

@@ -80,7 +80,12 @@ mod imp {
             let item = self.node_object.borrow();
             let item = item.as_ref().cloned().unwrap();
 
-            self.icon.set_icon_name(Some(&item.iconname()));
+            // Flatpak blocks access to application icons, so hide the icon when run in the sandbox.
+            if cfg!(not(feature = "sandboxed")) {
+                self.icon.set_icon_name(Some(&item.iconname()));
+            } else {
+                self.icon.set_visible(false);
+            }
 
             item.bind_property("name", &self.title_label.get(), "label").sync_create().build();
 

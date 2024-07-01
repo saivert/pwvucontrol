@@ -8,3 +8,10 @@ option(
   value: 'default',
   description: 'The build profile for pwvucontrol. One of "default" or "development".'
 )
+
+option(
+  'sandboxed',
+  type: 'boolean',
+  value: false,
+  description: 'If this is built to be run in a sandbox.'
+)
