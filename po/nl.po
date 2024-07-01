@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-07-01 20:03+0200\n"
-"PO-Revision-Date: 2024-06-28 22:07+0200\n"
+"PO-Revision-Date: 2024-07-01 21:02+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 22.12.3\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:3
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
@@ -24,7 +24,7 @@ msgstr "pwvucontrol"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:9
 msgid "GTK"
-msgstr ""
+msgstr "GTK"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -40,41 +40,45 @@ msgstr "Hoofdvenster"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
 msgid "Changelog since 0.4.3"
-msgstr ""
+msgstr "Wijzigingslog sinds 0.4.3"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
 msgid "Added dutch translation."
-msgstr ""
+msgstr "Nieuw: Nederlandse vertaling"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
 msgstr ""
+"Verbeterd: toepassingspictogrammen worden verborgen in de "
+"flatpakversie om het aantal rechten beperkt te houden"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
 msgid "Changelog since 0.4.2"
-msgstr ""
+msgstr "Wijzigingslog sinds 0.4.2"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid "Added new icons for input and output devices."
-msgstr ""
+msgstr "Nieuw: pictogrammen voor in- en uitvoerapparaten"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.3.1"
-msgstr ""
+msgstr "Wijzigingslog sinds 0.3.1"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
+"Nieuw: ondersteuning voor geluidsversterking - schakel in via het "
+"hamburgermenu"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
 msgid "Changelog since 0.2.0"
-msgstr ""
+msgstr "Wijzigingslog sinds 0.2.0"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Added card tab for selecing sound card profile"
-msgstr ""
+msgstr "Nieuw: tabblad voor het kiezen van een geluidskaartprofiel"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:69
 msgid "Nicolai Syvertsen"
@@ -96,7 +100,7 @@ msgstr "Standaard (niet) maximaliseren"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
-msgstr ""
+msgstr "Geluidsversterking inschakelen"
 
 #: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"
@@ -120,11 +124,11 @@ msgstr "Uitvoerapparaten"
 
 #: data/resources/ui/window.ui:242
 msgid "Cards"
-msgstr ""
+msgstr "Kaarten"
 
 #: data/resources/ui/window.ui:299
 msgid "_Enable over-amplification"
-msgstr ""
+msgstr "Geluidsversterking inschak_elen"
 
 #: data/resources/ui/window.ui:303
 msgid "_Keyboard Shortcuts"
@@ -147,7 +151,7 @@ msgstr "Sneltoetsen tonen"
 #: data/resources/ui/help-overlay.ui:22
 msgctxt "shortcut window"
 msgid "Open application menu"
-msgstr ""
+msgstr "Toepassingsmenu openen"
 
 #: data/resources/ui/help-overlay.ui:27
 msgctxt "shortcut window"
@@ -156,7 +160,7 @@ msgstr "Afsluiten"
 
 #: data/resources/ui/volumebox.ui:142
 msgid "_Advanced"
-msgstr ""
+msgstr "Ge_avanceerd"
 
 #: data/resources/ui/volumebox.ui:160
 msgid "Lock channels"
@@ -168,11 +172,11 @@ msgstr "Algemeen"
 
 #: data/resources/ui/volumebox.ui:217
 msgid "Monitor"
-msgstr ""
+msgstr "Monitoren"
 
 #: data/resources/ui/sinkbox.ui:13
 msgid "Port:"
-msgstr ""
+msgstr "Poort:"
 
 #: data/resources/ui/streambox.ui:13
 msgid "on"
@@ -184,20 +188,20 @@ msgstr "De bronnen kunnen niet worden geladen"
 
 #: src/ui/streambox.rs:107
 msgid "Default ({})"
-msgstr ""
+msgstr "Standaard ({})"
 
 #: src/ui/streambox.rs:112
 msgid "Default"
-msgstr ""
+msgstr "Standaard"
 
 #: src/ui/volumescale.rs:127
 msgid "Silence"
-msgstr ""
+msgstr "Dempen"
 
 #: src/ui/volumescale.rs:128
 msgid "100%"
-msgstr ""
+msgstr "100%"
 
 #: src/ui/volumescale.rs:133
 msgid "150%"
-msgstr ""
+msgstr "150%"
