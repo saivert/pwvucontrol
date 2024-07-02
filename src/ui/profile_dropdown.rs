@@ -51,25 +51,7 @@ mod imp {
             }
 
             pwvucontrol_info!("update_selected with index {}", deviceobject.profile_index());
-            if let Some(index) = self.get_model_index_from_profile_index(deviceobject.profile_index()) {
-                self.obj().set_selected_no_send(index);
-            }
-        }
-
-        fn get_model_index_from_profile_index(&self, index: u32) -> Option<u32> {
-            let Some(model) = self.profile_dropdown.model() else {
-                return None;
-            };
-
-            for (i, obj) in (0u32..).zip(model.iter::<glib::Object>()) {
-                if let Some(profile) = obj.ok().and_downcast::<PwProfileObject>() {
-                    if profile.index() == index {
-                        return Some(i);
-                    }
-                }
-            }
-
-            None
+            self.obj().set_selected_no_send(deviceobject.profile_index());
         }
 
         pub fn set_deviceobject(&self, new_deviceobject: Option<&PwDeviceObject>) {
@@ -97,7 +79,7 @@ mod imp {
                     clone!(@weak self as widget => @default-return None, move |_| {
                         widget.block_signal.set(false);
                         pwvucontrol_info!("About to call widget.update_selected() inside post-update-route handler");
-                        widget.update_selected();
+                        // widget.update_selected();
 
                         None
                     }),

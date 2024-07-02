@@ -117,7 +117,7 @@ pub mod imp {
             obj.update_icon_name();
             obj.update_profiles();
 
-            self.obj().update_current_profile_index();
+            obj.update_current_profile_index();
 
             obj.update_routes();
 
@@ -188,6 +188,7 @@ impl PwDeviceObject {
                     }
                     widget.emit_by_name::<()>("pre-update-profile", &[]);
                     widget.profilemodel().splice(0, widget.profilemodel().n_items(), &profiles);
+                    widget.update_current_profile_index();
                     widget.emit_by_name::<()>("post-update-profile", &[]);
                 } else if let Err(e) = res {
                     dbg!(e);
@@ -210,9 +211,26 @@ impl PwDeviceObject {
                 let description: String = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_description).expect("Profile description");
                 pwvucontrol_info!("Current profile #{} {}", index, description);
 
-                self.set_profile_index(index as u32);
+                if let Some(index) = self.get_model_index_from_profile_index(index as u32) {
+                    self.set_profile_index(index);
+                } else {
+                    pwvucontrol_critical!("Unable to get model index from profile index.");
+                }
             }
         }
+    }
+
+    pub fn get_model_index_from_profile_index(&self, index: u32) -> Option<u32> {
+
+        let model = self.profilemodel();
+
+        for (i, profile) in (0u32..).zip(model.iter::<glib::Object>().map_while(|x| x.ok().and_downcast::<PwProfileObject>())) {
+            if profile.index() == index {
+                return Some(i);
+            }
+        }
+
+        None
     }
 
     pub(crate) fn set_profile(&self, index: i32) {
@@ -327,7 +345,6 @@ impl PwDeviceObject {
 
         for (i, o) in routemodel.iter::<PwRouteObject>().enumerate() {
             if let Ok(obj) = o {
-                //let b: PwRouteObject = b.downcast().expect("PwRouteObject");
                 if obj.index() == routeindex as u32 {
                     return Some(i as u32);
                 }
