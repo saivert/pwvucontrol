@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 21:26+0200\n"
+"POT-Creation-Date: 2024-07-04 21:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -108,6 +108,10 @@ msgstr ""
 
 #: data/resources/ui/window.ui:32
 msgid "Lost connection to Pipewire server!"
+msgstr ""
+
+#: data/resources/ui/window.ui:36
+msgid "Reconnect"
 msgstr ""
 
 #: data/resources/ui/window.ui:59

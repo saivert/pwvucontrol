@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 21:26+0200\n"
+"POT-Creation-Date: 2024-07-04 21:32+0200\n"
 "PO-Revision-Date: 2024-07-01 21:02+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
@@ -113,6 +113,10 @@ msgstr "Geluidsversterking inschakelen"
 #: data/resources/ui/window.ui:32
 msgid "Lost connection to Pipewire server!"
 msgstr ""
+
+#: data/resources/ui/window.ui:36
+msgid "Reconnect"
+msgstr "Opnieuw verbinden"
 
 #: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"

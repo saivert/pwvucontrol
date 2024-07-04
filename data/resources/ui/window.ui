@@ -33,7 +33,7 @@
                     <property name="child">
                       <object class="GtkButton" id="reconnectbtn">
                         <property name="halign">GTK_ALIGN_CENTER</property>
-                        <property name="label">Reconnect</property>
+                        <property name="label" translatable="yes">Reconnect</property>
                       </object>
                     </property>
                   </object>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 21:26+0200\n"
+"POT-Creation-Date: 2024-07-04 21:32+0200\n"
 "PO-Revision-Date: 2023-06-13 22:28+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -113,6 +113,10 @@ msgstr "Aktiver over-forsterkning"
 #: data/resources/ui/window.ui:32
 msgid "Lost connection to Pipewire server!"
 msgstr "Mistet forbindelsen med Pipewire server!"
+
+#: data/resources/ui/window.ui:36
+msgid "Reconnect"
+msgstr "Koble til på nytt"
 
 #: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"
