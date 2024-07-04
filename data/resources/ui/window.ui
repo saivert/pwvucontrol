@@ -29,7 +29,7 @@
                 </child>
                 <child>
                   <object class="AdwStatusPage">
-                    <property name="title">Lost connection to Pipewire server!</property>
+                    <property name="title" translatable="yes">Lost connection to Pipewire server!</property>
                     <property name="child">
                       <object class="GtkButton" id="reconnectbtn">
                         <property name="halign">GTK_ALIGN_CENTER</property>

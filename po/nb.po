@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 20:03+0200\n"
+"POT-Creation-Date: 2024-07-04 21:26+0200\n"
 "PO-Revision-Date: 2023-06-13 22:28+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -39,44 +39,56 @@ msgid "Main window"
 msgstr "Hovedvindu"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-msgid "Changelog since 0.4.3"
+#, fuzzy
+msgid "Changelog since 0.4.4"
 msgstr "Endringer siden 0.4.3"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+#, fuzzy
+msgid "Updated dutch translation."
+msgstr "Lagt til nederlands oversettelse."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
+msgid "Changelog since 0.4.3"
+msgstr "Endringer siden 0.4.3"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
 msgid "Added dutch translation."
 msgstr "Lagt til nederlands oversettelse."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
-msgstr "Programikoner er nå skjulte i Flatpak-utgaven for å begrense rettigehter som programmet krever."
+msgstr ""
+"Programikoner er nå skjulte i Flatpak-utgaven for å begrense rettigehter som "
+"programmet krever."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.4.2"
 msgstr "Endringer siden 0.4.2"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added new icons for input and output devices."
 msgstr "Lagt til nye ikoner for inngangs- og utgangsenheter"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
 msgid "Changelog since 0.3.1"
 msgstr "Endringer siden 0.3.1"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr "Lagt til støtte over lydnivå > 100%. Aktiver via programmenyen."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
 msgid "Changelog since 0.2.0"
 msgstr "Endringer siden 0.2.0"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
 msgid "Added card tab for selecing sound card profile"
 msgstr "Lagt til flik for lydkort der du kan velge profil."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:69
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
 msgid "Nicolai Syvertsen"
 msgstr "Nicolai Syvertsen"
 
@@ -97,6 +109,10 @@ msgstr "Standard maksimert modus for vindu"
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
 msgstr "Aktiver over-forsterkning"
+
+#: data/resources/ui/window.ui:32
+msgid "Lost connection to Pipewire server!"
+msgstr "Mistet forbindelsen med Pipewire server!"
 
 #: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"
@@ -190,14 +206,14 @@ msgstr "Standard ({})"
 msgid "Default"
 msgstr "Standard"
 
-#: src/ui/volumescale.rs:127
+#: src/ui/volumescale.rs:124
 msgid "Silence"
 msgstr "Stille"
 
-#: src/ui/volumescale.rs:128
+#: src/ui/volumescale.rs:125
 msgid "100%"
 msgstr "100%"
 
-#: src/ui/volumescale.rs:133
+#: src/ui/volumescale.rs:130
 msgid "150%"
 msgstr "150%"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-01 20:03+0200\n"
+"POT-Creation-Date: 2024-07-04 21:26+0200\n"
 "PO-Revision-Date: 2024-07-01 21:02+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
@@ -39,48 +39,56 @@ msgid "Main window"
 msgstr "Hoofdvenster"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
+msgid "Changelog since 0.4.4"
+msgstr "Wijzigingslog sinds 0.4.4"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+msgid "Updated dutch translation."
+msgstr "Geupdate: Nederlandse vertaling"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
 msgid "Changelog since 0.4.3"
 msgstr "Wijzigingslog sinds 0.4.3"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
 msgid "Added dutch translation."
 msgstr "Nieuw: Nederlandse vertaling"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
 msgstr ""
-"Verbeterd: toepassingspictogrammen worden verborgen in de "
-"flatpakversie om het aantal rechten beperkt te houden"
+"Verbeterd: toepassingspictogrammen worden verborgen in de flatpakversie om "
+"het aantal rechten beperkt te houden"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.4.2"
 msgstr "Wijzigingslog sinds 0.4.2"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added new icons for input and output devices."
 msgstr "Nieuw: pictogrammen voor in- en uitvoerapparaten"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
 msgid "Changelog since 0.3.1"
 msgstr "Wijzigingslog sinds 0.3.1"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
 "Nieuw: ondersteuning voor geluidsversterking - schakel in via het "
 "hamburgermenu"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
 msgid "Changelog since 0.2.0"
 msgstr "Wijzigingslog sinds 0.2.0"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
 msgid "Added card tab for selecing sound card profile"
 msgstr "Nieuw: tabblad voor het kiezen van een geluidskaartprofiel"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:69
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
 msgid "Nicolai Syvertsen"
 msgstr "Nicolai Syvertsen"
 
@@ -101,6 +109,10 @@ msgstr "Standaard (niet) maximaliseren"
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
 msgstr "Geluidsversterking inschakelen"
+
+#: data/resources/ui/window.ui:32
+msgid "Lost connection to Pipewire server!"
+msgstr ""
 
 #: data/resources/ui/window.ui:59
 msgid "Pipewire Volume Control"
@@ -194,14 +206,14 @@ msgstr "Standaard ({})"
 msgid "Default"
 msgstr "Standaard"
 
-#: src/ui/volumescale.rs:127
+#: src/ui/volumescale.rs:124
 msgid "Silence"
 msgstr "Dempen"
 
-#: src/ui/volumescale.rs:128
+#: src/ui/volumescale.rs:125
 msgid "100%"
 msgstr "100%"
 
-#: src/ui/volumescale.rs:133
+#: src/ui/volumescale.rs:130
 msgid "150%"
 msgstr "150%"
