@@ -94,6 +94,16 @@ mod imp {
 
             let manager = PwvucontrolManager::default();
 
+            let wp_core = manager.wp_core();
+
+            wp_core.connect_connected(clone!(@weak self as window => move |_obj| {
+                window.obj().set_view(PwvucontrolWindowView::Connected);
+            }));
+
+            wp_core.connect_disconnected(clone!(@weak self as window => move |_obj| {
+                window.obj().set_view(PwvucontrolWindowView::Disconnected);
+            }));
+
             self.playbacklist.bind_model(
                 Some(&manager.stream_output_model()),
                 clone!(@weak self as window => @default-panic, move |item| {

@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::macros::*;
-use crate::{
-    backend::NodeType, backend::PwDeviceObject, backend::PwNodeFilterModel, backend::PwNodeObject, ui::PwvucontrolWindow,
-    ui::PwvucontrolWindowView, PwvucontrolApplication,
-};
+use crate::{backend::NodeType, backend::PwDeviceObject, backend::PwNodeFilterModel, backend::PwNodeObject, PwvucontrolApplication};
 use gtk::{
     gio,
     glib::{self, clone, Properties},
     prelude::*,
     subclass::prelude::*,
 };
-use std::cell::{RefCell, OnceCell};
+use std::cell::{OnceCell, RefCell};
 use wireplumber as wp;
 use wp::{
     plugin::{PluginFeatures, *},
@@ -115,22 +112,6 @@ mod imp {
             let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), Some(props));
             let wp_om = ObjectManager::new();
 
-            wp_core.connect_local("connected", false, |_obj| {
-                // let app = PwvucontrolManager::default();
-                // let win = app.window.get().expect("window");
-                let win = PwvucontrolWindow::default();
-                win.set_view(PwvucontrolWindowView::Connected);
-                None
-            });
-
-            wp_core.connect_local("disconnected", false, |_obj| {
-                // let app = PwvucontrolManager::default();
-                // let win = app.window.get().expect("window");
-                let win = PwvucontrolWindow::default();
-                win.set_view(PwvucontrolWindowView::Disconnected);
-                None
-            });
-
             wp_core.connect();
 
             wp_core
@@ -142,7 +123,9 @@ mod imp {
 
             wp_om.add_interest({
                 let interest: Interest<wp::pw::Node> = wp::registry::Interest::new();
-                let variant = glib::Variant::tuple_from_iter(["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Sink"].map(ToVariant::to_variant));
+                let variant = glib::Variant::tuple_from_iter(
+                    ["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Sink"].map(ToVariant::to_variant),
+                );
 
                 interest.add_constraint(
                     wp::registry::ConstraintType::PwGlobalProperty,
@@ -365,10 +348,9 @@ impl PwvucontrolManager {
             NodeType::Source => self.source_model(),
             NodeType::StreamInput => self.stream_input_model(),
             NodeType::StreamOutput => self.stream_output_model(),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
-
 }
 
 impl Default for PwvucontrolManager {
