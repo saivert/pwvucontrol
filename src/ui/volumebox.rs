@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    backend::{PwChannelObject, PwNodeObject, PwvucontrolManager},
+    backend::{PwChannelObject, PwNodeObject, PwvucontrolManager, NodeType},
     ui::{LevelbarProvider, PwChannelBox, PwVolumeScale},
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
@@ -81,10 +81,10 @@ mod imp {
             let item = item.as_ref().cloned().unwrap();
 
             // Flatpak blocks access to application icons, so hide the icon when run in the sandbox.
-            if cfg!(not(feature = "sandboxed")) {
-                self.icon.set_icon_name(Some(&item.iconname()));
-            } else {
+            if cfg!(feature = "sandboxed") && matches!(item.nodetype(), NodeType::StreamInput | NodeType::StreamOutput) {
                 self.icon.set_visible(false);
+            } else {
+                self.icon.set_icon_name(Some(&item.iconname()));
             }
 
             item.bind_property("name", &self.title_label.get(), "label").sync_create().build();
