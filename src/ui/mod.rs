@@ -13,7 +13,6 @@ mod route_dropdown;
 mod volumescale;
 
 pub use window::PwvucontrolWindow;
-pub use window::PwvucontrolWindowView;
 pub use profile_dropdown::PwProfileDropDown;
 pub use withdefaultlistmodel::WithDefaultListModel;
 pub use volumebox::{PwVolumeBox, PwVolumeBoxImpl};

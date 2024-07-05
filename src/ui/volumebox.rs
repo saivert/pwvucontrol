@@ -124,8 +124,9 @@ mod imp {
 
             let defaultnodesapi = manager.default_nodes_api();
             let widget = self.obj();
-            let defaultnodesapi_closure = closure_local!(@watch widget => move |defaultnodesapi: wp::plugin::Plugin| {
-                let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+            let defaultnodesapi_closure = closure_local!(@watch widget, @strong item => move |defaultnodesapi: wp::plugin::Plugin| {
+                let media_class: String = item.node_property("media.class");
+                let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&media_class]);
                 wp::info!("default-nodes-api changed: new id {id}");
                 widget.imp().default_node.set(id);
 
