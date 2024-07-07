@@ -2,7 +2,7 @@
 
 use glib::ExitCode;
 use gtk::{gio, prelude::*, subclass::prelude::*};
-use adw::{subclass::prelude::*, prelude::*};
+use adw::subclass::prelude::*;
 use std::cell::OnceCell;
 use crate::{
     config::{APP_ID, VERSION},
@@ -106,7 +106,8 @@ impl PwvucontrolApplication {
 
     fn show_about(&self) {
         let window = self.active_window().unwrap();
-        let about = adw::AboutDialog::builder()
+        let about = adw::AboutWindow::builder()
+            .transient_for(&window)
             .application_name("pwvucontrol")
             .application_icon("com.saivert.pwvucontrol")
             .developer_name("Nicolai Syvertsen")
@@ -115,7 +116,7 @@ impl PwvucontrolApplication {
             .copyright("© 2023 Nicolai Syvertsen")
             .build();
 
-        about.present(&window);
+        about.present();
     }
 
 }
