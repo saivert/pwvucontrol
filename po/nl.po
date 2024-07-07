@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-04 21:32+0200\n"
+"POT-Creation-Date: 2024-07-07 12:39+0200\n"
 "PO-Revision-Date: 2024-07-01 21:02+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
@@ -110,47 +110,47 @@ msgstr "Standaard (niet) maximaliseren"
 msgid "Enable over-amplification"
 msgstr "Geluidsversterking inschakelen"
 
-#: data/resources/ui/window.ui:32
-msgid "Lost connection to Pipewire server!"
-msgstr ""
-
-#: data/resources/ui/window.ui:36
-msgid "Reconnect"
-msgstr "Opnieuw verbinden"
-
-#: data/resources/ui/window.ui:59
+#: data/resources/ui/window.ui:11
 msgid "Pipewire Volume Control"
 msgstr "Pipewire-volumebediening"
 
-#: data/resources/ui/window.ui:78
+#: data/resources/ui/window.ui:41
+msgid "Lost connection to Pipewire server!"
+msgstr ""
+
+#: data/resources/ui/window.ui:45
+msgid "Reconnect"
+msgstr "Opnieuw verbinden"
+
+#: data/resources/ui/window.ui:91
 msgid "Playback"
 msgstr "Afspelen"
 
-#: data/resources/ui/window.ui:119
+#: data/resources/ui/window.ui:132
 msgid "Recording"
 msgstr "Opname"
 
-#: data/resources/ui/window.ui:160
+#: data/resources/ui/window.ui:173
 msgid "Input Devices"
 msgstr "Invoerapparaten"
 
-#: data/resources/ui/window.ui:201
+#: data/resources/ui/window.ui:214
 msgid "Output Devices"
 msgstr "Uitvoerapparaten"
 
-#: data/resources/ui/window.ui:242
+#: data/resources/ui/window.ui:255
 msgid "Cards"
 msgstr "Kaarten"
 
-#: data/resources/ui/window.ui:299
+#: data/resources/ui/window.ui:309
 msgid "_Enable over-amplification"
 msgstr "Geluidsversterking inschak_elen"
 
-#: data/resources/ui/window.ui:303
+#: data/resources/ui/window.ui:313
 msgid "_Keyboard Shortcuts"
 msgstr "_Sneltoetsen"
 
-#: data/resources/ui/window.ui:307
+#: data/resources/ui/window.ui:317
 msgid "_About Pwvucontrol"
 msgstr "_Over pwvucontrol"
 
@@ -221,3 +221,11 @@ msgstr "100%"
 #: src/ui/volumescale.rs:130
 msgid "150%"
 msgstr "150%"
+
+#: src/ui/window.rs:289
+msgid "No sound cards detected. Check pipewire configuration."
+msgstr ""
+
+#: src/ui/window.rs:291
+msgid "No sound devices detected. Check profiles in Card tab."
+msgstr ""

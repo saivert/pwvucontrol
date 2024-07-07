@@ -8,8 +8,7 @@
     <property name="default-height">300</property>
     <property name="width-request">360</property>
     <property name="height-request">294</property>
-    <property name="title">Pipewire Volume Control</property>
-    <property name="title" translatable="yes">Title</property>
+    <property name="title" translatable="yes">Pipewire Volume Control</property>
     <child>
       <object class="AdwBreakpoint">
         <condition>max-width: 550sp</condition>

@@ -11,3 +11,4 @@ src/main.rs
 src/ui/streambox.rs
 src/ui/sinkbox.rs
 src/ui/volumescale.rs
+src/ui/window.rs
