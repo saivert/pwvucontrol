@@ -5,9 +5,10 @@ use crate::{
     application::PwvucontrolApplication,
     backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
     config::{APP_ID, PROFILE},
-    ui::{devicebox::PwDeviceBox, PwStreamBox, PwSinkBox, PwVolumeBox},
+    ui::{devicebox::PwDeviceBox, PwSinkBox, PwStreamBox, PwVolumeBox},
 };
 use adw::subclass::prelude::*;
+use gettextrs::gettext;
 use glib::clone;
 use gtk::{gio, prelude::*};
 
@@ -39,6 +40,8 @@ mod imp {
         pub viewstack: TemplateChild<gtk::Stack>,
         #[template_child]
         pub reconnectbtn: TemplateChild<gtk::Button>,
+        #[template_child]
+        pub info_banner: TemplateChild<adw::Banner>,
 
         pub settings: gio::Settings,
     }
@@ -56,6 +59,7 @@ mod imp {
                 viewstack: TemplateChild::default(),
                 reconnectbtn: TemplateChild::default(),
                 settings: gio::Settings::new(APP_ID),
+                info_banner: TemplateChild::default(),
             }
         }
     }
@@ -103,6 +107,17 @@ mod imp {
             wp_core.connect_disconnected(clone!(@weak self as window => move |_obj| {
                 window.obj().set_view(PwvucontrolWindowView::Disconnected);
             }));
+
+            manager.node_model().connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
+                widget.obj().update_info_bar();
+            }));
+            manager
+                .device_model()
+                .connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
+                    widget.obj().update_info_bar();
+                }));
+
+            glib::idle_add_local_once(clone!(@weak self as widget => move || {widget.obj().update_info_bar();}));
 
             self.playbacklist.bind_model(
                 Some(&manager.stream_output_model()),
@@ -209,8 +224,6 @@ impl PwvucontrolWindow {
     fn save_window_size(&self) -> Result<(), glib::BoolError> {
         let settings = &self.imp().settings;
 
-        
-
         let size = self.default_size();
 
         settings.set_int("window-width", size.0)?;
@@ -266,6 +279,19 @@ impl PwvucontrolWindow {
             }),
         );
         scrolledwindow.add_controller(ecs);
+    }
+
+    fn update_info_bar(&self) {
+        let manager = PwvucontrolManager::default();
+        let imp = self.imp();
+
+        let message = if manager.device_model().n_items() == 0 {
+            gettext("No sound cards detected. Check pipewire configuration.")
+        } else {
+            gettext("No sound devices detected. Check profiles in Card tab.")
+        };
+        imp.info_banner.set_title(&message);
+        imp.info_banner.set_revealed(manager.node_model().n_items() == 0);
     }
 }
 

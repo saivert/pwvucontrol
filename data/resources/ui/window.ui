@@ -77,6 +77,11 @@
                   </object>
                 </child>
 
+                <child type="top">
+                  <object class="AdwBanner" id="info_banner">
+                  </object>
+                </child>
+
                 <property name="content">
                   <object class="AdwViewStack" id="stack">
                     <property name="hexpand">true</property>
