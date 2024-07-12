@@ -154,8 +154,7 @@ mod imp {
             wp_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
             wp_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
-                let devicemodel = &imp.device_model;
-                if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
+                if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
                     let mut hidden: bool = false;
                     // Hide ourselves.
                     if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
@@ -185,22 +184,20 @@ mod imp {
                     pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                     let pwobj = PwNodeObject::new(node);
                     pwobj.set_hidden(hidden);
-                    let model = &imp.node_model;
-                    model.append(&pwobj);
-                } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
-                    let n: String = device.pw_property("device.name").unwrap();
-                    pwvucontrol_info!("Got device: {n} bound id {}", device.bound_id());
-                    devicemodel.append(&PwDeviceObject::new(device));
+                    imp.node_model.append(&pwobj);
+                } else if let Some(device) = object.downcast_ref::<wp::pw::Device>() {
+                    pwvucontrol_info!("Got device: {} bound id {}", device.pw_property::<String>("device.name").unwrap_or_default(), device.bound_id());
+                    imp.device_model.append(&PwDeviceObject::new(device));
                 } else {
                     unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
                 }
             }));
 
             wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
-                if let Some(node) = object.dynamic_cast_ref::<wp::pw::Node>() {
-                    pwvucontrol_info!("removed: {:?} id: {}", node.name(), node.bound_id());
+                if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
+                    pwvucontrol_info!("removed: {} id: {}", node.name().unwrap_or_default(), node.bound_id());
                     imp.obj().remove_node_by_id(node.bound_id());
-                } else if let Some(device) = object.dynamic_cast_ref::<wp::pw::Device>() {
+                } else if let Some(device) = object.downcast_ref::<wp::pw::Device>() {
                     imp.obj().remove_device_by_id(device.bound_id());
                 } else {
                     pwvucontrol_info!("Object must be one of the above, but is {:?} instead", object.type_());
