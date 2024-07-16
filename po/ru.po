@@ -1,0 +1,237 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# SPDX-FileCopyrightText: 2024 Olesya Gerasimenko <translation-team@basealt.ru>
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-07-07 12:39+0200\n"
+"PO-Revision-Date: 2024-07-16 16:42+0300\n"
+"Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
+"Language-Team: Basealt Translation Team\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
+"=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 23.08.5\n"
+
+#: data/com.saivert.pwvucontrol.desktop.in.in:3
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
+msgid "pwvucontrol"
+msgstr "pwvucontrol"
+
+#: data/com.saivert.pwvucontrol.desktop.in.in:9
+msgid "GTK"
+msgstr "GTK"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
+msgid "Volume control for pipewire"
+msgstr "Управление громкостью для pipewire"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:10
+msgid "A native volume control app made with GTK + Rust."
+msgstr ""
+"Встроенное приложение для управления громкостью, созданное с помощью GTK и"
+" Rust."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:18
+msgid "Main window"
+msgstr "Главное окно"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
+msgid "Changelog since 0.4.4"
+msgstr "Журнал изменений с 0.4.4"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+msgid "Updated dutch translation."
+msgstr "Обновлён перевод на голландский язык."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
+msgid "Changelog since 0.4.3"
+msgstr "Журнал изменений с 0.4.3"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+msgid "Added dutch translation."
+msgstr "Добавлен перевод на голландский язык."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+msgid ""
+"Application icons are now hidden in Flatpak build to keep permissions "
+"reduced."
+msgstr ""
+"Во Flatpak-версии теперь скрыты значки приложений, чтобы ограничить"
+" количество разрешений."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+msgid "Changelog since 0.4.2"
+msgstr "Журнал изменений с 0.4.2"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+msgid "Added new icons for input and output devices."
+msgstr "Добавлены новые значки для устройств ввода и вывода."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
+msgid "Changelog since 0.3.1"
+msgstr "Журнал изменений с 0.3.1"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
+msgid "Added support for over-amplification. Enable via hamburger menu."
+msgstr ""
+"Добавлена ​​поддержка уровня звука выше 100%. Включение по кнопке"
+" гамбургер-меню."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
+msgid "Changelog since 0.2.0"
+msgstr "Журнал изменений с 0.2.0"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
+msgid "Added card tab for selecing sound card profile"
+msgstr "Добавлена вкладка карт для выбора профиля звуковой карты."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
+msgid "Nicolai Syvertsen"
+msgstr "Nicolai Syvertsen"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:6
+#: data/com.saivert.pwvucontrol.gschema.xml.in:7
+msgid "Default window width"
+msgstr "Ширина окна по умолчанию"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:11
+#: data/com.saivert.pwvucontrol.gschema.xml.in:12
+msgid "Default window height"
+msgstr "Высота окна по умолчанию"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:16
+msgid "Default window maximized behaviour"
+msgstr "Разворачивание окна по умолчанию"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:21
+msgid "Enable over-amplification"
+msgstr "Включить уровень звука выше 100%"
+
+#: data/resources/ui/window.ui:11
+msgid "Pipewire Volume Control"
+msgstr "Управление громкостью pipewire"
+
+#: data/resources/ui/window.ui:41
+msgid "Lost connection to Pipewire server!"
+msgstr "Потеряно соединение с сервером pipewire!"
+
+#: data/resources/ui/window.ui:45
+msgid "Reconnect"
+msgstr "Подключиться заново"
+
+#: data/resources/ui/window.ui:91
+msgid "Playback"
+msgstr "Воспроизведение"
+
+#: data/resources/ui/window.ui:132
+msgid "Recording"
+msgstr "Запись"
+
+#: data/resources/ui/window.ui:173
+msgid "Input Devices"
+msgstr "Устройства ввода"
+
+#: data/resources/ui/window.ui:214
+msgid "Output Devices"
+msgstr "Устройства вывода"
+
+#: data/resources/ui/window.ui:255
+msgid "Cards"
+msgstr "Карты"
+
+#: data/resources/ui/window.ui:309
+msgid "_Enable over-amplification"
+msgstr "_Включить уровень звука выше 100%"
+
+#: data/resources/ui/window.ui:313
+msgid "_Keyboard Shortcuts"
+msgstr "_Комбинации клавиш"
+
+#: data/resources/ui/window.ui:317
+msgid "_About Pwvucontrol"
+msgstr "_О программе pwvucontrol"
+
+#: data/resources/ui/help-overlay.ui:12
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Общие"
+
+#: data/resources/ui/help-overlay.ui:15
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Показать комбинации клавиш"
+
+#: data/resources/ui/help-overlay.ui:22
+msgctxt "shortcut window"
+msgid "Open application menu"
+msgstr "Открыть меню приложения"
+
+#: data/resources/ui/help-overlay.ui:27
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Выйти"
+
+#: data/resources/ui/volumebox.ui:142
+msgid "_Advanced"
+msgstr "_Дополнительно"
+
+#: data/resources/ui/volumebox.ui:160
+msgid "Lock channels"
+msgstr "Заблокировать каналы"
+
+#: data/resources/ui/volumebox.ui:198
+msgid "Main"
+msgstr "Основной"
+
+#: data/resources/ui/volumebox.ui:217
+msgid "Monitor"
+msgstr "Монитор"
+
+#: data/resources/ui/sinkbox.ui:13
+msgid "Port:"
+msgstr "Порт:"
+
+#: data/resources/ui/streambox.ui:13
+msgid "on"
+msgstr "на"
+
+#: src/main.rs:77
+msgid "Could not load resources"
+msgstr "Не удалось загрузить ресурсы"
+
+#: src/ui/streambox.rs:107
+msgid "Default ({})"
+msgstr "По умолчанию ({})"
+
+#: src/ui/streambox.rs:112
+msgid "Default"
+msgstr "По умолчанию"
+
+#: src/ui/volumescale.rs:124
+msgid "Silence"
+msgstr "Тишина"
+
+#: src/ui/volumescale.rs:125
+msgid "100%"
+msgstr "100%"
+
+#: src/ui/volumescale.rs:130
+msgid "150%"
+msgstr "150%"
+
+#: src/ui/window.rs:289
+msgid "No sound cards detected. Check pipewire configuration."
+msgstr "Звуковые карты не обнаружены. Проверьте конфигурацию pipewire."
+
+#: src/ui/window.rs:291
+msgid "No sound devices detected. Check profiles in Card tab."
+msgstr ""
+"Звуковые устройства не обнаружены. Проверьте профили на вкладке «Карты»."
+
+
