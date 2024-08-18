@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-07 12:39+0200\n"
+"POT-Creation-Date: 2024-08-18 22:23+0200\n"
 "PO-Revision-Date: 2024-07-16 16:42+0300\n"
 "Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
 "Language-Team: Basealt Translation Team\n"
@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
-"=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Lokalize 23.08.5\n"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:3
@@ -34,8 +34,8 @@ msgstr "Управление громкостью для pipewire"
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:10
 msgid "A native volume control app made with GTK + Rust."
 msgstr ""
-"Встроенное приложение для управления громкостью, созданное с помощью GTK и"
-" Rust."
+"Встроенное приложение для управления громкостью, созданное с помощью GTK и "
+"Rust."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:18
 msgid "Main window"
@@ -62,8 +62,8 @@ msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
 msgstr ""
-"Во Flatpak-версии теперь скрыты значки приложений, чтобы ограничить"
-" количество разрешений."
+"Во Flatpak-версии теперь скрыты значки приложений, чтобы ограничить "
+"количество разрешений."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.4.2"
@@ -80,8 +80,8 @@ msgstr "Журнал изменений с 0.3.1"
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
-"Добавлена ​​поддержка уровня звука выше 100%. Включение по кнопке"
-" гамбургер-меню."
+"Добавлена ​​поддержка уровня звука выше 100%. Включение по кнопке гамбургер-"
+"меню."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
 msgid "Changelog since 0.2.0"
@@ -233,5 +233,3 @@ msgstr "Звуковые карты не обнаружены. Проверьт�
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr ""
 "Звуковые устройства не обнаружены. Проверьте профили на вкладке «Карты»."
-
-
