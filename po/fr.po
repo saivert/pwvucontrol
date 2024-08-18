@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-18 22:23+0200\n"
-"PO-Revision-Date: 2024-08-18 22:43+0200\n"
+"PO-Revision-Date: 2024-08-18 23:07+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: fr\n"
@@ -29,15 +29,15 @@ msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
-msgstr "Contrôle du volume pour PipeWire"
+msgstr "Controle du volume pour PipeWire"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:10
 msgid "A native volume control app made with GTK + Rust."
-msgstr "Une application native de contrôle des volumes écrite avec GTK + Rust."
+msgstr "Une application native de controle des volumes ecrite avec GTK + Rust."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:18
 msgid "Main window"
-msgstr "Fenêtre principale"
+msgstr "Fenetre principale"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
 msgid "Changelog since 0.4.4"
@@ -45,7 +45,7 @@ msgstr "Evolution depuis la version 0.4.4"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
 msgid "Updated dutch translation."
-msgstr "Mise à jour de la traduction Hollandaise."
+msgstr "Mise a jour de la traduction Hollandaise."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
 msgid "Changelog since 0.4.3"
@@ -57,7 +57,7 @@ msgstr "Ajout de la traduction Hollandaise."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid "Application icons are now hidden in Flatpak build to keep permissions reduced."
-msgstr "Les icônes des applications sont désormais cachées dans la version Flatpak afin de réduire les permissions."
+msgstr "Les icones des applications sont desormais cachees dans la version Flatpak afin de reduire les permissions."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.4.2"
@@ -65,7 +65,7 @@ msgstr "Evolution depuis la version 0.4.2"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added new icons for input and output devices."
-msgstr "Ajout de nouvelles icônes pour les périphériques d'entrée et de sortie."
+msgstr "Ajout de nouvelles icones pour les peripheriques d'entree et de sortie."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
 msgid "Changelog since 0.3.1"
@@ -81,7 +81,7 @@ msgstr "Evolution depuis la version 0.2.0"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
 msgid "Added card tab for selecing sound card profile"
-msgstr "Ajout d'un onglet « carte » pour sélectionner le profil de la carte son"
+msgstr "Ajout d'un onglet carte pour selectionner le profil de la carte son"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
 msgid "Nicolai Syvertsen"
@@ -90,16 +90,16 @@ msgstr ""
 #: data/com.saivert.pwvucontrol.gschema.xml.in:6
 #: data/com.saivert.pwvucontrol.gschema.xml.in:7
 msgid "Default window width"
-msgstr "Largeur de la fenêtre par défaut"
+msgstr "Largeur de la fenetre par defaut"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:11
 #: data/com.saivert.pwvucontrol.gschema.xml.in:12
 msgid "Default window height"
-msgstr "Hauteur de la fenêtre par défaut"
+msgstr "Hauteur de la fenetre par defaut"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:16
 msgid "Default window maximized behaviour"
-msgstr "Comportement par défaut de la fenêtre maximisée"
+msgstr "Comportement par defaut de la fenetre maximisee"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
@@ -107,7 +107,7 @@ msgstr "Activer la suramplification"
 
 #: data/resources/ui/window.ui:11
 msgid "Pipewire Volume Control"
-msgstr "Contrôle des volumes PipeWire"
+msgstr "Controle des volumes PipeWire"
 
 #: data/resources/ui/window.ui:41
 msgid "Lost connection to Pipewire server!"
@@ -127,11 +127,11 @@ msgstr "Enregistrement"
 
 #: data/resources/ui/window.ui:173
 msgid "Input Devices"
-msgstr "Périphériques d'entrée"
+msgstr "Peripheriques d'entree"
 
 #: data/resources/ui/window.ui:214
 msgid "Output Devices"
-msgstr "Périphériques de sorties"
+msgstr "Peripheriques de sorties"
 
 #: data/resources/ui/window.ui:255
 msgid "Cards"
@@ -152,7 +152,7 @@ msgstr "A propos de Pwvucontrol"
 #: data/resources/ui/help-overlay.ui:12
 msgctxt "shortcut window"
 msgid "General"
-msgstr "Général"
+msgstr ""
 
 #: data/resources/ui/help-overlay.ui:15
 msgctxt "shortcut window"
@@ -171,7 +171,7 @@ msgstr "Quitter"
 
 #: data/resources/ui/volumebox.ui:142
 msgid "_Advanced"
-msgstr "_Avancé"
+msgstr "_Avance"
 
 #: data/resources/ui/volumebox.ui:160
 msgid "Lock channels"
@@ -183,11 +183,11 @@ msgstr "Principal"
 
 #: data/resources/ui/volumebox.ui:217
 msgid "Monitor"
-msgstr "Écoute de contrôle"
+msgstr "Ecoute de controle"
 
 #: data/resources/ui/sinkbox.ui:13
 msgid "Port:"
-msgstr "Port :"
+msgstr ""
 
 #: data/resources/ui/streambox.ui:13
 msgid "on"
@@ -199,11 +199,11 @@ msgstr "Impossible de charger les ressources"
 
 #: src/ui/streambox.rs:107
 msgid "Default ({})"
-msgstr "Défaut ({})"
+msgstr "Defaut ({})"
 
 #: src/ui/streambox.rs:112
 msgid "Default"
-msgstr "Défaut"
+msgstr "Defaut"
 
 #: src/ui/volumescale.rs:124
 msgid "Silence"
@@ -219,9 +219,8 @@ msgstr ""
 
 #: src/ui/window.rs:289
 msgid "No sound cards detected. Check pipewire configuration."
-msgstr "Aucune carte son n'est détectée. Vérifier la configuration de PipeWire."
+msgstr "Aucune carte son n'est detectee. Verifier la configuration de PipeWire."
 
 #: src/ui/window.rs:291
 msgid "No sound devices detected. Check profiles in Card tab."
-msgstr "Aucun périphérique sonore n'est détecté. Vérifier les profils dans l'onglet Carte."
-
+msgstr "Aucun peripherique sonore n'est detecte. Verifier les profils dans l'onglet Carte."
