@@ -68,7 +68,7 @@ mod imp {
                         .skip(position as usize)
                         .map_while(Result::ok)
                         .enumerate() {
-                        if routeobject.direction() == widget.direction() && routeobject.availability() == ParamAvailability::Yes {
+                        if routeobject.direction() == widget.direction() && routeobject.availability() == ParamAvailability::Yes || routeobject.availability() == ParamAvailability::Unknown {
                             hashset.insert(a as u32);
                         }
                     }
