@@ -103,7 +103,7 @@ impl PwStreamBox {
         let id = self.default_node();
 
         // The following is just so this string gets picked up by xgettext, since it doesn't handle rust macros yet.
-        #[cfg(_disabled_)]
+        #[cfg(debug_assertions)]
         gettextrs::gettext("Default ({})");
 
         let string = if let Some(node) = manager.get_node_by_id(id) {

@@ -162,17 +162,7 @@ mod imp {
 
             // Monitoring ourselves cause an infinite loop.
             if item.name() != "pwvucontrol-peak-detect" {
-                if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
-                    self.levelbarprovider.set(provider).expect("Provider not set already");
-
-                    self.timeoutid.set(Some(glib::timeout_add_local(
-                        std::time::Duration::from_millis(25),
-                        clone!(@weak self as obj => @default-panic, move || {
-                            obj.level_bar.set_value(obj.level.get() as f64);
-                            ControlFlow::Continue
-                        }),
-                    )));
-                }
+                self.setuplevelbar();
             } else {
                 self.level_bar.set_visible(false);
             }
@@ -214,6 +204,24 @@ mod imp {
         #[template_callback]
         fn invert_bool(&self, value: bool) -> bool {
             !value
+        }
+
+        fn setuplevelbar(&self) {
+            let item = self.node_object.borrow();
+            let item = item.as_ref().cloned().unwrap();
+
+            if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
+                self.levelbarprovider.set(provider).expect("Provider not set already");
+
+                let obj = self.obj();
+                self.timeoutid.set(Some(glib::timeout_add_local(
+                    std::time::Duration::from_millis(25),
+                    clone!(@strong obj => @default-panic, move || {
+                        obj.imp().level_bar.set_value(obj.imp().level.get() as f64);
+                        ControlFlow::Continue
+                    }),
+                )));
+            }
         }
     }
 }
