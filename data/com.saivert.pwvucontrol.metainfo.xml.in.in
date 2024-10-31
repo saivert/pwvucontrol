@@ -26,7 +26,7 @@
       <description>
         <p>Changelog since 0.4.5</p>
         <ul>
-          <li>Added polish, georgian and french translation.</li>
+          <li>Added polish, georgian, russian and french translation.</li>
           <li>Fix not all ports being visible in device port dropdown.</li>
         </ul>
       </description>
