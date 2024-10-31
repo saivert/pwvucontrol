@@ -56,6 +56,7 @@ mod imp {
             if let Some(node) = obj.node_object() {
                 node.connect_device_notify(clone!(@weak self as widget => move |nodeobject| {
                     widget.route_dropdown.set_nodeobject(Some(nodeobject));
+                    widget.obj().default_node_changed();
                 }));
             }
 
