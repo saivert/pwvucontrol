@@ -22,6 +22,15 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
+    <release version="0.4.6" date="2024-10-31">
+      <description>
+        <p>Changelog since 0.4.5</p>
+        <ul>
+          <li>Added polish, georgian and french translation.</li>
+          <li>Fix not all ports being visible in device port dropdown.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.5" date="2024-07-01">
       <description>
         <p>Changelog since 0.4.4</p>
