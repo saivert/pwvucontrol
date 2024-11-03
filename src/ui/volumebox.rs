@@ -10,6 +10,8 @@ use std::cell::{Cell, RefCell, OnceCell};
 use wireplumber as wp;
 
 mod imp {
+    use crate::pwvucontrol_warning;
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -125,7 +127,11 @@ mod imp {
             let defaultnodesapi = manager.default_nodes_api();
             let widget = self.obj();
             let defaultnodesapi_closure = closure_local!(@watch widget, @strong item => move |defaultnodesapi: wp::plugin::Plugin| {
-                let media_class: String = item.node_property("media.class");
+                let Some(media_class) = item.node_property::<String>("media.class")
+                else {
+                    pwvucontrol_warning!("{} is missing media.class property", item.name());
+                    return;
+                };
                 let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&media_class]);
                 wp::info!("default-nodes-api changed: new id {id}");
                 widget.imp().default_node.set(id);

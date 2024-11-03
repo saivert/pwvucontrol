@@ -88,7 +88,7 @@ mod imp {
             let parent: &PwVolumeBox = obj.upcast_ref();
             let node = parent.node_object().expect("nodeobj");
             let node_name: String = if _togglebutton.is_active() {
-                node.node_property("node.name")
+                node.node_property("node.name").unwrap_or_default()
             } else {
                 "".to_string()
             };

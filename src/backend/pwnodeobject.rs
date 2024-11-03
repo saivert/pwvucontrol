@@ -613,9 +613,9 @@ impl PwNodeObject {
     }
 
 
-    pub(crate) fn node_property<T: FromPipewirePropertyString>(&self, property: &str) -> T {
+    pub(crate) fn node_property<T: FromPipewirePropertyString>(&self, property: &str) -> Option<T> {
         let node = self.imp().wpnode.get().expect("node");
-        node.pw_property(property).expect(property)
+        node.pw_property(property).ok()
     }
 }
 
