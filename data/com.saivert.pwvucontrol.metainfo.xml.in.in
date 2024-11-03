@@ -22,6 +22,14 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
+    <release version="0.4.7" date="2024-11-03">
+      <description>
+        <p>Changelog since 0.4.6</p>
+        <ul>
+          <li>Fix crash when selecting Pro Audio profile.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.6" date="2024-10-31">
       <description>
         <p>Changelog since 0.4.5</p>
