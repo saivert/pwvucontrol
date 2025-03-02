@@ -70,6 +70,9 @@ pub mod imp {
         nodetype: Cell<NodeType>,
 
         #[property(get)]
+        is_virtual: Cell<bool>,
+
+        #[property(get)]
         pub(super) channelmodel: RefCell<gio::ListStore>,
 
         pub(super) format: Cell<Option<AudioFormat>>,
@@ -110,6 +113,7 @@ pub mod imp {
                 om: Default::default(),
                 hidden: Default::default(),
                 device: Default::default(),
+                is_virtual: Default::default(),
             }
         }
     }
@@ -175,6 +179,10 @@ pub mod imp {
 
             self.nodetype.set(get_node_type_for_node(node));
             self.boundid.set(node.bound_id());
+
+            if node.get_pw_property("media.class").as_deref() == Some("Audio/Source/Virtual") {
+                self.is_virtual.set(true);
+            }
 
             node.connect_notify_local(
                 Some("global-properties"),
@@ -263,6 +271,7 @@ pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
         Some("Stream/Output/Audio") => NodeType::StreamOutput,
         Some("Stream/Input/Audio") => NodeType::StreamInput,
         Some("Audio/Source") => NodeType::Source,
+        Some("Audio/Source/Virtual") => NodeType::Source,
         Some("Audio/Sink") => NodeType::Sink,
         _ => NodeType::Undefined,
     }

@@ -124,7 +124,7 @@ mod imp {
             wp_om.add_interest({
                 let interest: Interest<wp::pw::Node> = wp::registry::Interest::new();
                 let variant = glib::Variant::tuple_from_iter(
-                    ["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Sink"].map(ToVariant::to_variant),
+                    ["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Source/Virtual", "Audio/Sink"].map(ToVariant::to_variant),
                 );
 
                 interest.add_constraint(

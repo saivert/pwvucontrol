@@ -100,7 +100,10 @@ mod imp {
 
             let type_name = match node.nodetype() {
                 NodeType::Sink => "Audio/Sink",
-                NodeType::Source => "Audio/Source",
+                NodeType::Source => match node.is_virtual() {
+                    true => "Audio/Source/Virtual",
+                    false => "Audio/Source",
+                },
                 _ => unreachable!(),
             };
 
