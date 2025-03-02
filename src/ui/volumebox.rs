@@ -220,13 +220,10 @@ mod imp {
                 self.levelbarprovider.set(provider).expect("Provider not set already");
 
                 let obj = self.obj();
-                self.timeoutid.set(Some(glib::timeout_add_local(
-                    std::time::Duration::from_millis(25),
-                    clone!(@strong obj => @default-panic, move || {
-                        obj.imp().level_bar.set_value(obj.imp().level.get() as f64);
-                        ControlFlow::Continue
-                    }),
-                )));
+                self.level_bar.add_tick_callback(clone!(@strong obj => @default-panic, move |_, _| {
+                    obj.imp().level_bar.set_value(obj.imp().level.get() as f64);
+                    ControlFlow::Continue
+                }));
             }
         }
     }
