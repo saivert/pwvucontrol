@@ -6,12 +6,11 @@ use crate::{
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
-use std::cell::{Cell, RefCell, OnceCell};
+use std::cell::{Cell, RefCell};
 use wireplumber as wp;
+use crate::pwvucontrol_warning;
 
 mod imp {
-    use crate::pwvucontrol_warning;
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -22,8 +21,8 @@ mod imp {
         pub(super) node_object: RefCell<Option<PwNodeObject>>,
 
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
-        levelbarprovider: OnceCell<LevelbarProvider>,
-        timeoutid: Cell<Option<glib::SourceId>>,
+        levelbarprovider: Cell<Option<LevelbarProvider>>,
+        timeoutid: Cell<Option<gtk::TickCallbackId>>,
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
         pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
@@ -166,12 +165,6 @@ mod imp {
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
             self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
 
-            // Monitoring ourselves cause an infinite loop.
-            if item.name() != "pwvucontrol-peak-detect" {
-                self.setuplevelbar();
-            } else {
-                self.level_bar.set_visible(false);
-            }
         }
 
         fn dispose(&self) {
@@ -181,12 +174,31 @@ mod imp {
                     metadata.disconnect(sid);
                 };
             };
+        }
+    }
+
+    impl WidgetImpl for PwVolumeBox {
+        fn unmap(&self) {
             if let Some(t) = self.timeoutid.take() {
                 t.remove();
             }
+            self.levelbarprovider.take();
+            self.parent_unmap();
+        }
+
+        fn map(&self) {
+            self.parent_map();
+
+            // Monitoring ourselves cause an infinite loop.
+            let item = self.node_object.borrow();
+            let item = item.as_ref().unwrap();
+            if item.name() != "pwvucontrol-peak-detect" {
+                self.setuplevelbar();
+            } else {
+                self.level_bar.set_visible(false);
+            }
         }
     }
-    impl WidgetImpl for PwVolumeBox {}
     impl ListBoxRowImpl for PwVolumeBox {}
 
     impl BuildableImpl for PwVolumeBox {
@@ -217,13 +229,14 @@ mod imp {
             let item = item.as_ref().cloned().unwrap();
 
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
-                self.levelbarprovider.set(provider).expect("Provider not set already");
+                self.levelbarprovider.set(Some(provider));
 
                 let obj = self.obj();
-                self.level_bar.add_tick_callback(clone!(@strong obj => @default-panic, move |_, _| {
+                let callbackid = self.level_bar.add_tick_callback(clone!(@strong obj => @default-panic, move |_, _| {
                     obj.imp().level_bar.set_value(obj.imp().level.get() as f64);
                     ControlFlow::Continue
                 }));
+                self.timeoutid.set(Some(callbackid));
             }
         }
     }
