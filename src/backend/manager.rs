@@ -348,6 +348,18 @@ impl PwvucontrolManager {
             _ => unreachable!(),
         }
     }
+
+    pub fn default_configured_sink_node(&self) -> Option<PwNodeObject> {
+        let api = self.imp().default_nodes_api.get().expect("default_nodes_api");
+        let id = api.emit_by_name("get-default-node", &[&"Audio/Sink"]);
+        self.get_node_by_id(id)
+    }
+
+    pub fn default_configured_source_node(&self) -> Option<PwNodeObject> {
+        let api = self.imp().default_nodes_api.get().expect("default_nodes_api");
+        let id = api.emit_by_name("get-default-node", &[&"Audio/Source"]);
+        self.get_node_by_id(id)
+    }
 }
 
 impl Default for PwvucontrolManager {

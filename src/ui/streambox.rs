@@ -94,19 +94,27 @@ impl PwStreamBox {
 
         let item = self.node_object().expect("nodeobj");
 
-        let sinkmodel = manager.get_model_for_nodetype(item.nodetype());
+        let stream_model = match item.nodetype() {
+            crate::backend::NodeType::StreamInput => manager.source_model(),
+            crate::backend::NodeType::StreamOutput => manager.sink_model(),
+            _ => panic!("Invalid node type")
+        };
 
         let imp = self.imp();
 
         let output_dropdown = imp.output_dropdown.get();
 
-        let id = self.default_node();
+        let default_node = match item.nodetype() {
+            crate::backend::NodeType::StreamInput => manager.default_configured_source_node(),
+            crate::backend::NodeType::StreamOutput => manager.default_configured_sink_node(),
+            _ => panic!("Invalid node type")
+        };
 
         // The following is just so this string gets picked up by xgettext, since it doesn't handle rust macros yet.
         #[cfg(debug_assertions)]
         gettextrs::gettext("Default ({})");
 
-        let string = if let Some(node) = manager.get_node_by_id(id) {
+        let string = if let Some(node) = default_node {
             gettextrs::gettext!("Default ({})", node.name())
         } else {
             gettextrs::gettext("Default")
@@ -115,7 +123,7 @@ impl PwStreamBox {
 
 
         if let Some(deftarget) = item.default_target() {
-            if let Some(pos) = sinkmodel.get_node_pos_from_id(deftarget.boundid()) {
+            if let Some(pos) = stream_model.get_node_pos_from_id(deftarget.boundid()) {
                 pwvucontrol_info!(
                     "switching to preferred target pos={pos} boundid={} serial={}",
                     deftarget.boundid(),
