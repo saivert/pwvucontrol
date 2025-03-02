@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-18 22:23+0200\n"
+"POT-Creation-Date: 2025-03-02 15:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,8 +22,12 @@ msgstr ""
 msgid "pwvucontrol"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:9
-msgid "GTK"
+#: data/com.saivert.pwvucontrol.desktop.in.in:4 data/resources/ui/window.ui:11
+msgid "Pipewire Volume Control"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.desktop.in.in:10
+msgid "Volume"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
@@ -39,52 +43,84 @@ msgid "Main window"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-msgid "Changelog since 0.4.4"
+msgid "Changelog since 0.4.7"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
-msgid "Updated dutch translation."
+msgid "Fix displaying of default device name in stream dropdown."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
-msgid "Changelog since 0.4.3"
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+msgid "Increase responsiveness of peak meters."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
-msgid "Added dutch translation."
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+msgid "Changelog since 0.4.6"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+msgid "Fix crash when selecting Pro Audio profile."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+msgid "Changelog since 0.4.5"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+msgid "Added polish, georgian, russian and french translation."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:47
+msgid "Fix not all ports being visible in device port dropdown."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:53
+msgid "Changelog since 0.4.4"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:55
+msgid "Updated dutch translation."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:61
+msgid "Changelog since 0.4.3"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
+msgid "Added dutch translation."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:64
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:70
 msgid "Changelog since 0.4.2"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:72
 msgid "Added new icons for input and output devices."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:78
 msgid "Changelog since 0.3.1"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:86
 msgid "Changelog since 0.2.0"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
 msgid "Added card tab for selecing sound card profile"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:103
 msgid "Nicolai Syvertsen"
 msgstr ""
 
@@ -104,10 +140,6 @@ msgstr ""
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
-msgstr ""
-
-#: data/resources/ui/window.ui:11
-msgid "Pipewire Volume Control"
 msgstr ""
 
 #: data/resources/ui/window.ui:41
@@ -198,11 +230,11 @@ msgstr ""
 msgid "Could not load resources"
 msgstr ""
 
-#: src/ui/streambox.rs:107
+#: src/ui/streambox.rs:115
 msgid "Default ({})"
 msgstr ""
 
-#: src/ui/streambox.rs:112
+#: src/ui/streambox.rs:120
 msgid "Default"
 msgstr ""
 

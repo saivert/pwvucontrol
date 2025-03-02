@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-18 22:23+0200\n"
+"POT-Creation-Date: 2025-03-02 15:55+0100\n"
 "PO-Revision-Date: 2024-10-12 22:26+0200\n"
-"Last-Translator: Podiumnoche <134448981+Podiumnoche@users.noreply."
-"github.com>\n"
+"Last-Translator: Podiumnoche <134448981+Podiumnoche@users.noreply.github."
+"com>\n"
 "Language-Team: \n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -23,9 +23,13 @@ msgstr ""
 msgid "pwvucontrol"
 msgstr "pwvucontrol"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:9
-msgid "GTK"
-msgstr "GTK"
+#: data/com.saivert.pwvucontrol.desktop.in.in:4 data/resources/ui/window.ui:11
+msgid "Pipewire Volume Control"
+msgstr "Kontrola głośności Pipewire"
+
+#: data/com.saivert.pwvucontrol.desktop.in.in:10
+msgid "Volume"
+msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -33,64 +37,94 @@ msgstr "Kontrola głośności pipewire"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:10
 msgid "A native volume control app made with GTK + Rust."
-msgstr ""
-"Natywna aplikacja kontroli głośności stworzona z użyciem GTK + Rust."
+msgstr "Natywna aplikacja kontroli głośności stworzona z użyciem GTK + Rust."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:18
 msgid "Main window"
 msgstr "Główne okno"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
+msgid "Changelog since 0.4.7"
+msgstr "Dziennik zmian od wersji 0.4.7"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+msgid "Fix displaying of default device name in stream dropdown."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+msgid "Increase responsiveness of peak meters."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+msgid "Changelog since 0.4.6"
+msgstr "Dziennik zmian od wersji 0.4.6"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+msgid "Fix crash when selecting Pro Audio profile."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+msgid "Changelog since 0.4.5"
+msgstr "Dziennik zmian od wersji 0.4.5"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+msgid "Added polish, georgian, russian and french translation."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:47
+msgid "Fix not all ports being visible in device port dropdown."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:53
 msgid "Changelog since 0.4.4"
 msgstr "Dziennik zmian od wersji 0.4.4"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:55
 msgid "Updated dutch translation."
 msgstr "Zaktualizowano tłumaczenie na holenderski."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:35
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:61
 msgid "Changelog since 0.4.3"
 msgstr "Dziennik zmian od wersji 0.4.3"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
 msgid "Added dutch translation."
 msgstr "Dodano tłumaczenie na holenderski."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:64
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
 msgstr ""
-"Ikony aplikacji są teraz ukryte w wersji Flatpak aby zachować "
-"ograniczone uprawnienia."
+"Ikony aplikacji są teraz ukryte w wersji Flatpak aby zachować ograniczone "
+"uprawnienia."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:70
 msgid "Changelog since 0.4.2"
 msgstr "Dziennik zmian od wersji 0.4.2"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:72
 msgid "Added new icons for input and output devices."
 msgstr "Dodano nowe ikony dla urządzeń wejścia/wyjścia."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:52
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:78
 msgid "Changelog since 0.3.1"
 msgstr "Dziennik zmian od wersji 0.3.1"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
-"Dodano wsparcie dla nadmiernego wzmocnienia. Włącz przez hamburger "
-"menu."
+"Dodano wsparcie dla nadmiernego wzmocnienia. Włącz przez hamburger menu."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:60
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:86
 msgid "Changelog since 0.2.0"
 msgstr "Dziennik zmian od wersji 0.2.0"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:62
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
 msgid "Added card tab for selecing sound card profile"
 msgstr "Dodano zakładkę kart do wyboru profilu karty dźwiękowej"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:77
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:103
 msgid "Nicolai Syvertsen"
 msgstr "Nicolai Syvertsen"
 
@@ -111,10 +145,6 @@ msgstr "Domyślne zachowanie okna po maksymalizacji"
 #: data/com.saivert.pwvucontrol.gschema.xml.in:21
 msgid "Enable over-amplification"
 msgstr "Włącz nadmierne wzmocnienie"
-
-#: data/resources/ui/window.ui:11
-msgid "Pipewire Volume Control"
-msgstr "Kontrola głośności Pipewire"
 
 #: data/resources/ui/window.ui:41
 msgid "Lost connection to Pipewire server!"
@@ -204,11 +234,11 @@ msgstr "włącz"
 msgid "Could not load resources"
 msgstr "Nie można wczytać zasobów"
 
-#: src/ui/streambox.rs:107
+#: src/ui/streambox.rs:115
 msgid "Default ({})"
 msgstr "Domyślne ({})"
 
-#: src/ui/streambox.rs:112
+#: src/ui/streambox.rs:120
 msgid "Default"
 msgstr "Domyślne"
 
@@ -230,5 +260,7 @@ msgstr "Nie wykryto karty dźwiękowej. Sprawdź konfigurację pipewire."
 
 #: src/ui/window.rs:291
 msgid "No sound devices detected. Check profiles in Card tab."
-msgstr ""
-"Nie wykryto sterowników dźwięku. Sprawdź profile w zakładce Karty."
+msgstr "Nie wykryto sterowników dźwięku. Sprawdź profile w zakładce Karty."
+
+#~ msgid "GTK"
+#~ msgstr "GTK"

@@ -1,9 +1,10 @@
 [Desktop Entry]
 Name=pwvucontrol
+GenericName=Pipewire Volume Control
 Exec=pwvucontrol
 Icon=@icon@
 Terminal=false
 Type=Application
 Categories=Audio;System
-Keywords=GTK
+Keywords=Volume
 StartupNotify=true
