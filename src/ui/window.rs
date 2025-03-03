@@ -74,7 +74,6 @@ mod imp {
             PwVolumeBox::ensure_type();
 
             klass.bind_template();
-            klass.bind_template_callbacks();
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -198,7 +197,6 @@ mod imp {
     impl ApplicationWindowImpl for PwvucontrolWindow {}
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
 
-    #[gtk::template_callbacks]
     impl PwvucontrolWindow {}
 }
 

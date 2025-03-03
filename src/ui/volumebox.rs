@@ -64,7 +64,6 @@ mod imp {
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
-            klass.bind_template_callbacks();
         }
 
         fn instance_init(obj: &glib::subclass::InitializingObject<Self>) {
@@ -216,13 +215,7 @@ mod imp {
         }
     }
 
-    #[gtk::template_callbacks]
     impl PwVolumeBox {
-        #[template_callback]
-        fn invert_bool(&self, value: bool) -> bool {
-            !value
-        }
-
         fn setuplevelbar(&self) {
             let item = self.node_object.borrow();
             let item = item.as_ref().cloned().unwrap();
