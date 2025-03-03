@@ -7,6 +7,8 @@ use pipewire::{spa, spa::utils::Direction, stream::*, context::Context, loop_::L
 use std::os::fd::AsRawFd;
 use crate::ui::PwVolumeBox;
 
+const PEAK_RATE: u32 = 144;
+
 pub struct LevelbarProvider {
     _loop: Loop,
     _context: Context,
@@ -37,13 +39,15 @@ impl LevelbarProvider {
             }
         });
 
+        // We impersonate pavucontrol so we don't get listed as recording source in desktop shell / other volume control programs
         let props = properties! {
             "node.rate" => "1/25",
             "node.latency" => "1/25",
-            "node.name" => "pwvucontrol-peak-detect",
+            "node.name" => "PulseAudio Volume Control",
             "media.name" => "Peak detect",
             "resample.peaks" => "true",
-            "stream.monitor" => "true"
+            "stream.monitor" => "true",
+            "application.id" => "org.PulseAudio.pavucontrol",
         };
 
         let stream: Stream = Stream::new(&core, "peakdetect", props)?;
@@ -59,7 +63,7 @@ impl LevelbarProvider {
                         let chan = &d[0..std::mem::size_of::<f32>()];
                         let mut max = f32::from_le_bytes(chan.try_into().unwrap()).clamp(0.0, 1.0);
 
-                        const DECAY_STEP: f32 = 0.4;
+                        const DECAY_STEP: f32 = 1.0 / PEAK_RATE as f32;
                         if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
                             max = *last_peak - DECAY_STEP;
                         }
@@ -105,7 +109,7 @@ impl Drop for LevelbarProvider {
 fn create_audio_format_pod(buffer: &mut Vec<u8>) -> &spa::pod::Pod {
     let mut audio_info = spa::param::audio::AudioInfoRaw::new();
     audio_info.set_format(spa::param::audio::AudioFormat::F32LE);
-    audio_info.set_rate(25);
+    audio_info.set_rate(PEAK_RATE);
     audio_info.set_channels(1);
     audio_info.set_position([spa::sys::SPA_AUDIO_CHANNEL_MONO; 64]);
 
