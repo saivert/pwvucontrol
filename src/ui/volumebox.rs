@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    backend::{PwChannelObject, PwNodeObject, PwvucontrolManager, NodeType},
-    ui::{LevelbarProvider, PwChannelBox, PwVolumeScale},
+    backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale}
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
@@ -79,7 +78,7 @@ mod imp {
             self.parent_constructed();
 
             let item = self.node_object.borrow();
-            let item = item.as_ref().cloned().unwrap();
+            let item = item.as_ref().unwrap();
 
             // Flatpak blocks access to application icons, so hide the icon when run in the sandbox.
             if cfg!(feature = "sandboxed") && matches!(item.nodetype(), NodeType::StreamInput | NodeType::StreamOutput) {
@@ -231,11 +230,10 @@ mod imp {
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider.set(Some(provider));
 
-                let obj = self.obj();
-                let callbackid = self.level_bar.add_tick_callback(clone!(@strong obj => @default-panic, move |_, _| {
-                    obj.imp().level_bar.set_value(obj.imp().level.get() as f64);
+                let callbackid = self.obj().add_tick_callback(|widget, _fc| {
+                    widget.imp().level_bar.set_value(widget.imp().level.get() as f64);
                     ControlFlow::Continue
-                }));
+                });
                 self.timeoutid.set(Some(callbackid));
             }
         }
