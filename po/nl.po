@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-02 15:55+0100\n"
-"PO-Revision-Date: 2024-07-01 21:02+0200\n"
+"PO-Revision-Date: 2025-03-04 11:01+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch <>\n"
 "Language: nl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.5\n"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:3
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
@@ -28,7 +28,7 @@ msgstr "Pipewire-volumebediening"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:10
 msgid "Volume"
-msgstr ""
+msgstr "Volumeniveau"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -43,17 +43,18 @@ msgid "Main window"
 msgstr "Hoofdvenster"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-#, fuzzy
 msgid "Changelog since 0.4.7"
 msgstr "Wijzigingslog sinds 0.4.7"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
 msgid "Fix displaying of default device name in stream dropdown."
 msgstr ""
+"Opgelost: het standaardapparaat wordt voortaan goed getoond in het "
+"streammenu."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
 msgid "Increase responsiveness of peak meters."
-msgstr ""
+msgstr "Verbeterd: responsiviteit van de piekmeters."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
 msgid "Changelog since 0.4.6"
@@ -61,7 +62,7 @@ msgstr "Wijzigingslog sinds 0.4.6"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
 msgid "Fix crash when selecting Pro Audio profile."
-msgstr ""
+msgstr "Opgelost: crash na het kiezen van het Pro Audio-profiel."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
 msgid "Changelog since 0.4.5"
@@ -69,11 +70,11 @@ msgstr "Wijzigingslog sinds 0.4.5"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Added polish, georgian, russian and french translation."
-msgstr ""
+msgstr "Nieuw: Poolse, Georgische, Russische en Franse vertaling."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:47
 msgid "Fix not all ports being visible in device port dropdown."
-msgstr ""
+msgstr "Opgelost: niet alle poorten werden getoond in het apparaatpoortmenu."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:53
 msgid "Changelog since 0.4.4"
@@ -81,7 +82,7 @@ msgstr "Wijzigingslog sinds 0.4.4"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:55
 msgid "Updated dutch translation."
-msgstr "Geupdate: Nederlandse vertaling"
+msgstr "Bijgewerkt: Nederlandse vertaling."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:61
 msgid "Changelog since 0.4.3"
@@ -89,7 +90,7 @@ msgstr "Wijzigingslog sinds 0.4.3"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
 msgid "Added dutch translation."
-msgstr "Nieuw: Nederlandse vertaling"
+msgstr "Nieuw: Nederlandse vertaling."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:64
 msgid ""
@@ -97,7 +98,7 @@ msgid ""
 "reduced."
 msgstr ""
 "Verbeterd: toepassingspictogrammen worden verborgen in de flatpakversie om "
-"het aantal rechten beperkt te houden"
+"het aantal rechten beperkt te houden."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:70
 msgid "Changelog since 0.4.2"
@@ -105,7 +106,7 @@ msgstr "Wijzigingslog sinds 0.4.2"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:72
 msgid "Added new icons for input and output devices."
-msgstr "Nieuw: pictogrammen voor in- en uitvoerapparaten"
+msgstr "Nieuw: pictogrammen voor in- en uitvoerapparaten."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:78
 msgid "Changelog since 0.3.1"
@@ -115,7 +116,7 @@ msgstr "Wijzigingslog sinds 0.3.1"
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
 "Nieuw: ondersteuning voor geluidsversterking - schakel in via het "
-"hamburgermenu"
+"hamburgermenu."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:86
 msgid "Changelog since 0.2.0"
@@ -149,7 +150,7 @@ msgstr "Geluidsversterking inschakelen"
 
 #: data/resources/ui/window.ui:41
 msgid "Lost connection to Pipewire server!"
-msgstr ""
+msgstr "De verbinding met de Pipewire-server is verbroken!"
 
 #: data/resources/ui/window.ui:45
 msgid "Reconnect"
@@ -258,10 +259,12 @@ msgstr "150%"
 #: src/ui/window.rs:289
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr ""
+"Er zijn geel geluidskaarten aangetroffen - controleer de Pipewire-"
+"instellingen."
 
 #: src/ui/window.rs:291
 msgid "No sound devices detected. Check profiles in Card tab."
-msgstr ""
+msgstr "Er zijn geen geluidsapparaten aangetroffen - controleer de profielen."
 
 #~ msgid "GTK"
 #~ msgstr "GTK"
