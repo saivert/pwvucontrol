@@ -14,8 +14,7 @@
     <file preprocess="xml-stripblanks" alias="gtk/devicebox.ui">ui/devicebox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/profilerow.ui">ui/profilerow.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/volumescale.ui">ui/volumescale.ui</file>
-    <file>ui/levelbar.css</file>
-    <file>ui/list.css</file>
+    <file>ui/styling.css</file>
   </gresource>
   <gresource prefix="/com/saivert/pwvucontrol/icons/scalable/actions">
      <file preprocess="xml-stripblanks" alias="com.saivert.pwvucontrol.svg">../icons/com.saivert.pwvucontrol.svg</file>

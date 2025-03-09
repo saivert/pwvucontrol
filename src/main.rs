@@ -21,7 +21,7 @@
 mod config {
     #![allow(dead_code)]
 
-    include!(concat!(env!("CODEGEN_BUILD_DIR"), "/config.rs"));
+    include!(concat!(env!("OUT_DIR"), "/config.rs"));
 }
 mod macros;
 
@@ -80,8 +80,7 @@ fn main() -> gtk::glib::ExitCode {
     gio::resources_register(&resources);
 
     let css = gtk::CssProvider::new();
-    css.load_from_resource("/com/saivert/pwvucontrol/ui/levelbar.css");
-    css.load_from_resource("/com/saivert/pwvucontrol/ui/list.css");
+    css.load_from_resource("/com/saivert/pwvucontrol/ui/styling.css");
 
     gtk::style_context_add_provider_for_display(
         &gtk::gdk::Display::default().unwrap(),
