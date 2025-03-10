@@ -4,3 +4,6 @@
     border-radius: 0px;
 }
 
+.vumeter {
+    filter: invert(0.2);  
+}

@@ -79,14 +79,5 @@ fn main() -> gtk::glib::ExitCode {
     // Load resources
     gio::resources_register(&resources);
 
-    let css = gtk::CssProvider::new();
-    css.load_from_resource("/com/saivert/pwvucontrol/ui/styling.css");
-
-    gtk::style_context_add_provider_for_display(
-        &gtk::gdk::Display::default().unwrap(),
-        &css,
-        gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
-    );
-
     PwvucontrolApplication::run()
 }
