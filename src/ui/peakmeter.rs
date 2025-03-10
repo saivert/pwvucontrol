@@ -54,28 +54,33 @@ mod imp {
 
             snapshot.push_rounded_clip(&rounded_rect);
 
-            let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
-            let mut block_width = width / NUM_BLOCKS;
-            let extra_space = width - block_width * NUM_BLOCKS;
-            if extra_space > 0 {
-                block_width += 1;
-            }
-            let mut block_area_width = block_width;
-            let mut block_area_x = 0;
-
-            for i in 0..discrete_level {
-                if extra_space > 0 && i == extra_space {
-                    block_area_width -= 1;
+            if false {
+                snapshot.append_color(&RGBA::GREEN, &graphene::Rect::new(0.0, 0.0, level * w, h));
+            } else {
+                let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
+                let mut block_width = width / NUM_BLOCKS;
+                let extra_space = width - block_width * NUM_BLOCKS;
+                if extra_space > 0 {
+                    block_width += 1;
                 }
-
-                let color = match i {
-                    0..GREEN_LIMIT => RGBA::GREEN,
-                    GREEN_LIMIT..YELLOW_LIMIT => RGBA::new(1.0, 1.0, 0.0, 1.0),
-                    _ => RGBA::RED,
-                };
-                snapshot.append_color(&color, &graphene::Rect::new(block_area_x as f32, 0.0, block_area_width as f32 - 1.0, h));
-                block_area_x += block_area_width;
+                let mut block_area_width = block_width;
+                let mut block_area_x = 0;
+    
+                for i in 0..discrete_level {
+                    if extra_space > 0 && i == extra_space {
+                        block_area_width -= 1;
+                    }
+    
+                    let color = match i {
+                        0..GREEN_LIMIT => RGBA::GREEN,
+                        GREEN_LIMIT..YELLOW_LIMIT => RGBA::new(1.0, 1.0, 0.0, 1.0),
+                        _ => RGBA::RED,
+                    };
+                    snapshot.append_color(&color, &graphene::Rect::new(block_area_x as f32, 0.0, block_area_width as f32 - 1.0, h));
+                    block_area_x += block_area_width;
+                }
             }
+
             snapshot.pop();
         }
 
