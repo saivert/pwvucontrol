@@ -5,5 +5,8 @@
 }
 
 .vumeter {
-    filter: invert(0.2);  
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #303030;
+    filter: invert(.1);
 }

@@ -53,7 +53,6 @@ mod imp {
             let rounded_rect = gsk::RoundedRect::from_rect(bounding_box, 5.0);
 
             snapshot.push_rounded_clip(&rounded_rect);
-            snapshot.append_color(&RGBA::new(1.0, 1.0, 1.0, 0.1), &bounding_box);
 
             let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
             let mut block_width = width / NUM_BLOCKS;
