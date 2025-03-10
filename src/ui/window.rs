@@ -5,7 +5,7 @@ use crate::{
     application::PwvucontrolApplication,
     backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
     config::{APP_ID, PROFILE},
-    ui::{devicebox::PwDeviceBox, PwSinkBox, PwStreamBox, PwVolumeBox},
+    ui::{devicebox::PwDeviceBox, PwSinkBox, PwStreamBox},
 };
 use adw::subclass::prelude::*;
 use gettextrs::gettext;
@@ -71,8 +71,6 @@ mod imp {
         type ParentType = adw::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
-            PwVolumeBox::ensure_type();
-
             klass.bind_template();
         }
 
@@ -179,6 +177,8 @@ mod imp {
 
             let overamplification_action = self.settings.create_action("enable-overamplification");
             self.obj().add_action(&overamplification_action);
+            let use_led_peakmeter_action = self.settings.create_action("use-peakmeter-led");
+            self.obj().add_action(&use_led_peakmeter_action);
 
             self.obj().load_window_state();
         }

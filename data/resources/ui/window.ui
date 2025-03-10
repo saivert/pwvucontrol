@@ -310,6 +310,10 @@
         <attribute name="action">win.enable-overamplification</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">Use led peak meter</attribute>
+        <attribute name="action">win.use-peakmeter-led</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
         <attribute name="action">win.show-help-overlay</attribute>
       </item>

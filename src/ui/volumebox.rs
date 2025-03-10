@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{
-    backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale}
+    backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale, PeakMeterAbstraction}
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
@@ -25,6 +25,7 @@ mod imp {
         pub(super) level: Cell<f32>,
         pub(super) default_node: Cell<u32>,
         pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
+        pub peak_meter: RefCell<PeakMeterAbstraction>,
 
         // Template widgets
         #[template_child]
@@ -36,7 +37,7 @@ mod imp {
         #[template_child]
         pub volume_scale: TemplateChild<PwVolumeScale>,
         #[template_child]
-        pub level_bar: TemplateChild<gtk::LevelBar>,
+        pub peakmeterbox: TemplateChild<gtk::Box>,
         #[template_child]
         pub mutebtn: TemplateChild<gtk::ToggleButton>,
         #[template_child]
@@ -156,13 +157,14 @@ mod imp {
                 widget.obj().grab_focus();
             }));
 
-            self.level_bar.set_min_value(0.0);
-            self.level_bar.set_max_value(1.0);
+            let window = crate::ui::PwvucontrolWindow::default();
+            window
+                .imp()
+                .settings.connect_changed(Some("use-peakmeter-led"), clone!(@weak self as widget => move |_settings, _detail| {
+                    widget.setup_levelbar_widget();
+                }));
 
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_LOW, 0.0);
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_HIGH, 0.0);
-            self.level_bar.add_offset_value(gtk::LEVEL_BAR_OFFSET_FULL, 1.0);
-
+            self.setup_levelbar_widget();
         }
 
         fn dispose(&self) {
@@ -186,14 +188,14 @@ mod imp {
 
         fn map(&self) {
             self.parent_map();
-
+            
             // Monitoring ourselves cause an infinite loop.
             let item = self.node_object.borrow();
             let item = item.as_ref().unwrap();
             if item.name() != "pwvucontrol-peak-detect" {
                 self.setuplevelbar();
             } else {
-                self.level_bar.set_visible(false);
+                self.peak_meter.borrow().set_visible(false);
             }
         }
     }
@@ -218,17 +220,34 @@ mod imp {
     impl PwVolumeBox {
         fn setuplevelbar(&self) {
             let item = self.node_object.borrow();
-            let item = item.as_ref().cloned().unwrap();
+            let item = item.as_ref().unwrap();
 
             if let Ok(provider) = LevelbarProvider::new(&self.obj(), item.boundid()) {
                 self.levelbarprovider.set(Some(provider));
 
                 let callbackid = self.obj().add_tick_callback(|widget, _fc| {
-                    widget.imp().level_bar.set_value(widget.imp().level.get() as f64);
+
+                    widget.imp().peak_meter.borrow().set_level(widget.imp().level.get());
                     ControlFlow::Continue
                 });
                 self.timeoutid.set(Some(callbackid));
             }
+        }
+
+        fn setup_levelbar_widget(&self) {
+            let window = crate::ui::PwvucontrolWindow::default();
+            let peak_meter = match window.imp().settings.boolean("use-peakmeter-led") {
+                true => PeakMeterAbstraction::new(crate::ui::PeakMeterType::Led),
+                false => PeakMeterAbstraction::new(crate::ui::PeakMeterType::Basic)
+            };
+
+            if let Some (widget) = self.peak_meter.borrow().get_widget() {
+                self.peakmeterbox.remove(widget);
+            }
+            if let Some(widget) = peak_meter.get_widget() {
+                self.peakmeterbox.append(widget);
+            }
+            self.peak_meter.set(peak_meter);
         }
     }
 }

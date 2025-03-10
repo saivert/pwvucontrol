@@ -21,5 +21,10 @@
             <summary>Enable over-amplification</summary>
             <description></description>
         </key>
+        <key name="use-peakmeter-led" type="b">
+            <default>false</default>
+            <summary>Use led style peak meter</summary>
+            <description></description>
+        </key>
 	</schema>
 </schemalist>
