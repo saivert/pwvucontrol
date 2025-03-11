@@ -7,6 +7,6 @@
 .vumeter {
     border: 1px solid black;
     border-radius: 5px;
-    background-color: #303030;
-    filter: invert(.1);
+    filter: saturate(.65) brightness(.95);
+    background-color: #585858;
 }
