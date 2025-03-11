@@ -12,7 +12,6 @@ mod profilerow;
 mod route_dropdown;
 mod volumescale;
 mod peakmeter;
-mod peak_meter_abstraction;
 
 pub use window::PwvucontrolWindow;
 pub use profile_dropdown::PwProfileDropDown;
@@ -27,4 +26,3 @@ pub use profilerow::PwProfileRow;
 pub use route_dropdown::PwRouteDropDown;
 pub use volumescale::PwVolumeScale;
 pub use peakmeter::PwPeakMeter;
-pub use peak_meter_abstraction::{PeakMeterAbstraction, PeakMeterType};

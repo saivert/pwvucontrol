@@ -115,28 +115,10 @@
                                 <property name="use-overamplification">1</property>
                             </object>
                         </child>
-                        <!--
-                        <child>
-                            <object class="GtkLevelBar" id="level_bar">
-                                <property name="hexpand">True</property>
-                                <property name="hexpand-set">True</property>
-                                <property name="mode">continuous</property>
-                                <property name="max-value">1.0</property>
-                                <property name="min-value">0.0</property>
-                            </object>
-                        </child>
                         <child>
                             <object class="PwPeakMeter" id="peak_meter">
                                 <property name="hexpand">True</property>
                                 <property name="hexpand-set">True</property>
-                            </object>
-                        </child>
-                        -->
-                        <child>
-                            <object class="GtkBox" id="peakmeterbox">
-                                <property name="orientation">vertical</property>
-                                <property name="valign">center</property>
-                                <property name="hexpand">1</property>
                             </object>
                         </child>
                     </object>

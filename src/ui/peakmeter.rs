@@ -13,6 +13,9 @@ mod imp {
     pub struct PwPeakMeter {
         #[property(get, set = Self::set_level)]
         pub(super) level: Cell<f32>,
+
+        #[property(get, set)]
+        pub(super) use_led: Cell<bool>
     }
 
     #[glib::object_subclass]
@@ -54,7 +57,7 @@ mod imp {
 
             snapshot.push_rounded_clip(&rounded_rect);
 
-            if false {
+            if !self.use_led.get() {
                 snapshot.append_color(&RGBA::GREEN, &graphene::Rect::new(0.0, 0.0, level * w, h));
             } else {
                 let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
