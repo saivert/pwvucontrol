@@ -274,7 +274,15 @@ impl PwDeviceObject {
                         assert!(profiles.is_array());
                         let profiles_vec: Vec<u32> =  profiles.array_iterator::<i32>().map(|x| x as u32).collect();
 
-                        routes.push(PwRouteObject::new(index as u32, &description, available, direction, &profiles_vec));
+                        let info: wireplumber::spa::SpaPod = pod.spa_property(&wp::spa::ffi::SPA_PARAM_ROUTE_info).expect("Route info");
+
+                        let productname = Self::find_struct_key(&info, "device.product.name");
+                        let desc = match productname {
+                            Some(x) => format!("{description} [{x}]"),
+                            None => description
+                        };
+
+                        routes.push(PwRouteObject::new(index as u32, &desc, available, direction, &profiles_vec));
                     }
                     // Notify update of list model
                     widget.emit_by_name::<()>("pre-update-route", &[]);
@@ -288,6 +296,17 @@ impl PwDeviceObject {
                 }
             }),
         );
+    }
+
+    fn find_struct_key(input: &wireplumber::spa::SpaPod, key: &str) -> Option<String> {
+        let mut iter = input.iterator().into_iter();
+
+        while let Some(k) = iter.next() {
+            if k.string() == Some(key.into()) {
+                return iter.next()?.string().map(|gs|gs.to_string());
+            }
+        }
+        None
     }
 
     pub(crate) fn update_current_route_index(&self) {
