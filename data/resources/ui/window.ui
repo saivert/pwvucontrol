@@ -318,6 +318,10 @@
         <attribute name="action">win.show-help-overlay</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">Beep on volume changes</attribute>
+        <attribute name="action">win.beep-on-volume-changes</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">_About Pwvucontrol</attribute>
         <attribute name="action">app.about</attribute>
       </item>

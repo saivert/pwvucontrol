@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use std::time::Duration;
+
 use crate::macros::*;
 use crate::{
     application::PwvucontrolApplication,
@@ -11,12 +13,15 @@ use adw::subclass::prelude::*;
 use gettextrs::gettext;
 use glib::clone;
 use gtk::{gio, prelude::*};
+use std::cell::Cell;
+use std::time;
 
 pub enum PwvucontrolWindowView {
     Connected,
     Disconnected,
 }
 mod imp {
+
     use super::*;
 
     #[derive(Debug, gtk::CompositeTemplate)]
@@ -44,6 +49,9 @@ mod imp {
         pub info_banner: TemplateChild<adw::Banner>,
 
         pub settings: gio::Settings,
+
+        pub beep_elapsed: Cell<time::Instant>,
+        pub beep_enabled: Cell<bool>,
     }
 
     impl Default for PwvucontrolWindow {
@@ -60,6 +68,8 @@ mod imp {
                 reconnectbtn: TemplateChild::default(),
                 settings: gio::Settings::new(APP_ID),
                 info_banner: TemplateChild::default(),
+                beep_elapsed: Cell::new(std::time::Instant::now()),
+                beep_enabled: Default::default(),
             }
         }
     }
@@ -179,6 +189,13 @@ mod imp {
             self.obj().add_action(&overamplification_action);
             let use_led_peakmeter_action = self.settings.create_action("use-peakmeter-led");
             self.obj().add_action(&use_led_peakmeter_action);
+            let beep_on_volume_changes_action = self.settings.create_action("beep-on-volume-changes");
+            self.obj().add_action(&beep_on_volume_changes_action);
+
+            self.settings.connect_changed(Some("beep-on-volume-changes"), clone!(@weak self as widget => move |settings, _key| {
+                widget.beep_enabled.set(settings.boolean("beep-on-volume-changes"));
+            }));
+            self.beep_enabled.set(self.settings.boolean("beep-on-volume-changes"));
 
             self.obj().load_window_state();
         }
@@ -290,6 +307,16 @@ impl PwvucontrolWindow {
         };
         imp.info_banner.set_title(&message);
         imp.info_banner.set_revealed(manager.node_model().n_items() == 0);
+    }
+
+    pub(crate) fn play_beep(&self) {
+        if !self.imp().beep_enabled.get() {
+            return;
+        }
+        if self.imp().beep_elapsed.get().elapsed() > Duration::from_secs(1) {
+            self.display().beep();
+            self.imp().beep_elapsed.set(time::Instant::now());
+        }
     }
 }
 

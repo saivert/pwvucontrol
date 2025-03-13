@@ -60,6 +60,14 @@ mod imp {
             let item = obj.node_object().expect("nodeobj");
 
             self.volumebox.set_node_object(&item);
+
+            if matches!(item.nodetype(), NodeType::Sink) {
+                self.volumebox.imp().volume_scale.connect_volume_notify(|_| {
+                    let window = PwvucontrolWindow::default();
+                    window.play_beep();
+                });
+            }
+
             self.volumebox.set_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().default_node_changed();
             }));

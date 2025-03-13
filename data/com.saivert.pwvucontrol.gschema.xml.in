@@ -26,5 +26,10 @@
             <summary>Use led style peak meter</summary>
             <description></description>
         </key>
+        <key name="beep-on-volume-changes" type="b">
+            <default>false</default>
+            <summary>Play system beep on volume change</summary>
+            <description>Lets you preview the sound level even if you don't play any audio.</description>
+        </key>
 	</schema>
 </schemalist>
