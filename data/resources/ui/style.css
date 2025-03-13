@@ -4,6 +4,10 @@
     border-radius: 0px;
 }
 
+.boxed-list {
+    box-shadow: none;
+}
+
 .vumeter {
     border: 1px solid black;
     border-radius: 5px;
