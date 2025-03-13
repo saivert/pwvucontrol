@@ -74,6 +74,11 @@ impl LevelbarProvider {
                 }
             };
         }))
+        .state_changed(clone!(@weak volumebox => @default-return (), move |_stream, _user_data, _oldstate, state| {
+            if state == StreamState::Paused {
+                volumebox.set_level(0.0);
+            }
+        }))
         .register()?;
 
         let mut buffer: Vec<u8> = Vec::new();
