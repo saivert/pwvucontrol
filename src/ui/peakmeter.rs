@@ -4,7 +4,9 @@ use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 
 mod imp {
-    use gtk::{gdk::RGBA, graphene, gsk};
+    use gtk::{graphene, gsk};
+
+    use crate::macros::*;
 
     use super::*;
 
@@ -46,6 +48,10 @@ mod imp {
             const GREEN_LIMIT: u32 = (0.6 * NUM_BLOCKS as f32) as u32;
             const YELLOW_LIMIT: u32 = (0.9 * NUM_BLOCKS as f32) as u32;
 
+            let color_green = pwvucontrol_hex_to_rgba!(0x33 0xd1 0x7a);
+            let color_yellow = pwvucontrol_hex_to_rgba!(0xf6 0xd3 0x2d);
+            let color_red = pwvucontrol_hex_to_rgba!(0xe0 0x1b 0x24);
+
             let width = self.obj().width() as u32;
             let w = self.obj().width() as f32;
             let h = self.obj().height() as f32;
@@ -58,7 +64,7 @@ mod imp {
             snapshot.push_rounded_clip(&rounded_rect);
 
             if !self.use_led.get() {
-                snapshot.append_color(&RGBA::GREEN, &graphene::Rect::new(0.0, 0.0, level * w, h));
+                snapshot.append_color(&color_green, &graphene::Rect::new(0.0, 0.0, level * w, h));
             } else {
                 let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
                 let mut block_width = width / NUM_BLOCKS;
@@ -73,11 +79,11 @@ mod imp {
                     if extra_space > 0 && i == extra_space {
                         block_area_width -= 1;
                     }
-    
+
                     let color = match i {
-                        0..GREEN_LIMIT => RGBA::GREEN,
-                        GREEN_LIMIT..YELLOW_LIMIT => RGBA::new(1.0, 1.0, 0.0, 1.0),
-                        _ => RGBA::RED,
+                        0..GREEN_LIMIT => color_green,
+                        GREEN_LIMIT..YELLOW_LIMIT => color_yellow,
+                        _ => color_red,
                     };
                     snapshot.append_color(&color, &graphene::Rect::new(block_area_x as f32, 0.0, block_area_width as f32 - 1.0, h));
                     block_area_x += block_area_width;
