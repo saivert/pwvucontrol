@@ -16,7 +16,7 @@ mod imp {
     #[template(resource = "/com/saivert/pwvucontrol/gtk/volumebox.ui")]
     #[properties(wrapper_type = super::PwVolumeBox)]
     pub struct PwVolumeBox {
-        #[property(get, set, construct_only)]
+        #[property(get, set = Self::set_node_object)]
         pub(super) node_object: RefCell<Option<PwNodeObject>>,
 
         metadata_changed_event: Cell<Option<SignalHandlerId>>,
@@ -77,6 +77,70 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
+            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
+                widget.obj().grab_focus();
+            }));
+
+            let window = crate::ui::PwvucontrolWindow::default();
+            window.imp().settings.bind("use-peakmeter-led", &self.peak_meter.get(), "use-led")
+                .get_only()
+                .build();
+        }
+
+        fn dispose(&self) {
+            if let Some(sid) = self.metadata_changed_event.take() {
+                let manager = PwvucontrolManager::default();
+                if let Some(metadata) = manager.metadata() {
+                    metadata.disconnect(sid);
+                };
+            };
+        }
+    }
+
+    impl WidgetImpl for PwVolumeBox {
+        fn unmap(&self) {
+            if let Some(t) = self.timeoutid.take() {
+                t.remove();
+            }
+            self.levelbarprovider.take();
+            self.parent_unmap();
+        }
+
+        fn map(&self) {
+            self.parent_map();
+            
+            // Monitoring ourselves cause an infinite loop.
+            let item = self.node_object.borrow();
+            let item = item.as_ref().unwrap();
+            if item.name() != "pwvucontrol-peak-detect" {
+                self.setuplevelbar();
+            } else {
+                self.peak_meter.set_visible(false);
+            }
+        }
+    }
+    impl ListBoxRowImpl for PwVolumeBox {}
+
+    impl BuildableImpl for PwVolumeBox {
+        fn add_child(&self, builder: &gtk::Builder, child: &glib::Object, type_: Option<&str>) {
+            if type_ == Some("extra") {
+                if let Some(widget) = child.downcast_ref::<gtk::Widget>() {
+                    if let Some(container) = self.container.try_get() {
+                        widget.unparent();
+                        container.append(widget);
+                        container.set_child_visible(true);
+                    }
+                }
+            } else {
+                self.parent_add_child(builder, child, type_);
+            }
+        }
+    }
+
+    impl PwVolumeBox {
+
+        fn set_node_object(&self, node_object: PwNodeObject) {
+            self.node_object.set(Some(node_object));
             let item = self.node_object.borrow();
             let item = item.as_ref().unwrap();
 
@@ -152,68 +216,8 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
-
-            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
-                widget.obj().grab_focus();
-            }));
-
-            let window = crate::ui::PwvucontrolWindow::default();
-            window.imp().settings.bind("use-peakmeter-led", &self.peak_meter.get(), "use-led")
-                .get_only()
-                .build();
         }
 
-        fn dispose(&self) {
-            if let Some(sid) = self.metadata_changed_event.take() {
-                let manager = PwvucontrolManager::default();
-                if let Some(metadata) = manager.metadata() {
-                    metadata.disconnect(sid);
-                };
-            };
-        }
-    }
-
-    impl WidgetImpl for PwVolumeBox {
-        fn unmap(&self) {
-            if let Some(t) = self.timeoutid.take() {
-                t.remove();
-            }
-            self.levelbarprovider.take();
-            self.parent_unmap();
-        }
-
-        fn map(&self) {
-            self.parent_map();
-            
-            // Monitoring ourselves cause an infinite loop.
-            let item = self.node_object.borrow();
-            let item = item.as_ref().unwrap();
-            if item.name() != "pwvucontrol-peak-detect" {
-                self.setuplevelbar();
-            } else {
-                self.peak_meter.set_visible(false);
-            }
-        }
-    }
-    impl ListBoxRowImpl for PwVolumeBox {}
-
-    impl BuildableImpl for PwVolumeBox {
-        fn add_child(&self, builder: &gtk::Builder, child: &glib::Object, type_: Option<&str>) {
-            if type_.unwrap_or_default() == "extra" {
-                if let Some(widget) = child.downcast_ref::<gtk::Widget>() {
-                    if let Some(container) = self.container.try_get() {
-                        widget.unparent();
-                        container.append(widget);
-                        container.set_child_visible(true);
-                    }
-                }
-            } else {
-                self.parent_add_child(builder, child, type_);
-            }
-        }
-    }
-
-    impl PwVolumeBox {
         fn setuplevelbar(&self) {
             let item = self.node_object.borrow();
             let item = item.as_ref().unwrap();
@@ -234,7 +238,7 @@ mod imp {
 
 glib::wrapper! {
     pub struct PwVolumeBox(ObjectSubclass<imp::PwVolumeBox>)
-        @extends gtk::Widget, gtk::ListBoxRow,
+        @extends gtk::Widget,
         @implements gtk::Actionable, gtk::Buildable;
 }
 
@@ -249,27 +253,9 @@ impl PwVolumeBox {
         let mut handler = imp.default_node_changed_handler.borrow_mut();
         handler.replace(Box::new(c));
     }
-}
-pub trait PwVolumeBoxImpl: ListBoxRowImpl {}
 
-pub trait PwVolumeBoxExt: IsA<PwVolumeBox> {
-    fn default_node(&self) -> u32 {
+    pub fn default_node(&self) -> u32 {
         self.upcast_ref::<PwVolumeBox>().imp().default_node.get()
     }
-
-    fn node_object(&self) -> Option<PwNodeObject> {
-        self.upcast_ref::<PwVolumeBox>().node_object()
-    }
-
-    fn set_default_node_change_handler(&self, c: impl Fn() + 'static) {
-        self.upcast_ref::<PwVolumeBox>().set_default_node_change_handler(c);
-    }
 }
 
-impl<O: IsA<PwVolumeBox>> PwVolumeBoxExt for O {}
-
-unsafe impl<T: PwVolumeBoxImpl> IsSubclassable<T> for PwVolumeBox {
-    fn class_init(class: &mut glib::Class<Self>) {
-        Self::parent_class_init::<T>(class.upcast_ref_mut());
-    }
-}

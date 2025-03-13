@@ -16,7 +16,7 @@ mod peakmeter;
 pub use window::PwvucontrolWindow;
 pub use profile_dropdown::PwProfileDropDown;
 pub use withdefaultlistmodel::WithDefaultListModel;
-pub use volumebox::{PwVolumeBox, PwVolumeBoxImpl};
+pub use volumebox::PwVolumeBox;
 pub use stream_dropdown::PwStreamDropDown;
 pub use sinkbox::PwSinkBox;
 pub use channelbox::PwChannelBox;

@@ -1,23 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use super::volumebox::PwVolumeBoxExt;
 use crate::{
     backend::{NodeType, PwNodeObject, PwvucontrolManager},
     pwvucontrol_info,
-    ui::{PwRouteDropDown, PwVolumeBox, PwVolumeBoxImpl},
+    ui::{PwRouteDropDown, PwVolumeBox, PwvucontrolWindow},
 };
+
 use glib::clone;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use wireplumber as wp;
+use std::cell::RefCell;
 
 mod imp {
+
     use super::*;
 
-    #[derive(Default, gtk::CompositeTemplate)]
+    #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/sinkbox.ui")]
+    #[properties(wrapper_type = super::PwSinkBox)]
     pub struct PwSinkBox {
         pub(super) block_default_node_toggle_signal: Cell<bool>,
+
+        #[property(get, set, construct_only)]
+        pub(super) node_object: RefCell<Option<PwNodeObject>>,
+
+        #[template_child]
+        pub volumebox: TemplateChild<PwVolumeBox>,
 
         #[template_child]
         pub default_sink_toggle: TemplateChild<gtk::ToggleButton>,
@@ -30,7 +39,7 @@ mod imp {
     impl ObjectSubclass for PwSinkBox {
         const NAME: &'static str = "PwSinkBox";
         type Type = super::PwSinkBox;
-        type ParentType = PwVolumeBox;
+        type ParentType = gtk::ListBoxRow;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -42,13 +51,16 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for PwSinkBox {
         fn constructed(&self) {
             self.parent_constructed();
 
             let obj = self.obj();
+            let item = obj.node_object().expect("nodeobj");
 
-            obj.set_default_node_change_handler(clone!(@weak self as widget => move || {
+            self.volumebox.set_node_object(&item);
+            self.volumebox.set_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().default_node_changed();
             }));
 
@@ -75,7 +87,6 @@ mod imp {
     }
     impl WidgetImpl for PwSinkBox {}
     impl ListBoxRowImpl for PwSinkBox {}
-    impl PwVolumeBoxImpl for PwSinkBox {}
 
     #[gtk::template_callbacks]
     impl PwSinkBox {
@@ -84,9 +95,8 @@ mod imp {
             if self.block_default_node_toggle_signal.get() {
                 return;
             }
-            let obj = self.obj();
-            let parent: &PwVolumeBox = obj.upcast_ref();
-            let node = parent.node_object().expect("nodeobj");
+
+            let node = self.volumebox.node_object().expect("nodeobj");
             let node_name: String = if _togglebutton.is_active() {
                 node.node_property("node.name").unwrap_or_default()
             } else {
@@ -115,7 +125,7 @@ mod imp {
 
 glib::wrapper! {
     pub struct PwSinkBox(ObjectSubclass<imp::PwSinkBox>)
-        @extends gtk::Widget, gtk::ListBoxRow, PwVolumeBox,
+        @extends gtk::Widget, gtk::ListBoxRow,
         @implements gtk::Actionable;
 }
 
@@ -127,7 +137,7 @@ impl PwSinkBox {
     pub(crate) fn default_node_changed(&self) {
         let imp = self.imp();
         let node = self.node_object().expect("nodeobj");
-        let id = self.default_node();
+        let id = imp.volumebox.default_node();
 
         imp.block_default_node_toggle_signal.set(true);
         self.imp().default_sink_toggle.set_active(node.boundid() == id);

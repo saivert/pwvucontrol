@@ -3,20 +3,26 @@
 use crate::{
     backend::{PwNodeObject, PwvucontrolManager},
     macros::*,
-    ui::{PwStreamDropDown, PwVolumeBox, PwVolumeBoxImpl},
+    ui::{PwStreamDropDown, PwVolumeBox},
 };
 use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
 use wireplumber as wp;
-
-use super::volumebox::PwVolumeBoxExt;
+use std::cell::RefCell;
 
 mod imp {
     use super::*;
 
-    #[derive(Default, gtk::CompositeTemplate)]
+    #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/streambox.ui")]
+    #[properties(wrapper_type = super::PwStreamBox)]
     pub struct PwStreamBox {
+        #[property(get, set, construct_only)]
+        pub(super) node_object: RefCell<Option<PwNodeObject>>,
+
+        #[template_child]
+        pub volumebox: TemplateChild<PwVolumeBox>,
+
         #[template_child]
         pub output_dropdown: TemplateChild<PwStreamDropDown>,
     }
@@ -25,7 +31,7 @@ mod imp {
     impl ObjectSubclass for PwStreamBox {
         const NAME: &'static str = "PwStreamBox";
         type Type = super::PwStreamBox;
-        type ParentType = PwVolumeBox;
+        type ParentType = gtk::ListBoxRow;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -36,6 +42,7 @@ mod imp {
         }
     }
 
+    #[glib::derived_properties]
     impl ObjectImpl for PwStreamBox {
         fn constructed(&self) {
             let manager = PwvucontrolManager::default();
@@ -43,7 +50,9 @@ mod imp {
             let obj = self.obj();
             let item = obj.node_object().expect("nodeobj");
 
-            obj.set_default_node_change_handler(clone!(@weak self as widget => move || {
+            self.volumebox.set_node_object(&item);
+
+            self.volumebox.set_default_node_change_handler(clone!(@weak self as widget => move || {
                 widget.obj().update_output_device_dropdown();
             }));
 
@@ -73,14 +82,13 @@ mod imp {
     }
     impl WidgetImpl for PwStreamBox {}
     impl ListBoxRowImpl for PwStreamBox {}
-    impl PwVolumeBoxImpl for PwStreamBox {}
 
     impl PwStreamBox {}
 }
 
 glib::wrapper! {
     pub struct PwStreamBox(ObjectSubclass<imp::PwStreamBox>)
-        @extends gtk::Widget, gtk::ListBoxRow, PwVolumeBox,
+        @extends gtk::Widget, gtk::ListBoxRow,
         @implements gtk::Actionable;
 }
 
