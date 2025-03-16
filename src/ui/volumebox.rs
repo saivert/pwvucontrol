@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use crate::pwvucontrol_warning;
 use crate::{
-    backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager}, ui::{LevelbarProvider, PwChannelBox, PwVolumeScale, PwPeakMeter}
+    backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager},
+    ui::{LevelbarProvider, PwChannelBox, PwPeakMeter, PwVolumeScale},
 };
 use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
 use wireplumber as wp;
-use crate::pwvucontrol_warning;
 
 mod imp {
     use super::*;
@@ -82,7 +83,10 @@ mod imp {
             }));
 
             let window = crate::ui::PwvucontrolWindow::default();
-            window.imp().settings.bind("use-peakmeter-led", &self.peak_meter.get(), "use-led")
+            window
+                .imp()
+                .settings
+                .bind("use-peakmeter-led", &self.peak_meter.get(), "use-led")
                 .get_only()
                 .build();
         }
@@ -108,7 +112,7 @@ mod imp {
 
         fn map(&self) {
             self.parent_map();
-            
+
             // Monitoring ourselves cause an infinite loop.
             let item = self.node_object.borrow();
             let item = item.as_ref().unwrap();
@@ -138,7 +142,6 @@ mod imp {
     }
 
     impl PwVolumeBox {
-
         fn set_node_object(&self, node_object: PwNodeObject) {
             self.node_object.set(Some(node_object));
             let item = self.node_object.borrow();
@@ -226,7 +229,6 @@ mod imp {
                 self.levelbarprovider.set(Some(provider));
 
                 let callbackid = self.obj().add_tick_callback(|widget, _fc| {
-
                     widget.imp().peak_meter.set_level(widget.imp().level.get());
                     ControlFlow::Continue
                 });
@@ -258,4 +260,3 @@ impl PwVolumeBox {
         self.upcast_ref::<PwVolumeBox>().imp().default_node.get()
     }
 }
-

@@ -2,12 +2,12 @@
 
 use std::cell::{Cell, RefCell};
 
+use super::ParamAvailability;
 use gtk::{
     glib::{self, Properties},
     prelude::*,
-    subclass::prelude::*
+    subclass::prelude::*,
 };
-use super::ParamAvailability;
 
 mod imp {
 
@@ -43,9 +43,9 @@ glib::wrapper! {
 impl PwProfileObject {
     pub(crate) fn new(index: u32, description: &str, availability: u32) -> Self {
         glib::Object::builder()
-        .property("index", index)
-        .property("description", description)
-        .property("availability", ParamAvailability::from(availability))
-        .build()
+            .property("index", index)
+            .property("description", description)
+            .property("availability", ParamAvailability::from(availability))
+            .build()
     }
 }

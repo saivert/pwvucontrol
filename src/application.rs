@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use glib::ExitCode;
-use gtk::{gio, prelude::*, subclass::prelude::*};
-use adw::subclass::prelude::*;
-use std::cell::OnceCell;
 use crate::{
-    config::{APP_ID, VERSION},
     backend::PwvucontrolManager,
+    config::{APP_ID, VERSION},
     ui::PwvucontrolWindow,
 };
+use adw::subclass::prelude::*;
+use glib::ExitCode;
+use gtk::{gio, prelude::*, subclass::prelude::*};
+use std::cell::OnceCell;
 
 mod imp {
     use super::*;
@@ -39,7 +39,7 @@ mod imp {
     impl ObjectImpl for PwvucontrolApplication {
         fn constructed(&self) {
             self.parent_constructed();
-            
+
             let obj = self.obj();
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
@@ -52,10 +52,7 @@ mod imp {
         // tries to launch a "second instance" of the application. When they try
         // to do that, we'll just present any existing window.
         fn activate(&self) {
-            let window = self
-                .window
-                .get()
-                .expect("Should always be initialized in gio_application_startup");
+            let window = self.window.get().expect("Should always be initialized in gio_application_startup");
 
             // Ask the window manager/compositor to present the window
             window.present();
@@ -65,9 +62,7 @@ mod imp {
             self.parent_startup();
 
             let window = PwvucontrolWindow::new(&self.obj());
-            self.window
-                .set(window)
-                .expect("Failed to initialize application window");
+            self.window.set(window).expect("Failed to initialize application window");
         }
     }
 
@@ -86,18 +81,16 @@ glib::wrapper! {
 impl PwvucontrolApplication {
     pub fn run() -> ExitCode {
         let app: Self = glib::Object::builder()
-        .property("application-id", APP_ID)
-        .property("flags", gio::ApplicationFlags::empty())
-        .property("resource-base-path", "/com/saivert/pwvucontrol")
-        .build();
+            .property("application-id", APP_ID)
+            .property("flags", gio::ApplicationFlags::empty())
+            .property("resource-base-path", "/com/saivert/pwvucontrol")
+            .build();
 
         ApplicationExtManual::run(&app)
     }
 
     fn setup_gactions(&self) {
-        let quit_action = gio::ActionEntry::builder("quit")
-            .activate(move |app: &Self, _, _| app.quit())
-            .build();
+        let quit_action = gio::ActionEntry::builder("quit").activate(move |app: &Self, _, _| app.quit()).build();
         let about_action = gio::ActionEntry::builder("about")
             .activate(move |app: &Self, _, _| app.show_about())
             .build();
@@ -118,7 +111,6 @@ impl PwvucontrolApplication {
 
         about.present();
     }
-
 }
 
 impl Default for PwvucontrolApplication {

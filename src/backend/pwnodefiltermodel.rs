@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use super::{NodeType, PwNodeObject};
 use glib::{closure_local, Properties, SignalHandlerId};
 use gtk::{gio, prelude::*, subclass::prelude::*};
-use std::cell::{Cell, RefCell, OnceCell};
-use super::{NodeType, PwNodeObject};
+use std::cell::{Cell, OnceCell, RefCell};
 
 mod imp {
     use super::*;
@@ -43,8 +43,9 @@ mod imp {
                 node.nodetype() == nodetype && !node.hidden()
             });
 
-            self.filtered_model.set(gtk::FilterListModel::new(None::<gio::ListModel>, Some(filter))).expect("filtered model not set");
-
+            self.filtered_model
+                .set(gtk::FilterListModel::new(None::<gio::ListModel>, Some(filter)))
+                .expect("filtered model not set");
         }
     }
 
@@ -69,14 +70,14 @@ mod imp {
             self.disconnect();
 
             if let Some(new_model) = new_model {
-
                 assert!(self.item_type().is_a(new_model.item_type()));
 
                 let handler = closure_local!(@watch widget => move |_listmodel: &gio::ListModel, position: u32, removed: u32, added: u32| {
                     widget.items_changed(position, removed, added);
                 });
                 //handler.invoke::<()>(&[&new_model, &0u32, &0u32, &0u32]);
-                self.signalid.replace(Some(filtered_model.connect_closure("items-changed", true, handler)));
+                self.signalid
+                    .replace(Some(filtered_model.connect_closure("items-changed", true, handler)));
 
                 filtered_model.set_model(Some(&new_model));
 
@@ -101,18 +102,14 @@ glib::wrapper! {
 }
 
 impl PwNodeFilterModel {
-    pub(crate) fn new(nodetype: NodeType, model: Option<impl IsA<gio::ListModel>>) -> Self
-    {
-        glib::Object::builder()
-        .property("model", &model)
-        .property("nodetype", nodetype)
-        .build()
+    pub(crate) fn new(nodetype: NodeType, model: Option<impl IsA<gio::ListModel>>) -> Self {
+        glib::Object::builder().property("model", &model).property("nodetype", nodetype).build()
     }
 
     pub fn get_node_pos_from_id(&self, id: u32) -> Option<u32> {
-        let pos: Option<usize> = self.iter::<PwNodeObject>().position(|item| {
-            item.map_or(false, |item| item.boundid() == id)
-        });
+        let pos: Option<usize> = self
+            .iter::<PwNodeObject>()
+            .position(|item| item.map_or(false, |item| item.boundid() == id));
         pos.map(|x| x as u32)
     }
 }

@@ -30,11 +30,10 @@ macro_rules! pwvucontrol_critical {
 }
 pub use pwvucontrol_critical;
 
-
 #[macro_export]
 macro_rules! pwvucontrol_hex_to_rgba {
     ($r:literal $g:literal $b:literal) => {
-        gtk::gdk::RGBA::new($r as f32 / 255.0, $g as f32 / 255.0, $b as f32 / 255.0, 1.0 )
+        gtk::gdk::RGBA::new($r as f32 / 255.0, $g as f32 / 255.0, $b as f32 / 255.0, 1.0)
     };
 }
 pub use pwvucontrol_hex_to_rgba;

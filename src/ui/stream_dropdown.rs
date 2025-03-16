@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::{
-    ui::WithDefaultListModel,
-    backend::PwNodeObject,
-    backend::PwvucontrolManager,
-};
+use crate::{backend::PwNodeObject, backend::PwvucontrolManager, ui::WithDefaultListModel};
 use glib::closure_local;
 use gtk::{self, prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
@@ -33,7 +29,6 @@ mod imp {
         const NAME: &'static str = "PwStreamDropDown";
         type Type = super::PwStreamDropDown;
         type ParentType = gtk::Widget;
-
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -78,8 +73,6 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-
-            
             fn setup_handler(item: &glib::Object) {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                 let label = gtk::Label::new(None);
@@ -87,20 +80,18 @@ mod imp {
                 label.set_ellipsize(gtk::pango::EllipsizeMode::End);
 
                 item.property_expression("item")
-                    .chain_closure::<Option<String>>(closure_local!(
-                        move |_: Option<glib::Object>, item: Option<glib::Object>| {
-                            if let Some(item) = item {
-                                if let Some(item) = item.downcast_ref::<PwNodeObject>() {
-                                    return Some(item.name());
-                                }
-                                if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
-                                    return Some(item.string().to_string());
-                                }
+                    .chain_closure::<Option<String>>(closure_local!(move |_: Option<glib::Object>, item: Option<glib::Object>| {
+                        if let Some(item) = item {
+                            if let Some(item) = item.downcast_ref::<PwNodeObject>() {
+                                return Some(item.name());
                             }
-
-                            None
+                            if let Some(item) = item.downcast_ref::<gtk::StringObject>() {
+                                return Some(item.string().to_string());
+                            }
                         }
-                    ))
+
+                        None
+                    }))
                     .bind(&label, "label", gtk::Widget::NONE);
 
                 item.set_child(Some(&label));
@@ -118,7 +109,6 @@ mod imp {
             self.outputdevice_dropdown.set_enable_search(true);
             self.outputdevice_dropdown.set_search_match_mode(gtk::StringFilterMatchMode::Substring);
 
-
             self.outputdevice_dropdown
                 .set_expression(Some(gtk::ClosureExpression::new::<Option<String>>(
                     gtk::Expression::NONE,
@@ -130,7 +120,6 @@ mod imp {
                         }
                     }),
                 )));
-
 
             let widget = self.obj();
             let selected_handler = closure_local!(
@@ -158,7 +147,8 @@ mod imp {
                 }
             });
 
-            self.outputdevice_dropdown.connect_closure("notify::selected-item", true, selected_handler);
+            self.outputdevice_dropdown
+                .connect_closure("notify::selected-item", true, selected_handler);
         }
     }
 
@@ -170,11 +160,8 @@ glib::wrapper! {
 }
 
 impl PwStreamDropDown {
-
     pub fn new(nodeobj: Option<&PwNodeObject>) -> Self {
-        glib::Object::builder()
-        .property("nodeobj", nodeobj)
-        .build()
+        glib::Object::builder().property("nodeobj", nodeobj).build()
     }
 
     pub fn set_selected_no_send(&self, position: u32) {

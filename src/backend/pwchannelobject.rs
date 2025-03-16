@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{backend::PwNodeObject, macros::*};
-use std::cell::{Cell, RefCell};
 use gtk::{
     glib::{self, Properties, Value},
     prelude::*,
-    subclass::prelude::*
+    subclass::prelude::*,
 };
+use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 
 mod imp {
@@ -37,11 +37,7 @@ mod imp {
 
     impl PwChannelObject {
         fn set_volume(&self, value: &Value) {
-            pwvucontrol_debug!(
-                "Got set_volume on channel object {} = {:?}",
-                self.obj().name(),
-                value.get::<f32>()
-            );
+            pwvucontrol_debug!("Got set_volume on channel object {} = {:?}", self.obj().name(), value.get::<f32>());
             let index = self.index.get();
             let volume = value.get::<f32>().expect("f32 for set_volume");
             self.volume.set(volume);
@@ -63,8 +59,7 @@ glib::wrapper! {
 
 impl PwChannelObject {
     pub(crate) fn new(index: u32, volume: f32, node_object: &PwNodeObject) -> Self {
-        let t_audiochannel =
-            wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
+        let t_audiochannel = wp::spa::SpaIdTable::from_name("Spa:Enum:AudioChannel").expect("audio channel type");
         let channel = node_object.format().unwrap().positions[index as usize];
 
         let channelname = t_audiochannel.find_value(channel).expect("channel short name").short_name();
@@ -87,5 +82,4 @@ impl PwChannelObject {
         imp.volume.set(volume);
         self.notify_volume();
     }
-
 }

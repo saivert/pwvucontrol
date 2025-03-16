@@ -192,9 +192,12 @@ mod imp {
             let beep_on_volume_changes_action = self.settings.create_action("beep-on-volume-changes");
             self.obj().add_action(&beep_on_volume_changes_action);
 
-            self.settings.connect_changed(Some("beep-on-volume-changes"), clone!(@weak self as widget => move |settings, _key| {
-                widget.beep_enabled.set(settings.boolean("beep-on-volume-changes"));
-            }));
+            self.settings.connect_changed(
+                Some("beep-on-volume-changes"),
+                clone!(@weak self as widget => move |settings, _key| {
+                    widget.beep_enabled.set(settings.boolean("beep-on-volume-changes"));
+                }),
+            );
             self.beep_enabled.set(self.settings.boolean("beep-on-volume-changes"));
 
             self.obj().load_window_state();

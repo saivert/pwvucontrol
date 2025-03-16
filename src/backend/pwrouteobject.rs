@@ -5,7 +5,7 @@ use std::cell::{Cell, RefCell};
 use gtk::{
     glib::{self, Properties},
     prelude::*,
-    subclass::prelude::*
+    subclass::prelude::*,
 };
 
 use super::ParamAvailability;
@@ -48,11 +48,11 @@ glib::wrapper! {
 impl PwRouteObject {
     pub(crate) fn new(index: u32, description: &str, availability: ParamAvailability, direction: RouteDirection, profiles: &[u32]) -> Self {
         let new: PwRouteObject = glib::Object::builder()
-        .property("index", index)
-        .property("description", format!("{description} ({index})"))
-        .property("availability", availability)
-        .property("direction", direction)
-        .build();
+            .property("index", index)
+            .property("description", format!("{description} ({index})"))
+            .property("availability", availability)
+            .property("direction", direction)
+            .build();
 
         new.set_profiles(profiles);
 
@@ -66,5 +66,4 @@ impl PwRouteObject {
     pub(crate) fn set_profiles(&self, list: &[u32]) {
         self.imp().profiles.replace(list.to_vec());
     }
-
 }

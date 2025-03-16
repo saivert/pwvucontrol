@@ -13,14 +13,13 @@ use wp::{
     spa::SpaPodBuilder,
 };
 
-use crate::macros::*;
-use std::sync::OnceLock;
-use std::cell::OnceCell;
 use super::{PwRouteFilterModel, PwRouteObject, RouteDirection};
+use crate::macros::*;
+use std::cell::OnceCell;
 use std::cell::{Cell, RefCell};
+use std::sync::OnceLock;
 
 pub mod imp {
-
     use super::*;
 
     #[derive(Properties)]
@@ -208,7 +207,9 @@ impl PwDeviceObject {
                 }
 
                 let index: i32 = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_index).expect("Profile index");
-                let description: String = pod.spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_description).expect("Profile description");
+                let description: String = pod
+                    .spa_property(&wp::spa::ffi::SPA_PARAM_PROFILE_description)
+                    .expect("Profile description");
                 pwvucontrol_info!("Current profile #{} {}", index, description);
 
                 if let Some(index) = self.get_model_index_from_profile_index(index as u32) {
@@ -221,7 +222,6 @@ impl PwDeviceObject {
     }
 
     pub fn get_model_index_from_profile_index(&self, index: u32) -> Option<u32> {
-
         let model = self.profilemodel();
 
         for (i, profile) in (0u32..).zip(model.iter::<glib::Object>().map_while(|x| x.ok().and_downcast::<PwProfileObject>())) {
@@ -303,7 +303,7 @@ impl PwDeviceObject {
 
         while let Some(k) = iter.next() {
             if k.string() == Some(key.into()) {
-                return iter.next()?.string().map(|gs|gs.to_string());
+                return iter.next()?.string().map(|gs| gs.to_string());
             }
         }
         None
@@ -335,11 +335,7 @@ impl PwDeviceObject {
                     .expect("Description key")
                     .string()
                     .expect("String");
-                let direction_from_pod = pod
-                    .find_spa_property(&direction_key)
-                    .expect("direction key")
-                    .id()
-                    .expect("Id");
+                let direction_from_pod = pod.find_spa_property(&direction_key).expect("direction key").id().expect("Id");
 
                 if direction_from_pod != direction as u32 {
                     continue;
@@ -348,12 +344,22 @@ impl PwDeviceObject {
 
                 if let Some(modelindex) = self.get_model_index_from_route_index(direction, index) {
                     match direction {
-                        RouteDirection::Input => if self.route_index_input() != modelindex { self.set_route_index_input(modelindex) },
-                        RouteDirection::Output => if self.route_index_output() != modelindex { self.set_route_index_output(modelindex) },
-                        _ => unreachable!()
+                        RouteDirection::Input => {
+                            if self.route_index_input() != modelindex {
+                                self.set_route_index_input(modelindex)
+                            }
+                        }
+                        RouteDirection::Output => {
+                            if self.route_index_output() != modelindex {
+                                self.set_route_index_output(modelindex)
+                            }
+                        }
+                        _ => unreachable!(),
                     }
                 } else {
-                    pwvucontrol_critical!("{direction:?} Unable to get model index from route index in update_current_route_index_for_direction_sync");
+                    pwvucontrol_critical!(
+                        "{direction:?} Unable to get model index from route index in update_current_route_index_for_direction_sync"
+                    );
                 };
             }
         }

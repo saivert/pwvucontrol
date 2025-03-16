@@ -6,7 +6,7 @@ pub enum RouteDirection {
     #[default]
     Unknown = 2,
     Input = 0,
-    Output = 1
+    Output = 1,
 }
 
 impl From<u32> for RouteDirection {

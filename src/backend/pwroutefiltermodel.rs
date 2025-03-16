@@ -3,8 +3,8 @@
 use super::{ParamAvailability, PwRouteObject, RouteDirection};
 use glib::{closure_local, Properties};
 use gtk::{gio, prelude::*, subclass::prelude::*};
-use std::cell::{Cell, RefCell};
 use imbl::OrdSet;
+use std::cell::{Cell, RefCell};
 
 mod imp {
     use super::*;
@@ -53,8 +53,6 @@ mod imp {
 
     impl PwRouteFilterModel {
         pub fn set_model(&self, new_model: Option<&gio::ListModel>) {
-
-            
             if let Some(new_model) = new_model {
                 assert!(self.item_type().is_a(new_model.item_type()));
 

@@ -23,7 +23,6 @@
             <property name="name">disconnected</property>
             <property name="child">
               <object class="AdwToolbarView">
-
                 <child type="top">
                   <object class="AdwHeaderBar">
                     <property name="centering-policy">strict</property>
@@ -55,11 +54,9 @@
           <object class="GtkStackPage">
             <property name="name">connected</property>
             <property name="child">
-
               <object class="AdwToolbarView">
                 <child type="top">
                   <object class="AdwHeaderBar" id="header_bar">
-
                     <property name="title-widget">
                       <object class="AdwViewSwitcher">
                         <property name="policy">wide</property>
@@ -77,8 +74,7 @@
                 </child>
 
                 <child type="top">
-                  <object class="AdwBanner" id="info_banner">
-                  </object>
+                  <object class="AdwBanner" id="info_banner" />
                 </child>
 
                 <property name="content">
@@ -124,7 +120,6 @@
                       </object>
                     </child>
 
-
                     <child>
                       <object class="AdwViewStackPage">
                         <property name="visible">true</property>
@@ -164,7 +159,6 @@
                         </property>
                       </object>
                     </child>
-
 
                     <child>
                       <object class="AdwViewStackPage">
@@ -206,7 +200,6 @@
                       </object>
                     </child>
 
-
                     <child>
                       <object class="AdwViewStackPage">
                         <property name="visible">true</property>
@@ -247,7 +240,6 @@
                       </object>
                     </child>
 
-
                     <child>
                       <object class="AdwViewStackPage">
                         <property name="visible">true</property>
@@ -287,8 +279,6 @@
                         </property>
                       </object>
                     </child>
-
-
                   </object>
                 </property>
                 <child type="bottom">

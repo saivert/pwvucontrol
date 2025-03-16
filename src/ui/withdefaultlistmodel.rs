@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::backend::PwNodeFilterModel;
-use glib::{Properties, closure_local};
+use gettextrs::gettext;
+use glib::{closure_local, Properties};
 use gtk::{gio, glib, prelude::*, subclass::prelude::*};
 use std::cell::RefCell;
-use gettextrs::gettext;
 
 mod imp {
     use super::*;
@@ -37,8 +37,7 @@ mod imp {
     }
 
     #[glib::derived_properties]
-    impl ObjectImpl for WithDefaultListModel {
-    }
+    impl ObjectImpl for WithDefaultListModel {}
 
     impl ListModelImpl for WithDefaultListModel {
         fn item_type(&self) -> glib::Type {

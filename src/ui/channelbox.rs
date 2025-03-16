@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::{backend::PwChannelObject, ui::PwVolumeScale};
-use std::cell::RefCell;
 use gtk::{prelude::*, subclass::prelude::*};
+use std::cell::RefCell;
 
 mod imp {
     use super::*;
-    
+
     #[derive(Debug, Default, gtk::CompositeTemplate, glib::Properties)]
     #[template(resource = "/com/saivert/pwvucontrol/gtk/channelbox.ui")]
     #[properties(wrapper_type = super::PwChannelBox)]
@@ -19,7 +19,6 @@ mod imp {
         pub label: TemplateChild<gtk::Label>,
         #[template_child]
         pub scale: TemplateChild<PwVolumeScale>,
-
     }
 
     #[glib::object_subclass]
@@ -39,7 +38,6 @@ mod imp {
 
     #[glib::derived_properties]
     impl ObjectImpl for PwChannelBox {
-
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -51,13 +49,8 @@ mod imp {
                 .bidirectional()
                 .build();
 
-            item.bind_property("name", &self.label.get(), "label")
-                .sync_create()
-                .build();
-
+            item.bind_property("name", &self.label.get(), "label").sync_create().build();
         }
-
-
     }
     impl WidgetImpl for PwChannelBox {}
     impl ListBoxRowImpl for PwChannelBox {}
@@ -73,8 +66,6 @@ glib::wrapper! {
 
 impl PwChannelBox {
     pub(crate) fn new(channelobj: &PwChannelObject) -> Self {
-        glib::Object::builder()
-            .property("channel-object", channelobj)
-            .build()
+        glib::Object::builder().property("channel-object", channelobj).build()
     }
 }

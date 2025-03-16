@@ -9,8 +9,8 @@ use crate::{
 use glib::clone;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
-use wireplumber as wp;
 use std::cell::RefCell;
+use wireplumber as wp;
 
 mod imp {
 

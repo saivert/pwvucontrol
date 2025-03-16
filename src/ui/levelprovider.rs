@@ -2,10 +2,10 @@
 
 use std::{fmt::Debug, time::Duration};
 
-use glib::{self, clone, ControlFlow};
-use pipewire::{spa, spa::utils::Direction, stream::*, context::Context, loop_::Loop, properties::*};
-use std::os::fd::AsRawFd;
 use crate::ui::PwVolumeBox;
+use glib::{self, clone, ControlFlow};
+use pipewire::{context::Context, loop_::Loop, properties::*, spa, spa::utils::Direction, stream::*};
+use std::os::fd::AsRawFd;
 
 const PEAK_RATE: u32 = 144;
 
@@ -52,34 +52,37 @@ impl LevelbarProvider {
 
         let stream: Stream = Stream::new(&core, "peakdetect", props)?;
 
-        let listener = stream.add_local_listener::<f32>()
-        .process(clone!(@weak volumebox => @default-return (), move |stream, last_peak| {
-            match stream.dequeue_buffer() {
-                None => println!("No buffer received"),
-                Some(mut buffer) => {
-                    let datas = buffer.datas_mut();
+        let listener = stream
+            .add_local_listener::<f32>()
+            .process(clone!(@weak volumebox => @default-return (), move |stream, last_peak| {
+                match stream.dequeue_buffer() {
+                    None => println!("No buffer received"),
+                    Some(mut buffer) => {
+                        let datas = buffer.datas_mut();
 
-                    if let Some(d) = datas[0].data() {
-                        let chan = &d[0..std::mem::size_of::<f32>()];
-                        let mut max = f32::from_le_bytes(chan.try_into().unwrap()).clamp(0.0, 1.0);
+                        if let Some(d) = datas[0].data() {
+                            let chan = &d[0..std::mem::size_of::<f32>()];
+                            let mut max = f32::from_le_bytes(chan.try_into().unwrap()).clamp(0.0, 1.0);
 
-                        const DECAY_STEP: f32 = 1.0 / PEAK_RATE as f32;
-                        if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
-                            max = *last_peak - DECAY_STEP;
+                            const DECAY_STEP: f32 = 1.0 / PEAK_RATE as f32;
+                            if *last_peak >= DECAY_STEP && max < *last_peak - DECAY_STEP {
+                                max = *last_peak - DECAY_STEP;
+                            }
+                            *last_peak = max;
+
+                            volumebox.set_level(max);
                         }
-                        *last_peak = max;
-
-                        volumebox.set_level(max);
                     }
-                }
-            };
-        }))
-        .state_changed(clone!(@weak volumebox => @default-return (), move |_stream, _user_data, _oldstate, state| {
-            if state == StreamState::Paused {
-                volumebox.set_level(0.0);
-            }
-        }))
-        .register()?;
+                };
+            }))
+            .state_changed(
+                clone!(@weak volumebox => @default-return (), move |_stream, _user_data, _oldstate, state| {
+                    if state == StreamState::Paused {
+                        volumebox.set_level(0.0);
+                    }
+                }),
+            )
+            .register()?;
 
         let mut buffer: Vec<u8> = Vec::new();
         let fmtpod = create_audio_format_pod(&mut buffer);
@@ -87,10 +90,7 @@ impl LevelbarProvider {
         stream.connect(
             Direction::Input,
             Some(id),
-            StreamFlags::AUTOCONNECT
-                | StreamFlags::MAP_BUFFERS
-                | StreamFlags::RT_PROCESS
-                | StreamFlags::DONT_RECONNECT,
+            StreamFlags::AUTOCONNECT | StreamFlags::MAP_BUFFERS | StreamFlags::RT_PROCESS | StreamFlags::DONT_RECONNECT,
             &mut [fmtpod],
         )?;
 

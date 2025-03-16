@@ -8,7 +8,7 @@ sandboxed = []
 
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
-gtk = { version = "0.8.2", package = "gtk4", features = ["v4_12"]}
+gtk = { version = "0.8.2", package = "gtk4", features = ["v4_12"] }
 glib = { version = "0.19", features = ["log"] }
 log = "0.4.11"
 imbl = "3.0.0"

@@ -25,11 +25,14 @@ mod config {
 }
 mod macros;
 
+mod application;
 mod backend;
 mod ui;
-mod application;
 
-use std::{ffi::{OsStr, OsString}, path::PathBuf};
+use std::{
+    ffi::{OsStr, OsString},
+    path::PathBuf,
+};
 
 use self::application::PwvucontrolApplication;
 
@@ -47,22 +50,13 @@ where
         return path.join(append.as_ref()).into_os_string();
     }
 
-    [default, append]
-        .iter()
-        .map(|x| x.as_ref())
-        .collect::<PathBuf>()
-        .into_os_string()
+    [default, append].iter().map(|x| x.as_ref()).collect::<PathBuf>().into_os_string()
 }
 
 fn main() -> gtk::glib::ExitCode {
     // Set up gettext translations
-    bindtextdomain(
-        GETTEXT_PACKAGE,
-        path_override_from_env("PWVUCONTROL_LOCALEDIR", LOCALEDIR, None),
-    )
-    .expect("Unable to bind the text domain");
-    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8")
-        .expect("Unable to set the text domain encoding");
+    bindtextdomain(GETTEXT_PACKAGE, path_override_from_env("PWVUCONTROL_LOCALEDIR", LOCALEDIR, None)).expect("Unable to bind the text domain");
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8").expect("Unable to set the text domain encoding");
     textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
     gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
@@ -74,7 +68,7 @@ fn main() -> gtk::glib::ExitCode {
         Some("resources.gresource"),
     ))
     .or(gio::Resource::load(RESOURCES_FILE))
-    .unwrap_or_else(|_| { panic!("{}", gettext("Could not load resources")) });
+    .unwrap_or_else(|_| panic!("{}", gettext("Could not load resources")));
 
     // Load resources
     gio::resources_register(&resources);

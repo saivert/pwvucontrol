@@ -6,7 +6,7 @@ pub enum ParamAvailability {
     #[default]
     Unknown,
     No,
-    Yes
+    Yes,
 }
 
 impl From<u32> for ParamAvailability {
@@ -18,7 +18,6 @@ impl From<u32> for ParamAvailability {
         }
     }
 }
-
 
 impl<'a> From<&'a SpaPod> for ParamAvailability {
     fn from(value: &'a SpaPod) -> Self {

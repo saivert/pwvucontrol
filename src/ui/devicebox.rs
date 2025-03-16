@@ -46,10 +46,7 @@ mod imp {
 
             let deviceobject = obj.deviceobject().expect("Device object");
 
-            deviceobject
-                .bind_property("name", &self.label.get(), "label")
-                .sync_create()
-                .build();
+            deviceobject.bind_property("name", &self.label.get(), "label").sync_create().build();
 
             deviceobject
                 .bind_property("icon-name", &self.icon.get(), "icon-name")
@@ -73,8 +70,6 @@ glib::wrapper! {
 
 impl PwDeviceBox {
     pub(crate) fn new(deviceobject: &PwDeviceObject) -> Self {
-        glib::Object::builder()
-            .property("deviceobject", deviceobject)
-            .build()
+        glib::Object::builder().property("deviceobject", deviceobject).build()
     }
 }

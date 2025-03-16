@@ -17,7 +17,7 @@ mod imp {
         pub(super) level: Cell<f32>,
 
         #[property(get, set)]
-        pub(super) use_led: Cell<bool>
+        pub(super) use_led: Cell<bool>,
     }
 
     #[glib::object_subclass]
@@ -74,7 +74,7 @@ mod imp {
                 }
                 let mut block_area_width = block_width;
                 let mut block_area_x = 0;
-    
+
                 for i in 0..discrete_level {
                     if extra_space > 0 && i == extra_space {
                         block_area_width -= 1;
@@ -109,8 +109,7 @@ glib::wrapper! {
 
 impl PwPeakMeter {
     pub fn new() -> Self {
-        glib::Object::builder()
-        .build()
+        glib::Object::builder().build()
     }
 }
 

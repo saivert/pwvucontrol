@@ -7,8 +7,8 @@ use crate::{
 };
 use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
-use wireplumber as wp;
 use std::cell::RefCell;
+use wireplumber as wp;
 
 mod imp {
     use super::*;
@@ -105,7 +105,7 @@ impl PwStreamBox {
         let stream_model = match item.nodetype() {
             crate::backend::NodeType::StreamInput => manager.source_model(),
             crate::backend::NodeType::StreamOutput => manager.sink_model(),
-            _ => panic!("Invalid node type")
+            _ => panic!("Invalid node type"),
         };
 
         let imp = self.imp();
@@ -115,7 +115,7 @@ impl PwStreamBox {
         let default_node = match item.nodetype() {
             crate::backend::NodeType::StreamInput => manager.default_configured_source_node(),
             crate::backend::NodeType::StreamOutput => manager.default_configured_sink_node(),
-            _ => panic!("Invalid node type")
+            _ => panic!("Invalid node type"),
         };
 
         // The following is just so this string gets picked up by xgettext, since it doesn't handle rust macros yet.
@@ -128,7 +128,6 @@ impl PwStreamBox {
             gettextrs::gettext("Default")
         };
         output_dropdown.set_default_text(&string);
-
 
         if let Some(deftarget) = item.default_target() {
             if let Some(pos) = stream_model.get_node_pos_from_id(deftarget.boundid()) {

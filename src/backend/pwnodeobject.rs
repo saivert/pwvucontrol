@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use wireplumber as wp;
-use wp::{
-    pw::{FromPipewirePropertyString, GlobalProxyExt, MetadataExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt}, registry::{Constraint, ConstraintType, Interest}, spa::SpaPodBuilder
-};
-use std::cell::{Cell, RefCell};
-use glib::{clone, subclass::Signal, ParamSpec, Properties, Value};
-use std::sync::OnceLock;
-use std::cell::OnceCell;
-use gtk::{gio, prelude::*, subclass::prelude::*};
 use super::{PwChannelObject, PwDeviceObject, PwRouteObject, PwvucontrolManager};
+use glib::{clone, subclass::Signal, ParamSpec, Properties, Value};
+use gtk::{gio, prelude::*, subclass::prelude::*};
+use std::cell::OnceCell;
+use std::cell::{Cell, RefCell};
+use std::sync::OnceLock;
+use wireplumber as wp;
 use wp::registry::ObjectManager;
+use wp::{
+    pw::{FromPipewirePropertyString, GlobalProxyExt, MetadataExt, PipewireObjectExt, PipewireObjectExt2, ProxyExt},
+    registry::{Constraint, ConstraintType, Interest},
+    spa::SpaPodBuilder,
+};
 
 use crate::macros::*;
 
@@ -35,7 +37,7 @@ pub struct AudioFormat {
 pub(crate) enum PropertyChanged {
     Volume,
     Mute,
-    ChannelVolumes
+    ChannelVolumes,
 }
 
 pub mod imp {
@@ -136,23 +138,23 @@ pub mod imp {
                     if !self.block.get() {
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Volume);
                     }
-                },
+                }
                 "mute" => {
                     if !self.block.get() {
                         self.obj().send_volume_using_mixerapi(PropertyChanged::Mute);
                     }
-                },
+                }
                 "mainvolume" => {
                     if !self.block.get() {
                         self.obj().send_mainvolume();
                     }
-                },
+                }
                 "monitorvolume" => {
                     if !self.block.get() {
                         self.obj().send_monitorvolume();
                     }
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
 
@@ -162,13 +164,8 @@ pub mod imp {
 
         fn signals() -> &'static [Signal] {
             static SIGNALS: OnceLock<Vec<Signal>> = OnceLock::new();
-             SIGNALS.get_or_init(|| {
-                vec![
-                    Signal::builder("format").build(),
-                ]
-             })
+            SIGNALS.get_or_init(|| vec![Signal::builder("format").build()])
         }
-
 
         fn constructed(&self) {
             self.parent_constructed();
@@ -220,13 +217,18 @@ pub mod imp {
 
             let om = self.om.borrow();
 
-            om.add_interest([Constraint::compare(ConstraintType::PwProperty, "link.output.node", node.bound_id(), true)]
-            .iter().collect::<Interest<wp::pw::Link>>());
+            om.add_interest(
+                [Constraint::compare(ConstraintType::PwProperty, "link.output.node", node.bound_id(), true)]
+                    .iter()
+                    .collect::<Interest<wp::pw::Link>>(),
+            );
 
             if let Ok(Some(device_id)) = node.device_id() {
-                om.add_interest([Constraint::compare(ConstraintType::GProperty, "bound-id", device_id, true)]
-                .iter()
-                .collect::<Interest<wp::pw::Device>>());
+                om.add_interest(
+                    [Constraint::compare(ConstraintType::GProperty, "bound-id", device_id, true)]
+                        .iter()
+                        .collect::<Interest<wp::pw::Device>>(),
+                );
             }
 
             om.connect_object_added(clone!(@weak self as nodeobject => move |_om, obj| {
@@ -242,7 +244,7 @@ pub mod imp {
                     pwvucontrol_info!("Node {} linked to device {device_name}", nodeobject.obj().name());
                 }
             }));
-    
+
             PwvucontrolManager::default().wp_core().install_object_manager(&om);
 
             // let manager = PwvucontrolManager::default();
@@ -279,56 +281,35 @@ pub(crate) fn get_node_type_for_node(node: &wp::pw::Node) -> NodeType {
 
 impl PwNodeObject {
     pub(crate) fn new(node: &wp::pw::Node) -> Self {
-        glib::Object::builder()
-            .property("wpnode", node)
-            .build()
+        glib::Object::builder().property("wpnode", node).build()
     }
 
     fn label_set_name(&self) {
-        let wp_node = self
-            .imp()
-            .wpnode
-            .get()
-            .expect("Node widget should always have a wp_node");
+        let wp_node = self.imp().wpnode.get().expect("Node widget should always have a wp_node");
         let props = wp_node.global_properties().expect("Node has no properties");
 
         let name_gstr = match self.nodetype() {
-            NodeType::Sink | NodeType::Source => {
-                props
+            NodeType::Sink | NodeType::Source => props
                 .get("node.description")
                 .or_else(|| props.get("node.nick"))
-                .or_else(|| props.get("node.name"))
-            },
-            _ => {
-                props
+                .or_else(|| props.get("node.name")),
+            _ => props
                 .get("node.nick")
                 .or_else(|| props.get("node.description"))
-                .or_else(|| props.get("node.name"))
-            }
+                .or_else(|| props.get("node.name")),
         };
 
-        let name = name_gstr
-            .as_ref()
-            .map(|name| name.as_str())
-            .unwrap_or_default();
+        let name = name_gstr.as_ref().map(|name| name.as_str()).unwrap_or_default();
 
         self.set_name(name);
     }
 
     fn label_set_description(&self) {
-        let wp_node = self
-            .imp()
-            .wpnode
-            .get()
-            .expect("Node widget should always have a wp_node");
+        let wp_node = self.imp().wpnode.get().expect("Node widget should always have a wp_node");
         let props = wp_node.properties().expect("Node has no properties");
-        let name_gstr = props
-            .get("media.name");
+        let name_gstr = props.get("media.name");
 
-        let name = name_gstr
-            .as_ref()
-            .map(|name| name.as_str())
-            .unwrap_or_default();
+        let name = name_gstr.as_ref().map(|name| name.as_str()).unwrap_or_default();
 
         self.set_description(name);
     }
@@ -343,10 +324,10 @@ impl PwNodeObject {
                         self.set_iconname(appid);
                     }
                 }
-            },
+            }
             NodeType::Source | NodeType::Sink => {
                 self.set_iconname("soundcard-symbolic");
-            },
+            }
             _ => {
                 self.set_iconname("library-music-symbolic");
             }
@@ -413,16 +394,13 @@ impl PwNodeObject {
             } else {
                 pwvucontrol_debug!("enum_params async call didn't return anything useful");
             }
-            
         }));
     }
 
     pub(crate) fn update_props(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
-        let params = node
-            .enum_params_sync("Props", None)
-            .expect("getting params");
+        let params = node.enum_params_sync("Props", None).expect("getting params");
 
         for a in params {
             let pod: wp::spa::SpaPod = a.get().unwrap();
@@ -442,7 +420,7 @@ impl PwNodeObject {
             }
         }
     }
-    
+
     fn send_mainvolume(&self) {
         let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
         let node = self.imp().wpnode.get().expect("WpNode set");
@@ -453,9 +431,7 @@ impl PwNodeObject {
         if let Some(pod) = podbuilder.end() {
             node.set_param("Props", 0, pod);
         }
-
     }
-
 
     fn send_monitorvolume(&self) {
         let podbuilder = SpaPodBuilder::new_object("Spa:Pod:Object:Param:Props", "Props");
@@ -474,7 +450,6 @@ impl PwNodeObject {
         if let Some(pod) = podbuilder.end() {
             node.set_param("Props", 0, pod);
         }
-
     }
 
     pub(crate) fn channel_volumes_vec(&self) -> Vec<f32> {
@@ -495,12 +470,7 @@ impl PwNodeObject {
     }
 
     pub(crate) fn set_channel_volume(&self, index: u32, volume: f32) {
-        if let Some(value) = self
-            .imp()
-            .channel_volumes
-            .borrow_mut()
-            .get_mut(index as usize)
-        {
+        if let Some(value) = self.imp().channel_volumes.borrow_mut().get_mut(index as usize) {
             *value = volume;
         }
 
@@ -521,12 +491,21 @@ impl PwNodeObject {
     }
 
     pub(crate) fn set_default_target(&self, target_node: &PwNodeObject) {
-
         let manager = PwvucontrolManager::default();
 
         if let Some(metadata) = manager.metadata() {
-            metadata.set(self.boundid(), Some("target.node"), Some("Spa:Id"), Some(&target_node.boundid().to_string()));
-            metadata.set(self.boundid(), Some("target.object"), Some("Spa:Id"), Some(&target_node.serial().to_string()));
+            metadata.set(
+                self.boundid(),
+                Some("target.node"),
+                Some("Spa:Id"),
+                Some(&target_node.boundid().to_string()),
+            );
+            metadata.set(
+                self.boundid(),
+                Some("target.object"),
+                Some("Spa:Id"),
+                Some(&target_node.serial().to_string()),
+            );
         } else {
             pwvucontrol_warning!("Cannot get metadata object");
         };
@@ -555,12 +534,16 @@ impl PwNodeObject {
         if let Some(metadata) = manager.metadata() {
             if let Some(target_serial) = metadata.find_notype(self.boundid(), "target.object") {
                 if target_serial != "-1" {
-                    if let Some(sinknode) = om.lookup([
-                        Constraint::compare(ConstraintType::PwProperty,
+                    if let Some(sinknode) = om.lookup(
+                        [Constraint::compare(
+                            ConstraintType::PwProperty,
                             "object.serial",
                             target_serial.as_str(),
-                            true),
-                    ].iter().collect::<Interest<wp::pw::Node>>()) {
+                            true,
+                        )]
+                        .iter()
+                        .collect::<Interest<wp::pw::Node>>(),
+                    ) {
                         return manager.get_node_by_id(sinknode.bound_id());
                     };
                 }
@@ -568,12 +551,11 @@ impl PwNodeObject {
 
             if let Some(target_node) = metadata.find_notype(self.boundid(), "target.node") {
                 if target_node != "-1" {
-                    if let Some(sinknode) = om.lookup([
-                        Constraint::compare(ConstraintType::PwProperty,
-                            "object.id",
-                            target_node.as_str(),
-                            true),
-                    ].iter().collect::<Interest<wp::pw::Node>>()) {
+                    if let Some(sinknode) = om.lookup(
+                        [Constraint::compare(ConstraintType::PwProperty, "object.id", target_node.as_str(), true)]
+                            .iter()
+                            .collect::<Interest<wp::pw::Node>>(),
+                    ) {
                         return manager.get_node_by_id(sinknode.bound_id());
                     };
                 }
@@ -607,9 +589,8 @@ impl PwNodeObject {
     fn update_channel_objects(&self) {
         let channelmodel = self.imp().channelmodel.borrow();
         for (index, vol) in self.channel_volumes_vec().iter().enumerate() {
-            if let Some(channel_object) = channelmodel.item(index as u32)
-                .and_downcast_ref::<PwChannelObject>() {
-                    channel_object.set_volume_no_send(*vol);
+            if let Some(channel_object) = channelmodel.item(index as u32).and_downcast_ref::<PwChannelObject>() {
+                channel_object.set_volume_no_send(*vol);
             }
         }
     }
@@ -621,7 +602,6 @@ impl PwNodeObject {
         serial as u32
     }
 
-
     pub(crate) fn node_property<T: FromPipewirePropertyString>(&self, property: &str) -> Option<T> {
         let node = self.imp().wpnode.get().expect("node");
         node.pw_property(property).ok()
@@ -632,15 +612,17 @@ trait MetadataExtFix: 'static {
     fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString>;
 }
 
-impl <O: IsA<wp::pw::Metadata>> MetadataExtFix for O {
+impl<O: IsA<wp::pw::Metadata>> MetadataExtFix for O {
     fn find_notype(&self, subject: u32, key: &str) -> Option<glib::GString> {
         use glib::translate::ToGlibPtr;
         unsafe {
             let mut type_ = std::ptr::null();
-            glib::translate::from_glib_none(
-                wp::ffi::wp_metadata_find(self.as_ref().to_glib_none().0,
+            glib::translate::from_glib_none(wp::ffi::wp_metadata_find(
+                self.as_ref().to_glib_none().0,
                 subject,
-                ToGlibPtr::to_glib_none(&key).0, &mut type_))
+                ToGlibPtr::to_glib_none(&key).0,
+                &mut type_,
+            ))
         }
     }
 }
