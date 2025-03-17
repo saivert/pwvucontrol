@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-02 15:55+0100\n"
+"POT-Creation-Date: 2025-03-17 20:11+0100\n"
 "PO-Revision-Date: 2024-08-18 23:07+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -44,57 +44,70 @@ msgid "Main window"
 msgstr "Fenetre principale"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-#, fuzzy
-msgid "Changelog since 0.4.7"
-msgstr "Evolution depuis la version 0.4.4"
+msgid "Changelog since 0.4.8"
+msgstr "Evolution depuis la version 0.4.8"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
-msgid "Fix displaying of default device name in stream dropdown."
+msgid "Add LED peak meter option."
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+msgid "Add beep on volume change option (only output devices)."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:31
+msgid "Show product name in port dropdown (e.g. for HDMI ports)."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+msgid "Changelog since 0.4.7"
+msgstr "Evolution depuis la version 0.4.7"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:39
+msgid "Fix displaying of default device name in stream dropdown."
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:40
 msgid "Increase responsiveness of peak meters."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
-#, fuzzy
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Changelog since 0.4.6"
-msgstr "Evolution depuis la version 0.4.4"
+msgstr "Evolution depuis la version 0.4.6"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:48
 msgid "Fix crash when selecting Pro Audio profile."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
-#, fuzzy
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Changelog since 0.4.5"
-msgstr "Evolution depuis la version 0.4.4"
+msgstr "Evolution depuis la version 0.4.5"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:56
 msgid "Added polish, georgian, russian and french translation."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:47
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:57
 msgid "Fix not all ports being visible in device port dropdown."
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:53
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
 msgid "Changelog since 0.4.4"
 msgstr "Evolution depuis la version 0.4.4"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:55
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:65
 msgid "Updated dutch translation."
 msgstr "Mise a jour de la traduction Hollandaise."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:61
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:71
 msgid "Changelog since 0.4.3"
 msgstr "Evolution depuis la version 0.4.3"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:73
 msgid "Added dutch translation."
 msgstr "Ajout de la traduction Hollandaise."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:64
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:74
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
@@ -102,34 +115,34 @@ msgstr ""
 "Les icones des applications sont desormais cachees dans la version Flatpak "
 "afin de reduire les permissions."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:70
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
 msgid "Changelog since 0.4.2"
 msgstr "Evolution depuis la version 0.4.2"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:72
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:82
 msgid "Added new icons for input and output devices."
 msgstr ""
 "Ajout de nouvelles icones pour les peripheriques d'entree et de sortie."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:78
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
 msgid "Changelog since 0.3.1"
 msgstr "Evolution depuis la version 0.3.1"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:90
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr ""
 "Ajout de la prise en charge de la suramplification. Activation via le menu "
 "hamburger."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:86
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:96
 msgid "Changelog since 0.2.0"
 msgstr "Evolution depuis la version 0.2.0"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:98
 msgid "Added card tab for selecing sound card profile"
 msgstr "Ajout d'un onglet carte pour selectionner le profil de la carte son"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:103
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:113
 msgid "Nicolai Syvertsen"
 msgstr ""
 
@@ -151,43 +164,63 @@ msgstr "Comportement par defaut de la fenetre maximisee"
 msgid "Enable over-amplification"
 msgstr "Activer la suramplification"
 
-#: data/resources/ui/window.ui:41
+#: data/com.saivert.pwvucontrol.gschema.xml.in:26
+msgid "Use led style peak meter"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:31
+msgid "Play system beep on volume change"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:32
+msgid "Lets you preview the sound level even if you don't play any audio."
+msgstr ""
+
+#: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
 msgstr "Perte de connexion au serveur Pipewire !"
 
-#: data/resources/ui/window.ui:45
+#: data/resources/ui/window.ui:44
 msgid "Reconnect"
 msgstr "Reconnecter"
 
-#: data/resources/ui/window.ui:91
+#: data/resources/ui/window.ui:87
 msgid "Playback"
 msgstr "Lecture"
 
-#: data/resources/ui/window.ui:132
+#: data/resources/ui/window.ui:127
 msgid "Recording"
 msgstr "Enregistrement"
 
-#: data/resources/ui/window.ui:173
+#: data/resources/ui/window.ui:167
 msgid "Input Devices"
 msgstr "Peripheriques d'entree"
 
-#: data/resources/ui/window.ui:214
+#: data/resources/ui/window.ui:207
 msgid "Output Devices"
 msgstr "Peripheriques de sorties"
 
-#: data/resources/ui/window.ui:255
+#: data/resources/ui/window.ui:247
 msgid "Cards"
 msgstr "Cartes"
 
-#: data/resources/ui/window.ui:309
+#: data/resources/ui/window.ui:299
 msgid "_Enable over-amplification"
 msgstr "_Activer la suramplification"
 
-#: data/resources/ui/window.ui:313
+#: data/resources/ui/window.ui:303
+msgid "Use led peak meter"
+msgstr ""
+
+#: data/resources/ui/window.ui:307
 msgid "_Keyboard Shortcuts"
 msgstr "_Raccourcis clavier"
 
-#: data/resources/ui/window.ui:317
+#: data/resources/ui/window.ui:311
+msgid "Beep on volume changes"
+msgstr ""
+
+#: data/resources/ui/window.ui:315
 msgid "_About Pwvucontrol"
 msgstr "A propos de Pwvucontrol"
 
@@ -211,39 +244,39 @@ msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Quitter"
 
-#: data/resources/ui/volumebox.ui:142
+#: data/resources/ui/volumebox.ui:133
 msgid "_Advanced"
 msgstr "_Avance"
 
-#: data/resources/ui/volumebox.ui:160
+#: data/resources/ui/volumebox.ui:150
 msgid "Lock channels"
 msgstr "Verrouiller les canaux"
 
-#: data/resources/ui/volumebox.ui:198
+#: data/resources/ui/volumebox.ui:186
 msgid "Main"
 msgstr "Principal"
 
-#: data/resources/ui/volumebox.ui:217
+#: data/resources/ui/volumebox.ui:205
 msgid "Monitor"
 msgstr "Ecoute de controle"
 
-#: data/resources/ui/sinkbox.ui:13
+#: data/resources/ui/sinkbox.ui:15
 msgid "Port:"
 msgstr ""
 
-#: data/resources/ui/streambox.ui:13
+#: data/resources/ui/streambox.ui:15
 msgid "on"
 msgstr "marche"
 
-#: src/main.rs:77
+#: src/main.rs:71
 msgid "Could not load resources"
 msgstr "Impossible de charger les ressources"
 
-#: src/ui/streambox.rs:115
+#: src/ui/streambox.rs:123
 msgid "Default ({})"
 msgstr "Defaut ({})"
 
-#: src/ui/streambox.rs:120
+#: src/ui/streambox.rs:128
 msgid "Default"
 msgstr "Defaut"
 
@@ -259,12 +292,12 @@ msgstr ""
 msgid "150%"
 msgstr ""
 
-#: src/ui/window.rs:289
+#: src/ui/window.rs:307
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr ""
 "Aucune carte son n'est detectee. Verifier la configuration de PipeWire."
 
-#: src/ui/window.rs:291
+#: src/ui/window.rs:309
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr ""
 "Aucun peripherique sonore n'est detecte. Verifier les profils dans l'onglet "

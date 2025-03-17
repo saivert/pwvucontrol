@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-02 15:55+0100\n"
+"POT-Creation-Date: 2025-03-17 20:11+0100\n"
 "PO-Revision-Date: 2023-06-13 22:28+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -28,7 +28,7 @@ msgstr "Pipewire volumkontroll"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:10
 msgid "Volume"
-msgstr ""
+msgstr "Lydnivå"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -43,54 +43,71 @@ msgid "Main window"
 msgstr "Hovedvindu"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:27
-msgid "Changelog since 0.4.7"
+msgid "Changelog since 0.4.8"
 msgstr "Endringer siden 0.4.8"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
-msgid "Fix displaying of default device name in stream dropdown."
-msgstr "Fikset visning av standard enhetsnavn i nedtrekksboksen for programmer."
+msgid "Add LED peak meter option."
+msgstr "Lagt til LED lydindikator alternativ."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
+msgid "Add beep on volume change option (only output devices)."
+msgstr "Lagt til pip ved lydnivåendringer (kun utgangsenheter)."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:31
+msgid "Show product name in port dropdown (e.g. for HDMI ports)."
+msgstr "Vis produktnavn i nedtrekksboksen for porter (f.eks HDMI porter)."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
+msgid "Changelog since 0.4.7"
+msgstr "Endringer siden 0.4.7"
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:39
+msgid "Fix displaying of default device name in stream dropdown."
+msgstr ""
+"Fikset visning av standard enhetsnavn i nedtrekksboksen for programmer."
+
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:40
 msgid "Increase responsiveness of peak meters."
 msgstr "Øk responsiviteten for lydindikator."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:36
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Changelog since 0.4.6"
 msgstr "Endringer siden 0.4.6"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:38
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:48
 msgid "Fix crash when selecting Pro Audio profile."
 msgstr "Fiks krasj når man velger Pro Audio profilen."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:44
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Changelog since 0.4.5"
 msgstr "Endringer siden 0.4.5"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:56
 msgid "Added polish, georgian, russian and french translation."
 msgstr "La til polsk, georgisk, russisk og fransk oversettelse."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:47
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:57
 msgid "Fix not all ports being visible in device port dropdown."
 msgstr "Fikset så alle porter er synlige i nedtrekksboksen for enheter."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:53
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
 msgid "Changelog since 0.4.4"
 msgstr "Endringer siden 0.4.4"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:55
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:65
 msgid "Updated dutch translation."
 msgstr "Oppdatert nederlandsk oversettelse."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:61
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:71
 msgid "Changelog since 0.4.3"
 msgstr "Endringer siden 0.4.3"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:73
 msgid "Added dutch translation."
 msgstr "Lagt til nederlandsk oversettelse."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:64
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:74
 msgid ""
 "Application icons are now hidden in Flatpak build to keep permissions "
 "reduced."
@@ -98,31 +115,31 @@ msgstr ""
 "Programikoner er nå skjulte i Flatpak-utgaven for å begrense rettigehter som "
 "programmet krever."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:70
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
 msgid "Changelog since 0.4.2"
 msgstr "Endringer siden 0.4.2"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:72
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:82
 msgid "Added new icons for input and output devices."
 msgstr "Lagt til nye ikoner for inngangs- og utgangsenheter"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:78
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
 msgid "Changelog since 0.3.1"
 msgstr "Endringer siden 0.3.1"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:80
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:90
 msgid "Added support for over-amplification. Enable via hamburger menu."
 msgstr "Lagt til støtte over lydnivå > 100%. Aktiver via programmenyen."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:86
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:96
 msgid "Changelog since 0.2.0"
 msgstr "Endringer siden 0.2.0"
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:88
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:98
 msgid "Added card tab for selecing sound card profile"
 msgstr "Lagt til flik for lydkort der du kan velge profil."
 
-#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:103
+#: data/com.saivert.pwvucontrol.metainfo.xml.in.in:113
 msgid "Nicolai Syvertsen"
 msgstr "Nicolai Syvertsen"
 
@@ -144,43 +161,63 @@ msgstr "Standard maksimert modus for vindu"
 msgid "Enable over-amplification"
 msgstr "Aktiver over-forsterkning"
 
-#: data/resources/ui/window.ui:41
+#: data/com.saivert.pwvucontrol.gschema.xml.in:26
+msgid "Use led style peak meter"
+msgstr "Bruk LED lydindikator"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:31
+msgid "Play system beep on volume change"
+msgstr "Spill pipelyd ved lydnivåendringer"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:32
+msgid "Lets you preview the sound level even if you don't play any audio."
+msgstr "Lar deg lytte til lydnivået selv om du ikke spiller av noe lyd."
+
+#: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
 msgstr "Mistet forbindelsen med Pipewire server!"
 
-#: data/resources/ui/window.ui:45
+#: data/resources/ui/window.ui:44
 msgid "Reconnect"
 msgstr "Koble til på nytt"
 
-#: data/resources/ui/window.ui:91
+#: data/resources/ui/window.ui:87
 msgid "Playback"
 msgstr "Avspilling"
 
-#: data/resources/ui/window.ui:132
+#: data/resources/ui/window.ui:127
 msgid "Recording"
 msgstr "Opptak"
 
-#: data/resources/ui/window.ui:173
+#: data/resources/ui/window.ui:167
 msgid "Input Devices"
 msgstr "Inngangsenheter"
 
-#: data/resources/ui/window.ui:214
+#: data/resources/ui/window.ui:207
 msgid "Output Devices"
 msgstr "Utgangsenheter"
 
-#: data/resources/ui/window.ui:255
+#: data/resources/ui/window.ui:247
 msgid "Cards"
 msgstr "Lydkort"
 
-#: data/resources/ui/window.ui:309
+#: data/resources/ui/window.ui:299
 msgid "_Enable over-amplification"
 msgstr "Aktiver over-_forsterkning"
 
-#: data/resources/ui/window.ui:313
+#: data/resources/ui/window.ui:303
+msgid "Use led peak meter"
+msgstr "Bruk LED lydindikator"
+
+#: data/resources/ui/window.ui:307
 msgid "_Keyboard Shortcuts"
 msgstr "_Hurtigtaster"
 
-#: data/resources/ui/window.ui:317
+#: data/resources/ui/window.ui:311
+msgid "Beep on volume changes"
+msgstr "Spill pipelyd ved lydnivåendringer"
+
+#: data/resources/ui/window.ui:315
 msgid "_About Pwvucontrol"
 msgstr "_Om Pwvucontrol"
 
@@ -204,39 +241,39 @@ msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Avslutt"
 
-#: data/resources/ui/volumebox.ui:142
+#: data/resources/ui/volumebox.ui:133
 msgid "_Advanced"
 msgstr "_Avansert"
 
-#: data/resources/ui/volumebox.ui:160
+#: data/resources/ui/volumebox.ui:150
 msgid "Lock channels"
 msgstr "Lås kanaler"
 
-#: data/resources/ui/volumebox.ui:198
+#: data/resources/ui/volumebox.ui:186
 msgid "Main"
 msgstr "Hoved"
 
-#: data/resources/ui/volumebox.ui:217
+#: data/resources/ui/volumebox.ui:205
 msgid "Monitor"
 msgstr "Monitor"
 
-#: data/resources/ui/sinkbox.ui:13
+#: data/resources/ui/sinkbox.ui:15
 msgid "Port:"
 msgstr "Port:"
 
-#: data/resources/ui/streambox.ui:13
+#: data/resources/ui/streambox.ui:15
 msgid "on"
 msgstr "på"
 
-#: src/main.rs:77
+#: src/main.rs:71
 msgid "Could not load resources"
 msgstr "Kan ikke laste ressurser"
 
-#: src/ui/streambox.rs:115
+#: src/ui/streambox.rs:123
 msgid "Default ({})"
 msgstr "Standard ({})"
 
-#: src/ui/streambox.rs:120
+#: src/ui/streambox.rs:128
 msgid "Default"
 msgstr "Standard"
 
@@ -252,10 +289,10 @@ msgstr "100%"
 msgid "150%"
 msgstr "150%"
 
-#: src/ui/window.rs:289
+#: src/ui/window.rs:307
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr "Ingen lydkort oppdaget. Sjekk pipewire konfigurasjonen."
 
-#: src/ui/window.rs:291
+#: src/ui/window.rs:309
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr "Ingen lydenheter oppdaget. Sjekk profiler i fanen for Lydkort."
