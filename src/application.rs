@@ -7,7 +7,7 @@ use crate::{
 };
 use adw::subclass::prelude::*;
 use glib::ExitCode;
-use gtk::{gio, prelude::*, subclass::prelude::*};
+use gtk::{gio, prelude::*};
 use std::cell::OnceCell;
 
 mod imp {
