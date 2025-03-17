@@ -1,0 +1,15 @@
+{
+  "overrides": [
+    {
+      "files": "*.ui",
+      "options": {
+        "xmlWhitespaceSensitivity": "preserve",
+        "xmlSelfClosingSpace": false,
+        "tabWidth": 2,
+        "printWidth": 150,
+        "parser": "xml",
+        "plugins": ["@prettier/plugin-xml"]
+      }
+    }
+  ]
+}

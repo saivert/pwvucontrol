@@ -1,0 +1,7 @@
+include = ["Cargo.toml", ".taplo.toml", "rustfmt.toml"]
+
+[formatting]
+column_width = 150
+array_auto_collapse = true
+array_auto_expand = false
+array_trailing_comma = true
