@@ -22,6 +22,16 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
+    <release version="0.4.9" date="2025-03-17">
+      <description>
+        <p>Changelog since 0.4.8</p>
+        <ul>
+          <li>Add LED peak meter option.</li>
+          <li>Add beep on volume change option (only output devices).</li>
+          <li>Show product name in port dropdown (e.g. for HDMI ports).</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.4.8" date="2025-03-02">
       <description>
         <p>Changelog since 0.4.7</p>
@@ -89,16 +99,16 @@
         </ul>
       </description>
     </release>
-    <release version="0.2.0" date="2023-08-11"/>
-    <release version="0.1.0" date="2023-08-01"/>
+    <release version="0.2.0" date="2023-08-11" />
+    <release version="0.1.0" date="2023-08-01" />
   </releases>
   <kudos>
-     <!--
+    <!--
        GNOME Software kudos:
        https://gitlab.gnome.org/GNOME/gnome-software/-/blob/main/doc/kudos.md
      -->
-     <kudo>ModernToolkit</kudo>
-     <kudo>HiDpiIcon</kudo>
+    <kudo>ModernToolkit</kudo>
+    <kudo>HiDpiIcon</kudo>
   </kudos>
   <developer_name>Nicolai Syvertsen</developer_name>
   <update_contact>saivert@saivert.com</update_contact>
