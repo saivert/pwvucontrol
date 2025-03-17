@@ -9,7 +9,8 @@ fn main() {
     // also need to copy the generated config.rs file there.
     println!("cargo::rerun-if-changed=src/config.rs.in");
     let out_dir = env::var("OUT_DIR").unwrap();
-    let sourcepath: PathBuf = ["builddir", "src", "config.rs"].iter().collect();
+    let codegen_dir = env::var("CODEGEN_DIR").unwrap();
+    let sourcepath: PathBuf = [&codegen_dir, "config.rs"].iter().collect();
     if !Path::exists(&sourcepath) {
         panic!("Please configure the project with meson once to generate config.rs!");
     }

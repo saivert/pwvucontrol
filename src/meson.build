@@ -27,7 +27,7 @@ endif
 
 cargo_env = [
   'CARGO_HOME=' + meson.project_build_root() / 'cargo-home',
-  'OUT_DIR=' + meson.current_build_dir(),
+  'CODEGEN_DIR=' + meson.current_build_dir(),
 ]
 
 custom_target(
