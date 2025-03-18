@@ -12,10 +12,14 @@ gtk = { version = "0.8.2", package = "gtk4", features = ["v4_12"] }
 glib = { version = "0.19", features = ["log"] }
 log = "0.4.11"
 imbl = "3.0.0"
-wireplumber = { git = "https://github.com/arcnmx/wireplumber.rs.git", rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda", features = ["v0_4_16"] }
 futures = "0.3"
 anyhow = "1.0"
 pipewire = "0.8"
+
+[dependencies.wireplumber]
+git = "https://github.com/arcnmx/wireplumber.rs.git"
+rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda"
+features = ["v0_4_16"]
 
 [dependencies.adw]
 package = "libadwaita"
