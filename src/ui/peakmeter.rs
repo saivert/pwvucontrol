@@ -6,8 +6,6 @@ use std::cell::Cell;
 mod imp {
     use gtk::{graphene, gsk};
 
-    use crate::macros::*;
-
     use super::*;
 
     #[derive(Debug, Default, glib::Properties)]
@@ -48,9 +46,9 @@ mod imp {
             const GREEN_LIMIT: u32 = (0.6 * NUM_BLOCKS as f32) as u32;
             const YELLOW_LIMIT: u32 = (0.9 * NUM_BLOCKS as f32) as u32;
 
-            let color_green = pwvucontrol_hex_to_rgba!(0x33 0xd1 0x7a);
-            let color_yellow = pwvucontrol_hex_to_rgba!(0xf6 0xd3 0x2d);
-            let color_red = pwvucontrol_hex_to_rgba!(0xe0 0x1b 0x24);
+            let color_green = hex_to_rgb(0x33d17a);
+            let color_yellow = hex_to_rgb(0xf6d32d);
+            let color_red = hex_to_rgb(0xe01b24);
 
             let width = self.obj().width() as u32;
             let w = self.obj().width() as f32;
@@ -117,4 +115,11 @@ impl Default for PwPeakMeter {
     fn default() -> Self {
         Self::new()
     }
+}
+
+fn hex_to_rgb(hex: u32) -> gtk::gdk::RGBA {
+    let r = ((hex >> 16) & 0xFF) as f32 / 255.0;
+    let g = ((hex >> 8) & 0xFF) as f32 / 255.0;
+    let b = (hex & 0xFF) as f32 / 255.0;
+    gtk::gdk::RGBA::new(r, g, b, 1.0)
 }
