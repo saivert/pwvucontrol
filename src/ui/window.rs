@@ -118,11 +118,9 @@ mod imp {
             manager.node_model().connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
                 widget.obj().update_info_bar();
             }));
-            manager
-                .device_model()
-                .connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
-                    widget.obj().update_info_bar();
-                }));
+            manager.device_model().connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
+                widget.obj().update_info_bar();
+            }));
 
             glib::idle_add_local_once(clone!(@weak self as widget => move || {widget.obj().update_info_bar();}));
 
@@ -319,6 +317,17 @@ impl PwvucontrolWindow {
         if self.imp().beep_elapsed.get().elapsed() > Duration::from_secs(1) {
             self.display().beep();
             self.imp().beep_elapsed.set(time::Instant::now());
+        }
+    }
+
+    pub(crate) fn select_tab(&self, tab: i32) {
+        match tab {
+            1 => self.imp().stack.set_visible_child_name("playback"),
+            2 => self.imp().stack.set_visible_child_name("recording"),
+            3 => self.imp().stack.set_visible_child_name("inputdevices"),
+            4 => self.imp().stack.set_visible_child_name("outputdevices"),
+            5 => self.imp().stack.set_visible_child_name("cards"),
+            _ => {}
         }
     }
 }

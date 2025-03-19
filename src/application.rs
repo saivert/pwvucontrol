@@ -6,9 +6,9 @@ use crate::{
     ui::PwvucontrolWindow,
 };
 use adw::subclass::prelude::*;
-use glib::ExitCode;
+use glib::{ExitCode, OptionArg, OptionFlags};
 use gtk::{gio, prelude::*};
-use std::cell::OnceCell;
+use std::cell::{Cell, OnceCell};
 
 mod imp {
     use super::*;
@@ -19,6 +19,8 @@ mod imp {
         pub window: OnceCell<PwvucontrolWindow>,
         #[property(get)]
         pub manager: PwvucontrolManager,
+
+        pub(super) tab: Cell<i32>,
     }
 
     #[glib::object_subclass]
@@ -28,10 +30,7 @@ mod imp {
         type ParentType = adw::Application;
 
         fn new() -> PwvucontrolApplication {
-            PwvucontrolApplication {
-                window: OnceCell::default(),
-                manager: PwvucontrolManager::new(),
-            }
+            PwvucontrolApplication { window: OnceCell::default(), manager: PwvucontrolManager::new(), tab: Default::default() }
         }
     }
 
@@ -56,6 +55,8 @@ mod imp {
 
             // Ask the window manager/compositor to present the window
             window.present();
+
+            window.select_tab(self.tab.get());
         }
 
         fn startup(&self) {
@@ -63,6 +64,26 @@ mod imp {
 
             let window = PwvucontrolWindow::new(&self.obj());
             self.window.set(window).expect("Failed to initialize application window");
+        }
+
+        fn command_line(&self, command_line: &gio::ApplicationCommandLine) -> ExitCode {
+            let tab_arg = command_line.options_dict().lookup::<i32>("tab");
+            if let Ok(Some(tab)) = tab_arg {
+                self.tab.set(tab);
+            }
+
+            self.activate();
+
+            ExitCode::SUCCESS
+        }
+
+        fn handle_local_options(&self, options: &glib::VariantDict) -> ExitCode {
+            if options.lookup_value("version", None).is_some() {
+                println!("pwvucontrol version {}", VERSION);
+                return ExitCode::SUCCESS;
+            }
+
+            self.parent_handle_local_options(options)
         }
     }
 
@@ -79,21 +100,22 @@ glib::wrapper! {
 }
 
 impl PwvucontrolApplication {
-    pub fn run() -> ExitCode {
+    pub fn run(/*args: crate::Args*/) -> ExitCode {
         let app: Self = glib::Object::builder()
             .property("application-id", APP_ID)
-            .property("flags", gio::ApplicationFlags::empty())
+            .property("flags", gio::ApplicationFlags::HANDLES_COMMAND_LINE)
             .property("resource-base-path", "/com/saivert/pwvucontrol")
             .build();
+
+        app.add_main_option("tab", glib::Char('t' as i8), OptionFlags::NONE, OptionArg::Int, "Select tab to open.", Some("number"));
+        app.add_main_option("version", glib::Char('v' as i8), OptionFlags::NONE, OptionArg::None, "Show version.", None);
 
         ApplicationExtManual::run(&app)
     }
 
     fn setup_gactions(&self) {
-        let quit_action = gio::ActionEntry::builder("quit").activate(move |app: &Self, _, _| app.quit()).build();
-        let about_action = gio::ActionEntry::builder("about")
-            .activate(move |app: &Self, _, _| app.show_about())
-            .build();
+        let quit_action = gio::ActionEntryBuilder::new("quit").activate(move |app: &Self, _, _| app.quit()).build();
+        let about_action = gio::ActionEntryBuilder::new("about").activate(move |app: &Self, _, _| app.show_about()).build();
         self.add_action_entries([quit_action, about_action])
     }
 
@@ -115,9 +137,6 @@ impl PwvucontrolApplication {
 
 impl Default for PwvucontrolApplication {
     fn default() -> Self {
-        gio::Application::default()
-            .expect("Could not get default GApplication")
-            .downcast()
-            .unwrap()
+        gio::Application::default().expect("Could not get default GApplication").downcast().unwrap()
     }
 }
