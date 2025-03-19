@@ -123,7 +123,7 @@ impl PwStreamBox {
         gettextrs::gettext("Default ({})");
 
         let string = if let Some(node) = default_node {
-            gettextrs::gettext!("Default ({})", node.name())
+            formatx::formatx!(gettextrs::gettext("Default ({})"), node.name()).unwrap()
         } else {
             gettextrs::gettext("Default")
         };

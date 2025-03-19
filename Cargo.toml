@@ -15,6 +15,7 @@ imbl = "3.0.0"
 futures = "0.3"
 anyhow = "1.0"
 pipewire = "0.8"
+formatx = "0.2.3"
 
 [dependencies.wireplumber]
 git = "https://github.com/arcnmx/wireplumber.rs.git"
