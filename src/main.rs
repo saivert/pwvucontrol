@@ -62,13 +62,9 @@ fn main() -> gtk::glib::ExitCode {
     gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
     gtk::glib::set_application_name("Pwvucontrol");
 
-    let resources = gio::Resource::load(path_override_from_env(
-        "PWVUCONTROL_RESOURCEDIR",
-        "../data/resources",
-        Some("resources.gresource"),
-    ))
-    .or(gio::Resource::load(RESOURCES_FILE))
-    .unwrap_or_else(|_| panic!("{}", gettext("Could not load resources")));
+    let resources = gio::Resource::load(path_override_from_env("PWVUCONTROL_RESOURCEDIR", "../data/resources", Some("resources.gresource")))
+        .or(gio::Resource::load(RESOURCES_FILE))
+        .unwrap_or_else(|_| panic!("{}", gettext("Could not load resources")));
 
     // Load resources
     gio::resources_register(&resources);

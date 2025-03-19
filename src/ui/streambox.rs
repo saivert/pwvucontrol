@@ -131,11 +131,7 @@ impl PwStreamBox {
 
         if let Some(deftarget) = item.default_target() {
             if let Some(pos) = stream_model.get_node_pos_from_id(deftarget.boundid()) {
-                pwvucontrol_info!(
-                    "switching to preferred target pos={pos} boundid={} serial={}",
-                    deftarget.boundid(),
-                    deftarget.serial()
-                );
+                pwvucontrol_info!("switching to preferred target pos={pos} boundid={} serial={}", deftarget.boundid(), deftarget.serial());
                 output_dropdown.set_selected_no_send(pos + 1);
             }
         } else {

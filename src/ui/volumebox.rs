@@ -83,12 +83,7 @@ mod imp {
             }));
 
             let window = crate::ui::PwvucontrolWindow::default();
-            window
-                .imp()
-                .settings
-                .bind("use-peakmeter-led", &self.peak_meter.get(), "use-led")
-                .get_only()
-                .build();
+            window.imp().settings.bind("use-peakmeter-led", &self.peak_meter.get(), "use-led").get_only().build();
         }
 
         fn dispose(&self) {
@@ -156,36 +151,19 @@ mod imp {
 
             item.bind_property("name", &self.title_label.get(), "label").sync_create().build();
 
-            item.bind_property("description", &self.subtitle_label.get(), "label")
-                .sync_create()
-                .build();
+            item.bind_property("description", &self.subtitle_label.get(), "label").sync_create().build();
 
-            item.bind_property("mute", &self.mutebtn.get(), "active")
-                .sync_create()
-                .bidirectional()
-                .build();
+            item.bind_property("mute", &self.mutebtn.get(), "active").sync_create().bidirectional().build();
 
-            item.bind_property("volume", &self.volume_scale.get(), "volume")
-                .sync_create()
-                .bidirectional()
-                .build();
+            item.bind_property("volume", &self.volume_scale.get(), "volume").sync_create().bidirectional().build();
 
-            item.bind_property("monitorvolume", &self.monitorvolumescale.get(), "volume")
-                .sync_create()
-                .bidirectional()
-                .build();
+            item.bind_property("monitorvolume", &self.monitorvolumescale.get(), "volume").sync_create().bidirectional().build();
 
             item.bind_property("formatstr", &self.format.get(), "label").sync_create().build();
 
-            item.bind_property("channellock", &self.channellock.get(), "active")
-                .sync_create()
-                .bidirectional()
-                .build();
+            item.bind_property("channellock", &self.channellock.get(), "active").sync_create().bidirectional().build();
 
-            item.bind_property("mainvolume", &self.mainvolumescale.get(), "volume")
-                .sync_create()
-                .bidirectional()
-                .build();
+            item.bind_property("mainvolume", &self.mainvolumescale.get(), "volume").sync_create().bidirectional().build();
 
             let manager = PwvucontrolManager::default();
 
