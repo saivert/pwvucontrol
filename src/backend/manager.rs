@@ -114,24 +114,13 @@ mod imp {
 
             wp_core.connect();
 
-            wp_core
-                .load_component("libwireplumber-module-mixer-api", "module", None)
-                .expect("loadig mixer-api plugin");
-            wp_core
-                .load_component("libwireplumber-module-default-nodes-api", "module", None)
-                .expect("loadig mixer-api plugin");
+            wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");
+            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None).expect("loadig mixer-api plugin");
 
             wp_om.add_interest({
                 let interest: Interest<wp::pw::Node> = wp::registry::Interest::new();
                 let variant = glib::Variant::tuple_from_iter(
-                    [
-                        "Stream/Output/Audio",
-                        "Stream/Input/Audio",
-                        "Audio/Source",
-                        "Audio/Source/Virtual",
-                        "Audio/Sink",
-                    ]
-                    .map(ToVariant::to_variant),
+                    ["Stream/Output/Audio", "Stream/Input/Audio", "Audio/Source", "Audio/Source/Virtual", "Audio/Sink"].map(ToVariant::to_variant),
                 );
 
                 interest.add_constraint(
@@ -235,12 +224,8 @@ mod imp {
                 }
             }));
 
-            self.wp_core
-                .set(wp_core)
-                .expect("wp_core should only be set once during application activation");
-            self.wp_object_manager
-                .set(wp_om)
-                .expect("wp_object_manager should only be set once during application activation");
+            self.wp_core.set(wp_core).expect("wp_core should only be set once during application activation");
+            self.wp_object_manager.set(wp_om).expect("wp_object_manager should only be set once during application activation");
         }
 
         fn setup_metadata_om(&self) {
@@ -256,25 +241,43 @@ mod imp {
 
             metadata_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
-            metadata_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
-                if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
-                    pwvucontrol_info!("added metadata object: {:?}", metadataobj.bound_id());
-                    imp.metadata.replace(Some(metadataobj.clone()));
-                    for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
-                        let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
-                        pwvucontrol_info!("Metadata value: {s}, {k:?}, {t:?}, {v:?}");
-                    }
-                } else {
-                    unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
-                }
-            }));
-
-            metadata_om.connect_objects_changed(clone!(@weak self as imp => move |_| {
-
-            }));
+            metadata_om.connect_object_added(
+                clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)),
+            );
 
             wp_core.install_object_manager(&metadata_om);
             self.metadata_om.set(metadata_om).expect("metadata object manager set already");
+        }
+
+        fn metadata_changed(&self, _subject: u32, key: Option<&str>, type_: Option<&str>, value: Option<&str>) {
+            if let (Some(key), Some(json_str), Some("Spa:String:JSON")) = (key, value, type_) {
+                if let Some(node_name) = json_str.split(r#"{"name":""#).nth(1).and_then(|x| x.split('"').next()) {
+                    match key {
+                        "default.audio.sink" => {
+                            pwvucontrol_info!("New default sink: {node_name}")
+                        }
+                        "default.audio.source" => {
+                            pwvucontrol_info!("New default source: {node_name}")
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        fn metadata_object_added(&self, object: &glib::Object) {
+            if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
+                self.metadata.replace(Some(metadataobj.clone()));
+
+                for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
+                    let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
+                    self.metadata_changed(s, Some(&k), Some(&t), Some(&v));
+                }
+
+                metadataobj.connect_changed(clone!(@weak self as manager => move |_,s,k,t,v| manager.metadata_changed(s, k, t, v)));
+            } else {
+                unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
+            }
         }
     }
 }
