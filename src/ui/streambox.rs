@@ -52,9 +52,11 @@ mod imp {
 
             self.volumebox.set_node_object(&item);
 
-            self.volumebox.set_default_node_change_handler(clone!(@weak self as widget => move || {
-                widget.obj().update_output_device_dropdown();
-            }));
+            let defaultnodesapi = manager.default_nodes_api();
+            let widget = self.obj();
+            let defaultnodesapi_closure = closure_local!(@watch widget => move |_: wp::plugin::Plugin| widget.update_output_device_dropdown());
+            defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
+            widget.update_output_device_dropdown();
 
             self.parent_constructed();
 
@@ -97,7 +99,7 @@ impl PwStreamBox {
         glib::Object::builder().property("node-object", node_object).build()
     }
 
-    pub(crate) fn update_output_device_dropdown(&self) {
+    fn update_output_device_dropdown(&self) {
         let manager = PwvucontrolManager::default();
 
         let item = self.node_object().expect("nodeobj");

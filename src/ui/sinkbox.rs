@@ -6,14 +6,15 @@ use crate::{
     ui::{PwRouteDropDown, PwVolumeBox, PwvucontrolWindow},
 };
 
+use crate::pwvucontrol_warning;
 use glib::clone;
+use glib::closure_local;
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::Cell;
 use std::cell::RefCell;
 use wireplumber as wp;
 
 mod imp {
-
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -67,28 +68,20 @@ mod imp {
                     window.play_beep();
                 });
             }
-
-            self.volumebox.set_default_node_change_handler(clone!(@weak self as widget => move || {
-                widget.obj().default_node_changed();
-            }));
+            let manager = PwvucontrolManager::default();
+            let defaultnodesapi = manager.default_nodes_api();
+            let widget = self.obj();
+            let defaultnodesapi_closure = closure_local!(@watch widget => move |_: wp::plugin::Plugin| widget.imp().default_node_changed());
+            defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
+            self.default_node_changed();
 
             // Only set nodeobject once it has a device associated.
             if let Some(node) = obj.node_object() {
                 node.connect_device_notify(clone!(@weak self as widget => move |nodeobject| {
                     widget.route_dropdown.set_nodeobject(Some(nodeobject));
-                    widget.obj().default_node_changed();
+                    widget.default_node_changed();
                 }));
             }
-
-            // glib::idle_add_local_once(clone!(@weak self as widget => move || {
-            //     widget.obj().default_node_changed();
-
-            //     // TODO: Hack! Associated PwDeviceObject for a sink type PwNodeObject may not have been added to model yet at this time.
-            //     // Delay the set_nodeobject call as workaround for now.
-            //     if let Some(node) = widget.obj().node_object() {
-            //         widget.route_dropdown.set_nodeobject(Some(node));
-            //     }
-            // }));
 
             pwvucontrol_info!("sinkbox set_nodeobject {}", self.obj().node_object().expect("Node object").name());
         }
@@ -105,11 +98,7 @@ mod imp {
             }
 
             let node = self.volumebox.node_object().expect("nodeobj");
-            let node_name: String = if _togglebutton.is_active() {
-                node.node_property("node.name").unwrap_or_default()
-            } else {
-                "".to_string()
-            };
+            let node_name: String = if _togglebutton.is_active() { node.node_property("node.name").unwrap_or_default() } else { "".to_string() };
 
             let manager = PwvucontrolManager::default();
 
@@ -128,6 +117,22 @@ mod imp {
             let result: bool = defaultnodesapi.emit_by_name("set-default-configured-node-name", &[&type_name, &node_name]);
             wp::info!("set-default-configured-node-name result: {result:?}");
         }
+
+        fn default_node_changed(&self) {
+            let manager = PwvucontrolManager::default();
+            let defaultnodesapi = manager.default_nodes_api();
+
+            let node = self.obj().node_object().expect("nodeobj");
+            let Some(media_class) = node.node_property::<String>("media.class") else {
+                pwvucontrol_warning!("{} is missing media.class property", node.name());
+                return;
+            };
+            let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&media_class]);
+
+            self.block_default_node_toggle_signal.set(true);
+            self.default_sink_toggle.set_active(node.boundid() == id);
+            self.block_default_node_toggle_signal.set(false);
+        }
     }
 }
 
@@ -140,15 +145,5 @@ glib::wrapper! {
 impl PwSinkBox {
     pub(crate) fn new(node_object: &impl IsA<PwNodeObject>) -> Self {
         glib::Object::builder().property("node-object", node_object).build()
-    }
-
-    pub(crate) fn default_node_changed(&self) {
-        let imp = self.imp();
-        let node = self.node_object().expect("nodeobj");
-        let id = imp.volumebox.default_node();
-
-        imp.block_default_node_toggle_signal.set(true);
-        self.imp().default_sink_toggle.set_active(node.boundid() == id);
-        imp.block_default_node_toggle_signal.set(false);
     }
 }

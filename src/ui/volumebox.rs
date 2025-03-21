@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::pwvucontrol_warning;
 use crate::{
     backend::{NodeType, PwChannelObject, PwNodeObject, PwvucontrolManager},
     ui::{LevelbarProvider, PwChannelBox, PwPeakMeter, PwVolumeScale},
 };
-use glib::{clone, closure_local, ControlFlow, SignalHandlerId};
+use glib::{clone, ControlFlow, SignalHandlerId};
 use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
-use wireplumber as wp;
 
 mod imp {
     use super::*;
@@ -24,8 +22,6 @@ mod imp {
         levelbarprovider: Cell<Option<LevelbarProvider>>,
         timeoutid: Cell<Option<gtk::TickCallbackId>>,
         pub(super) level: Cell<f32>,
-        pub(super) default_node: Cell<u32>,
-        pub(super) default_node_changed_handler: RefCell<Option<Box<dyn Fn()>>>,
 
         // Template widgets
         #[template_child]
@@ -165,28 +161,6 @@ mod imp {
 
             item.bind_property("mainvolume", &self.mainvolumescale.get(), "volume").sync_create().bidirectional().build();
 
-            let manager = PwvucontrolManager::default();
-
-            let defaultnodesapi = manager.default_nodes_api();
-            let widget = self.obj();
-            let defaultnodesapi_closure = closure_local!(@watch widget, @strong item => move |defaultnodesapi: wp::plugin::Plugin| {
-                let Some(media_class) = item.node_property::<String>("media.class")
-                else {
-                    pwvucontrol_warning!("{} is missing media.class property", item.name());
-                    return;
-                };
-                let id: u32 = defaultnodesapi.emit_by_name("get-default-node", &[&media_class]);
-                wp::info!("default-nodes-api changed: new id {id}");
-                widget.imp().default_node.set(id);
-
-                let handler = widget.imp().default_node_changed_handler.borrow();
-                if let Some(cb) = handler.as_ref() {
-                    cb();
-                }
-            });
-            defaultnodesapi_closure.invoke::<()>(&[&defaultnodesapi]);
-            defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
-
             self.channel_listbox.bind_model(
                 Some(&item.channelmodel()),
                 clone!(@weak self as widget => @default-panic, move |item| {
@@ -225,16 +199,5 @@ glib::wrapper! {
 impl PwVolumeBox {
     pub(crate) fn set_level(&self, level: f32) {
         self.imp().level.set(level);
-    }
-
-    pub fn set_default_node_change_handler(&self, c: impl Fn() + 'static) {
-        let imp = self.imp();
-
-        let mut handler = imp.default_node_changed_handler.borrow_mut();
-        handler.replace(Box::new(c));
-    }
-
-    pub fn default_node(&self) -> u32 {
-        self.upcast_ref::<PwVolumeBox>().imp().default_node.get()
     }
 }

@@ -2,7 +2,6 @@
 
 use std::time::Duration;
 
-use crate::macros::*;
 use crate::{
     application::PwvucontrolApplication,
     backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
