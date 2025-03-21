@@ -21,7 +21,6 @@ pub enum PwvucontrolWindowView {
     Disconnected,
 }
 mod imp {
-
     use super::*;
 
     #[derive(Debug, gtk::CompositeTemplate)]
@@ -51,7 +50,6 @@ mod imp {
         pub settings: gio::Settings,
 
         pub beep_elapsed: Cell<time::Instant>,
-        pub beep_enabled: Cell<bool>,
     }
 
     impl Default for PwvucontrolWindow {
@@ -69,7 +67,6 @@ mod imp {
                 settings: gio::Settings::new(APP_ID),
                 info_banner: TemplateChild::default(),
                 beep_elapsed: Cell::new(std::time::Instant::now()),
-                beep_enabled: Default::default(),
             }
         }
     }
@@ -190,14 +187,6 @@ mod imp {
             let beep_on_volume_changes_action = self.settings.create_action("beep-on-volume-changes");
             self.obj().add_action(&beep_on_volume_changes_action);
 
-            self.settings.connect_changed(
-                Some("beep-on-volume-changes"),
-                clone!(@weak self as widget => move |settings, _key| {
-                    widget.beep_enabled.set(settings.boolean("beep-on-volume-changes"));
-                }),
-            );
-            self.beep_enabled.set(self.settings.boolean("beep-on-volume-changes"));
-
             self.obj().load_window_state();
         }
     }
@@ -311,7 +300,7 @@ impl PwvucontrolWindow {
     }
 
     pub(crate) fn play_beep(&self) {
-        if !self.imp().beep_enabled.get() {
+        if !self.imp().settings.boolean("beep-on-volume-changes") {
             return;
         }
         if self.imp().beep_elapsed.get().elapsed() > Duration::from_secs(1) {
