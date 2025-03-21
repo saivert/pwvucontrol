@@ -12,6 +12,7 @@ mod volumebox;
 mod volumescale;
 mod window;
 mod withdefaultlistmodel;
+mod utils;
 
 pub use channelbox::PwChannelBox;
 pub use levelprovider::LevelbarProvider;
@@ -26,3 +27,4 @@ pub use volumebox::PwVolumeBox;
 pub use volumescale::PwVolumeScale;
 pub use window::PwvucontrolWindow;
 pub use withdefaultlistmodel::WithDefaultListModel;
+pub use utils::remember_window_size;

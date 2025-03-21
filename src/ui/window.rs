@@ -95,6 +95,8 @@ mod imp {
                 self.obj().add_css_class("devel");
             }
 
+            crate::ui::remember_window_size(self.obj().upcast_ref(), &self.settings);
+
             self.obj().setup_scroll_blocker(&self.playbacklist);
             self.obj().setup_scroll_blocker(&self.recordlist);
             self.obj().setup_scroll_blocker(&self.inputlist);
@@ -187,19 +189,10 @@ mod imp {
             let beep_on_volume_changes_action = self.settings.create_action("beep-on-volume-changes");
             self.obj().add_action(&beep_on_volume_changes_action);
 
-            self.obj().load_window_state();
         }
     }
     impl WidgetImpl for PwvucontrolWindow {}
     impl WindowImpl for PwvucontrolWindow {
-        // save window state on delete event
-
-        fn close_request(&self) -> glib::Propagation {
-            if let Err(err) = self.obj().save_window_size() {
-                pwvucontrol_warning!("Failed to save window state, {}", &err);
-            }
-            self.parent_close_request()
-        }
     }
     impl ApplicationWindowImpl for PwvucontrolWindow {}
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
@@ -226,32 +219,6 @@ impl PwvucontrolWindow {
         }
     }
 
-    fn save_window_size(&self) -> Result<(), glib::BoolError> {
-        let settings = &self.imp().settings;
-
-        let size = self.default_size();
-
-        settings.set_int("window-width", size.0)?;
-        settings.set_int("window-height", size.1)?;
-
-        settings.set_boolean("is-maximized", self.is_maximized())?;
-
-        Ok(())
-    }
-
-    fn load_window_state(&self) {
-        let settings = &self.imp().settings;
-
-        let width = settings.int("window-width");
-        let height = settings.int("window-height");
-        let is_maximized = settings.boolean("is-maximized");
-
-        self.set_default_size(width, height);
-
-        if is_maximized {
-            self.maximize();
-        }
-    }
 
     /// This prevents child widgets from capturing scroll events
     fn setup_scroll_blocker(&self, listbox: &gtk::ListBox) {
