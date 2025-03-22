@@ -6,5 +6,5 @@ Icon=@icon@
 Terminal=false
 Type=Application
 Categories=Audio;System
-Keywords=Volume;Sound
+Keywords=PipeWire;Volume;Audio;Mixer;Control;Sound
 StartupNotify=true
