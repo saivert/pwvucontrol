@@ -93,7 +93,9 @@
                             <property name="hexpand">0</property>
                             <property name="vexpand">1</property>
                             <child>
-                              <object class="GtkViewport">
+                              <object class="GtkListView" id="playbacklist">
+                              </object>
+                              <!-- <object class="GtkViewport">
                                 <property name="scroll-to-focus">1</property>
                                 <child>
                                   <object class="GtkBox">
@@ -113,7 +115,7 @@
                                     </child>
                                   </object>
                                 </child>
-                              </object>
+                              </object> -->
                             </child>
                           </object>
                         </property>

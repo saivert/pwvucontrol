@@ -3,7 +3,13 @@
 <interface>
   <requires lib="gtk" version="4.0" />
   <requires lib="Adw" version="1.0" />
-  <template class="PwStreamBox" parent="GtkListBoxRow">
+  <template class="PwStreamBox" parent="GtkWidget">
+    <property name="layout-manager">
+      <object class="GtkBinLayout" />
+    </property>
+    <style>
+      <class name="streambox"/>
+    </style>
     <child>
       <object class="PwVolumeBox" id="volumebox">
         <child type="extra">

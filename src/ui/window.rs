@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use crate::{
     application::PwvucontrolApplication,
-    backend::{PwDeviceObject, PwNodeObject, PwvucontrolManager},
+    backend::{NodeType, PwDeviceObject, PwNodeObject, PwvucontrolManager},
     config::{APP_ID, PROFILE},
     ui::{devicebox::PwDeviceBox, PwSinkBox, PwStreamBox},
 };
@@ -30,7 +30,7 @@ mod imp {
         #[template_child]
         pub stack: TemplateChild<adw::ViewStack>,
         #[template_child]
-        pub playbacklist: TemplateChild<gtk::ListBox>,
+        pub playbacklist: TemplateChild<gtk::ListView>,
         #[template_child]
         pub recordlist: TemplateChild<gtk::ListBox>,
         #[template_child]
@@ -49,6 +49,8 @@ mod imp {
         pub settings: gio::Settings,
 
         pub beep_elapsed: Cell<time::Instant>,
+
+        pub experimental_toggle: Cell<bool>,
     }
 
     impl Default for PwvucontrolWindow {
@@ -66,6 +68,7 @@ mod imp {
                 settings: gio::Settings::new(APP_ID),
                 info_banner: TemplateChild::default(),
                 beep_elapsed: Cell::new(std::time::Instant::now()),
+                experimental_toggle: Cell::new(false),
             }
         }
     }
@@ -96,10 +99,10 @@ mod imp {
 
             crate::ui::remember_window_size(self.obj().upcast_ref(), &self.settings);
 
-            self.obj().setup_scroll_blocker(&self.playbacklist);
-            self.obj().setup_scroll_blocker(&self.recordlist);
-            self.obj().setup_scroll_blocker(&self.inputlist);
-            self.obj().setup_scroll_blocker(&self.outputlist);
+            self.obj().setup_scroll_blocker(&*self.playbacklist);
+            self.obj().setup_scroll_blocker(&*self.recordlist);
+            self.obj().setup_scroll_blocker(&*self.inputlist);
+            self.obj().setup_scroll_blocker(&*self.outputlist);
 
             let manager = PwvucontrolManager::default();
 
@@ -122,27 +125,58 @@ mod imp {
 
             glib::idle_add_local_once(clone!(@weak self as widget => move || {widget.obj().update_info_bar();}));
 
-            self.playbacklist.bind_model(
-                Some(&manager.stream_output_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
-                    PwStreamBox::new(
-                        item.downcast_ref::<PwNodeObject>()
-                            .expect("RowData is of wrong type"),
-                    )
-                    .upcast::<gtk::Widget>()
-                }),
-            );
+            let factory = gtk::SignalListItemFactory::new();
+            factory.connect_setup(|_, item| {
+                let item = item.downcast_ref::<gtk::ListItem>().expect("ListItem");
+                item.set_activatable(false);
+            });
+            factory.connect_bind(|_, item| {
+                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                let node: PwNodeObject = item.item().and_downcast().expect("RowData is of wrong type");
+                let streambox = PwStreamBox::new(&node);
+                streambox.add_css_class("streambox");
 
-            self.recordlist.bind_model(
-                Some(&manager.stream_input_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
-                    PwStreamBox::new(
-                        item.downcast_ref::<PwNodeObject>()
-                            .expect("RowData is of wrong type"),
-                    )
-                    .upcast::<gtk::Widget>()
-                }),
-            );
+                item.set_child(Some(&streambox));
+            });
+            factory.connect_unbind(|_, item| {
+                let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
+                // let streambox: PwStreamBox = item.child().and_downcast().expect("RowData is of wrong type");
+                // streambox.emit_by_name::<()>("destroy", &[]);
+                item.set_child(gtk::Widget::NONE);
+            });
+
+            self.playbacklist.set_factory(Some(&factory));
+            self.playbacklist.set_show_separators(true);
+
+            let composite_store = gio::ListStore::new::<gio::ListModel>();
+            composite_store.append(&manager.stream_output_model());
+            composite_store.append(&manager.stream_input_model());
+
+            let flattened_model = gtk::FlattenListModel::new(Some(composite_store));
+
+            let selection_model = gtk::NoSelection::new(Some(flattened_model));
+
+            let header_factory = gtk::SignalListItemFactory::new();
+            header_factory.connect_setup(|_, item| {
+                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
+                let label = gtk::Label::new(Some("nice"));
+                header.set_child(Some(&label));
+            });
+            header_factory.connect_bind(|_, item| {
+                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
+                let label: gtk::Label = header.child().and_downcast().expect("Label in section");
+                if let Some(node) = header.item().and_downcast_ref::<PwNodeObject>() {
+                    label.set_label(match node.nodetype() {
+                        NodeType::StreamOutput => "Playback",
+                        NodeType::StreamInput => "Recording",
+                        _ => "Unknown",
+                    });
+                }
+            });
+            self.playbacklist.set_header_factory(Some(&header_factory));
+
+            self.playbacklist.set_model(Some(&selection_model));
+
 
             self.inputlist.bind_model(
                 Some(&manager.source_model()),
@@ -188,11 +222,24 @@ mod imp {
             let beep_on_volume_changes_action = self.settings.create_action("beep-on-volume-changes");
             self.obj().add_action(&beep_on_volume_changes_action);
 
+            let experimental_action = gio::SimpleAction::new("bleh", None);
+            experimental_action.connect_activate(clone!(@weak self as obj => move |_, _| {
+                let state = !obj.experimental_toggle.get();
+                obj.experimental_toggle.set(state);
+
+                let manager = PwvucontrolManager::default();
+
+                let model = if state { manager.stream_input_model() } else { manager.stream_output_model() };
+
+                let selection_model = gtk::NoSelection::new(Some(model));
+                obj.playbacklist.set_model(Some(&selection_model));
+            }));
+            self.obj().add_action(&experimental_action);
+            PwvucontrolApplication::default().set_accels_for_action("win.bleh", &["<Control>y"]);
         }
     }
     impl WidgetImpl for PwvucontrolWindow {}
-    impl WindowImpl for PwvucontrolWindow {
-    }
+    impl WindowImpl for PwvucontrolWindow {}
     impl ApplicationWindowImpl for PwvucontrolWindow {}
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
 
@@ -218,9 +265,8 @@ impl PwvucontrolWindow {
         }
     }
 
-
     /// This prevents child widgets from capturing scroll events
-    fn setup_scroll_blocker(&self, listbox: &gtk::ListBox) {
+    fn setup_scroll_blocker(&self, listbox: &impl IsA<gtk::Widget>) {
         let scrolledwindow = listbox
             .ancestor(gtk::ScrolledWindow::static_type())
             .and_then(|x| x.downcast::<gtk::ScrolledWindow>().ok())

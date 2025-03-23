@@ -31,7 +31,7 @@ mod imp {
     impl ObjectSubclass for PwStreamBox {
         const NAME: &'static str = "PwStreamBox";
         type Type = super::PwStreamBox;
-        type ParentType = gtk::ListBoxRow;
+        type ParentType = gtk::Widget;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -89,9 +89,7 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwStreamBox(ObjectSubclass<imp::PwStreamBox>)
-        @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+    pub struct PwStreamBox(ObjectSubclass<imp::PwStreamBox>) @extends gtk::Widget;
 }
 
 impl PwStreamBox {
@@ -119,10 +117,6 @@ impl PwStreamBox {
             crate::backend::NodeType::StreamOutput => manager.default_configured_sink_node(),
             _ => panic!("Invalid node type"),
         };
-
-        // The following is just so this string gets picked up by xgettext, since it doesn't handle rust macros yet.
-        #[cfg(debug_assertions)]
-        gettextrs::gettext("Default ({})");
 
         let string = if let Some(node) = default_node {
             formatx::formatx!(gettextrs::gettext("Default ({})"), node.name()).unwrap()
