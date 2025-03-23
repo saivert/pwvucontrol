@@ -3,7 +3,7 @@
 use std::{fmt::Debug, time::Duration};
 
 use crate::ui::PwVolumeBox;
-use glib::{self, clone, ControlFlow};
+use glib::{self, clone, ControlFlow, SourceId};
 use pipewire::{context::Context, loop_::Loop, properties::*, spa, spa::utils::Direction, stream::*};
 use std::os::fd::AsRawFd;
 
@@ -14,6 +14,7 @@ pub struct LevelbarProvider {
     _context: Context,
     stream: Option<Stream>,
     _listener: StreamListener<f32>,
+    sig: Option<SourceId>,
 }
 
 impl Debug for LevelbarProvider {
@@ -30,7 +31,7 @@ impl LevelbarProvider {
 
         let fd = loop_.fd();
 
-        glib::source::unix_fd_add_local(fd.as_raw_fd(), glib::IOCondition::all(), {
+        let sig = glib::source::unix_fd_add_local(fd.as_raw_fd(), glib::IOCondition::all(), {
             let loop_ = loop_.clone();
             move |_, _| {
                 loop_.iterate(Duration::ZERO);
@@ -99,6 +100,7 @@ impl LevelbarProvider {
             _context: context,
             stream: Some(stream),
             _listener: listener,
+            sig: Some(sig)
         })
     }
 }
@@ -107,6 +109,9 @@ impl Drop for LevelbarProvider {
     fn drop(&mut self) {
         if let Some(stream) = self.stream.take() {
             stream.disconnect().unwrap();
+        }
+        if let Some(sig) = self.sig.take() {
+            sig.remove();
         }
     }
 }
