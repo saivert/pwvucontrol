@@ -60,14 +60,15 @@ mod imp {
 
     impl Default for PwvucontrolManager {
         fn default() -> Self {
+            let node_model = gio::ListStore::new::<PwNodeObject>();
             Self {
                 wp_core: Default::default(),
                 wp_object_manager: Default::default(),
-                node_model: gio::ListStore::new::<PwNodeObject>(),
-                stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, None::<gio::ListModel>),
-                stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, None::<gio::ListModel>),
-                source_model: PwNodeFilterModel::new(NodeType::Source, None::<gio::ListModel>),
-                sink_model: PwNodeFilterModel::new(NodeType::Sink, None::<gio::ListModel>),
+                node_model: node_model.clone(),
+                stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, Some(node_model.clone())),
+                stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, Some(node_model.clone())),
+                source_model: PwNodeFilterModel::new(NodeType::Source, Some(node_model.clone())),
+                sink_model: PwNodeFilterModel::new(NodeType::Sink, Some(node_model.clone())),
                 device_model: gio::ListStore::new::<PwDeviceObject>(),
                 metadata_om: Default::default(),
                 metadata: Default::default(),
@@ -88,11 +89,6 @@ mod imp {
     impl ObjectImpl for PwvucontrolManager {
         fn constructed(&self) {
             self.parent_constructed();
-
-            self.stream_input_model.set_model(Some(self.node_model.clone()));
-            self.stream_output_model.set_model(Some(self.node_model.clone()));
-            self.sink_model.set_model(Some(self.node_model.clone()));
-            self.source_model.set_model(Some(self.node_model.clone()));
 
             self.setup_wp_connection();
             self.setup_metadata_om();
