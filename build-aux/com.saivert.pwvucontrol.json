@@ -20,9 +20,6 @@
     "build-options": {
         "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm18/bin",
         "prepend-ld-library-path": "/usr/lib/sdk/llvm18/lib",
-        "build-args" : [
-            "--share=network"
-        ],
         "env": {
             "CARGO_REGISTRIES_CRATES_IO_PROTOCOL": "sparse",
             "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "clang",
@@ -81,6 +78,14 @@
                         "flatpak-build",
                         "myrepo",
                         "target"
+                    ]
+                },
+                "cargo-sources.json",
+                {
+                    "type": "shell",
+                    "commands": [
+                        "mkdir .cargo",
+                        "cp cargo/config .cargo/"
                     ]
                 }
             ]
