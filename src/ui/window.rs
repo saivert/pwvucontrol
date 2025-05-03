@@ -20,6 +20,8 @@ pub enum PwvucontrolWindowView {
     Disconnected,
 }
 mod imp {
+    use crate::backend::PwNodeFilterModel;
+
     use super::*;
 
     #[derive(Debug, gtk::CompositeTemplate)]
@@ -51,6 +53,8 @@ mod imp {
         pub beep_elapsed: Cell<time::Instant>,
 
         pub experimental_toggle: Cell<bool>,
+
+        pub filtermodel: PwNodeFilterModel,
     }
 
     impl Default for PwvucontrolWindow {
@@ -69,6 +73,7 @@ mod imp {
                 info_banner: TemplateChild::default(),
                 beep_elapsed: Cell::new(std::time::Instant::now()),
                 experimental_toggle: Cell::new(false),
+                filtermodel: Default::default(),
             }
         }
     }
@@ -133,10 +138,12 @@ mod imp {
             factory.connect_bind(|_, item| {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                 let node: PwNodeObject = item.item().and_downcast().expect("RowData is of wrong type");
-                let streambox = PwStreamBox::new(&node);
-                streambox.add_css_class("streambox");
-
-                item.set_child(Some(&streambox));
+                let whoaw: Option<gtk::Widget> = match node.nodetype() {
+                    NodeType::StreamInput | NodeType::StreamOutput if !node.hidden() => Some(PwStreamBox::new(&node).upcast()),
+                    NodeType::Sink | NodeType::Source if !node.hidden() => Some(PwSinkBox::new(&node).upcast()),
+                    _ => None,
+                };
+                item.set_child(whoaw.as_ref());
             });
             factory.connect_unbind(|_, item| {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
@@ -148,35 +155,21 @@ mod imp {
             self.playbacklist.set_factory(Some(&factory));
             self.playbacklist.set_show_separators(true);
 
-            let composite_store = gio::ListStore::new::<gio::ListModel>();
-            composite_store.append(&manager.stream_output_model());
-            composite_store.append(&manager.stream_input_model());
+            self.filtermodel.set_model(Some(manager.node_model()));
 
-            let flattened_model = gtk::FlattenListModel::new(Some(composite_store));
-
-            let selection_model = gtk::NoSelection::new(Some(flattened_model));
-
-            let header_factory = gtk::SignalListItemFactory::new();
-            header_factory.connect_setup(|_, item| {
-                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
-                let label = gtk::Label::new(Some("nice"));
-                header.set_child(Some(&label));
+            let sorter = gtk::CustomSorter::new(|a, b| {
+                let node_a: &PwNodeObject = a.downcast_ref().unwrap();
+                let node_b: &PwNodeObject = b.downcast_ref().unwrap();
+                node_a.nodetype().cmp(&node_b.nodetype()).into()
             });
-            header_factory.connect_bind(|_, item| {
-                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
-                let label: gtk::Label = header.child().and_downcast().expect("Label in section");
-                if let Some(node) = header.item().and_downcast_ref::<PwNodeObject>() {
-                    label.set_label(match node.nodetype() {
-                        NodeType::StreamOutput => "Playback",
-                        NodeType::StreamInput => "Recording",
-                        _ => "Unknown",
-                    });
-                }
-            });
-            self.playbacklist.set_header_factory(Some(&header_factory));
+            let sorted_model = gtk::SortListModel::new(Some(self.filtermodel.clone()), None::<gtk::Sorter>);
+            sorted_model.set_section_sorter(Some(&sorter));
+
+            let selection_model = gtk::NoSelection::new(Some(sorted_model));
+
+            self.playbacklist.set_header_factory(Some(&Self::create_header_factory()));
 
             self.playbacklist.set_model(Some(&selection_model));
-
 
             self.inputlist.bind_model(
                 Some(&manager.source_model()),
@@ -227,12 +220,15 @@ mod imp {
                 let state = !obj.experimental_toggle.get();
                 obj.experimental_toggle.set(state);
 
-                let manager = PwvucontrolManager::default();
+                let node_type = if state { NodeType::StreamOutput } else { NodeType::Undefined };
 
-                let model = if state { manager.stream_input_model() } else { manager.stream_output_model() };
+                if state {
+                    obj.playbacklist.set_header_factory(gtk::ListItemFactory::NONE);
+                } else {
+                    obj.playbacklist.set_header_factory(Some(&Self::create_header_factory()));
+                }
 
-                let selection_model = gtk::NoSelection::new(Some(model));
-                obj.playbacklist.set_model(Some(&selection_model));
+                obj.filtermodel.set_nodetype(node_type);
             }));
             self.obj().add_action(&experimental_action);
             PwvucontrolApplication::default().set_accels_for_action("win.bleh", &["<Control>y"]);
@@ -243,7 +239,39 @@ mod imp {
     impl ApplicationWindowImpl for PwvucontrolWindow {}
     impl AdwApplicationWindowImpl for PwvucontrolWindow {}
 
-    impl PwvucontrolWindow {}
+    impl PwvucontrolWindow {
+        fn create_header_factory() -> gtk::SignalListItemFactory {
+            let header_factory = gtk::SignalListItemFactory::new();
+
+            header_factory.connect_setup(|_, item| {
+                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
+                let label = gtk::Label::new(Some("nice"));
+                header.set_child(Some(&label));
+            });
+
+            header_factory.connect_bind(|_, item| {
+                let header = item.downcast_ref::<gtk::ListHeader>().expect("ListHeader");
+                let label: gtk::Label = header.child().and_downcast().expect("Label in section");
+                if let Some(node) = header.item().and_downcast_ref::<PwNodeObject>() {
+                    let title = format!(
+                        "{} ({})",
+                        match node.nodetype() {
+                            NodeType::StreamOutput => gettext("Playback"),
+                            NodeType::StreamInput => gettext("Recording"),
+                            NodeType::Sink => gettext("Output devices"),
+                            NodeType::Source => gettext("Input devices"),
+                            _ => gettext("Unknown"),
+                        },
+                        header.n_items()
+                    );
+
+                    label.set_label(&title);
+                }
+            });
+
+            header_factory
+        }
+    }
 }
 
 glib::wrapper! {

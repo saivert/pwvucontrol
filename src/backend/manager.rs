@@ -176,7 +176,9 @@ mod imp {
                     if node.pw_property::<String>("stream.monitor").is_ok() {
                         hidden = true;
                     }
-
+                    if hidden {
+                        return;
+                    }
                     pwvucontrol_info!("Got node: {} bound id {}", node.name().unwrap_or_default(), node.bound_id());
                     let pwobj = PwNodeObject::new(node);
                     pwobj.set_hidden(hidden);

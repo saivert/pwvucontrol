@@ -12,9 +12,9 @@ mod imp {
     #[properties(wrapper_type = super::PwNodeFilterModel)]
     pub struct PwNodeFilterModel {
         /// Contains the items that matches the filter predicate.
-        pub(super) filtered_model: OnceCell<gtk::FilterListModel>,
+        pub(super) filtered_model: gtk::FilterListModel,
 
-        #[property(get, set, construct_only, builder(NodeType::Undefined))]
+        #[property(get, set = Self::set_nodetype, builder(NodeType::Undefined))]
         pub(super) nodetype: Cell<NodeType>,
 
         /// The model we are filtering.
@@ -32,39 +32,38 @@ mod imp {
     }
 
     #[glib::derived_properties]
-    impl ObjectImpl for PwNodeFilterModel {
-        fn constructed(&self) {
-            self.parent_constructed();
-
-            let nodetype = self.nodetype.get();
-
-            let filter = gtk::CustomFilter::new(move |obj| {
-                let node: &PwNodeObject = obj.downcast_ref().expect("PwNodeObject");
-                node.nodetype() == nodetype && !node.hidden()
-            });
-
-            self.filtered_model
-                .set(gtk::FilterListModel::new(None::<gio::ListModel>, Some(filter)))
-                .expect("filtered model not set");
-        }
-    }
+    impl ObjectImpl for PwNodeFilterModel {}
 
     impl ListModelImpl for PwNodeFilterModel {
         fn item_type(&self) -> glib::Type {
             PwNodeObject::static_type()
         }
         fn n_items(&self) -> u32 {
-            self.filtered_model.get().expect("Filtered model").n_items()
+            self.filtered_model.n_items()
         }
         fn item(&self, position: u32) -> Option<glib::Object> {
-            self.filtered_model.get().expect("Filtered model").item(position)
+            self.filtered_model.item(position)
         }
     }
 
     impl PwNodeFilterModel {
+
+        fn set_nodetype(&self, nodetype: NodeType) {
+            self.nodetype.set(nodetype);
+
+            let filter = gtk::CustomFilter::new(move |obj| {
+                let node: &PwNodeObject = obj.downcast_ref().expect("PwNodeObject");
+                if nodetype == NodeType::Undefined {
+                    return !node.hidden();
+                }
+                node.nodetype() == nodetype && !node.hidden()
+            });
+
+            self.filtered_model.set_filter(Some(&filter));
+        }
+
         fn set_model(&self, new_model: Option<gio::ListModel>) {
-            let filtered_model = self.filtered_model.get().expect("Filtered model");
-            let removed = filtered_model.n_items();
+            let removed = self.filtered_model.n_items();
             let widget = self.obj();
 
             self.disconnect();
@@ -76,10 +75,9 @@ mod imp {
                     widget.items_changed(position, removed, added);
                 });
                 //handler.invoke::<()>(&[&new_model, &0u32, &0u32, &0u32]);
-                self.signalid
-                    .replace(Some(filtered_model.connect_closure("items-changed", true, handler)));
+                self.signalid.replace(Some(self.filtered_model.connect_closure("items-changed", true, handler)));
 
-                filtered_model.set_model(Some(&new_model));
+                self.filtered_model.set_model(Some(&new_model));
 
                 self.model.replace(Some(new_model));
             } else {
@@ -88,10 +86,9 @@ mod imp {
         }
 
         fn disconnect(&self) {
-            let filtered_model = self.filtered_model.get().expect("Filtered model");
-            filtered_model.set_model(gio::ListModel::NONE);
+            self.filtered_model.set_model(gio::ListModel::NONE);
             if let Some(id) = self.signalid.take() {
-                filtered_model.disconnect(id);
+                self.filtered_model.disconnect(id);
             }
         }
     }
@@ -107,9 +104,13 @@ impl PwNodeFilterModel {
     }
 
     pub fn get_node_pos_from_id(&self, id: u32) -> Option<u32> {
-        let pos: Option<usize> = self
-            .iter::<PwNodeObject>()
-            .position(|item| item.map_or(false, |item| item.boundid() == id));
+        let pos: Option<usize> = self.iter::<PwNodeObject>().position(|item| item.map_or(false, |item| item.boundid() == id));
         pos.map(|x| x as u32)
+    }
+}
+
+impl Default for PwNodeFilterModel {
+    fn default() -> Self {
+        Self::new(NodeType::Undefined, None::<gio::ListModel>)
     }
 }

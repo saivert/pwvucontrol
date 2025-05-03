@@ -18,7 +18,7 @@ use crate::macros::*;
 
 mod mixerapi;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Default, glib::Enum)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Default, glib::Enum)]
 #[enum_type(name = "NodeType")]
 pub enum NodeType {
     #[default]
