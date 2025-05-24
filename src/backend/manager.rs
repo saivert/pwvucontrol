@@ -149,7 +149,7 @@ mod imp {
                 if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
                     let mut hidden: bool = false;
                     // Hide ourselves.
-                    if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
+                    if node.name().unwrap_or_default() == "PulseAudio Volume Control" {
                         hidden = true;
                     }
 
