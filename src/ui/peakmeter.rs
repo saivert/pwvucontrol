@@ -94,7 +94,7 @@ mod imp {
         fn measure(&self, orientation: gtk::Orientation, _for_size: i32) -> (i32, i32, i32, i32) {
             match orientation {
                 gtk::Orientation::Horizontal => (10, 10, -1, -1),
-                gtk::Orientation::Vertical => (10, 20, -1, -1),
+                gtk::Orientation::Vertical => (10, 10, -1, -1),
                 _ => panic!("Invalid orientation passed to measure"),
             }
         }
