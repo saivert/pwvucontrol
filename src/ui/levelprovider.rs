@@ -45,6 +45,7 @@ impl LevelbarProvider {
             "node.rate" => "1/25",
             "node.latency" => "1/25",
             "node.name" => "PulseAudio Volume Control",
+            "node.passive" => "true",
             "media.name" => "Peak detect",
             "resample.peaks" => "true",
             "stream.monitor" => "true",
