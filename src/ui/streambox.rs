@@ -7,10 +7,11 @@ use crate::{
 };
 use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
-use std::cell::RefCell;
+use std::cell::OnceCell;
 use wireplumber as wp;
 
 mod imp {
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -18,7 +19,7 @@ mod imp {
     #[properties(wrapper_type = super::PwStreamBox)]
     pub struct PwStreamBox {
         #[property(get, set, construct_only)]
-        pub(super) node_object: RefCell<Option<PwNodeObject>>,
+        pub(super) node_object: OnceCell<PwNodeObject>,
 
         #[template_child]
         pub volumebox: TemplateChild<PwVolumeBox>,
@@ -48,7 +49,7 @@ mod imp {
             let manager = PwvucontrolManager::default();
 
             let obj = self.obj();
-            let item = obj.node_object().expect("nodeobj");
+            let item = obj.node_object();
 
             self.volumebox.set_node_object(&item);
 
@@ -102,7 +103,7 @@ impl PwStreamBox {
     fn update_output_device_dropdown(&self) {
         let manager = PwvucontrolManager::default();
 
-        let item = self.node_object().expect("nodeobj");
+        let item = self.node_object();
 
         let stream_model = match item.nodetype() {
             crate::backend::NodeType::StreamInput => manager.source_model(),
