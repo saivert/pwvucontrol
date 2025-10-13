@@ -46,6 +46,15 @@ mod imp {
         #[template_child]
         pub info_banner: TemplateChild<adw::Banner>,
 
+        #[template_child]
+        pub playbackviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub recordviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub inputviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub outputviewstack: TemplateChild<gtk::Stack>,
+
         pub settings: gio::Settings,
 
         pub beep_elapsed: Cell<time::Instant>,
@@ -65,6 +74,10 @@ mod imp {
                 reconnectbtn: TemplateChild::default(),
                 settings: gio::Settings::new(APP_ID),
                 info_banner: TemplateChild::default(),
+                playbackviewstack: TemplateChild::default(),
+                recordviewstack: TemplateChild::default(),
+                inputviewstack: TemplateChild::default(),
+                outputviewstack: TemplateChild::default(),
                 beep_elapsed: Cell::new(std::time::Instant::now()),
             }
         }
@@ -93,6 +106,17 @@ mod imp {
             if PROFILE == "Devel" {
                 self.obj().add_css_class("devel");
             }
+
+            self.stack.set_visible_child_name(&self.settings.string("last-tab-name"));
+
+            self.stack.connect_visible_child_name_notify(clone!(@weak self as widget => move |stack| {
+                if let Some(name) = stack.visible_child_name(){
+                    if widget.settings.set_string("last-tab-name", &name).is_err() {
+                        crate::pwvucontrol_warning!("Unable to save tab to gsettings");
+                    }
+                }
+            }));
+            
 
             crate::ui::remember_window_size(self.obj().upcast_ref(), &self.settings);
 
@@ -133,6 +157,13 @@ mod imp {
                 }),
             );
 
+            manager.stream_output_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.playbackviewstack.set_visible_child_name("empty"),
+                    _ => widget.playbackviewstack.set_visible_child_name("notempty")
+                }
+            }));
+
             self.recordlist.bind_model(
                 Some(&manager.stream_input_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
@@ -143,6 +174,13 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
+            
+            manager.stream_input_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.recordviewstack.set_visible_child_name("empty"),
+                    _ => widget.recordviewstack.set_visible_child_name("notempty")
+                }
+            }));
 
             self.inputlist.bind_model(
                 Some(&manager.source_model()),
@@ -155,6 +193,13 @@ mod imp {
                 }),
             );
 
+            manager.source_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.inputviewstack.set_visible_child_name("empty"),
+                    _ => widget.inputviewstack.set_visible_child_name("notempty")
+                }
+            }));
+
             self.outputlist.bind_model(
                 Some(&manager.sink_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
@@ -165,6 +210,13 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
+
+            manager.sink_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.outputviewstack.set_visible_child_name("empty"),
+                    _ => widget.outputviewstack.set_visible_child_name("notempty")
+                }
+            }));
 
             self.cardlist.bind_model(
                 Some(&manager.device_model()),

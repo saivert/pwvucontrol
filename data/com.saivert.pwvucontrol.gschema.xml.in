@@ -31,5 +31,10 @@
             <summary>Play system beep on volume change</summary>
             <description>Lets you preview the sound level even if you don't play any audio.</description>
         </key>
+        <key name="last-tab-name" type="s">
+            <default>"playback"</default>
+            <summary>The last tab that was open</summary>
+            <description>Stores the last tab that was open.</description>
+        </key>
 	</schema>
 </schemalist>

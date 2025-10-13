@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 20:11+0100\n"
+"POT-Creation-Date: 2025-10-13 22:10+0200\n"
 "PO-Revision-Date: 2024-08-18 23:07+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,18 +18,19 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:3
+#: data/com.saivert.pwvucontrol.desktop.in.in:2
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
 msgid "pwvucontrol"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:4 data/resources/ui/window.ui:11
+#: data/com.saivert.pwvucontrol.desktop.in.in:3 data/resources/ui/window.ui:11
 msgid "Pipewire Volume Control"
 msgstr "Controle des volumes PipeWire"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:10
-msgid "Volume"
-msgstr ""
+#: data/com.saivert.pwvucontrol.desktop.in.in:9
+#, fuzzy
+msgid "PipeWire;Volume;Audio;Mixer;Control;Sound"
+msgstr "Controle des volumes PipeWire"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -176,6 +177,14 @@ msgstr ""
 msgid "Lets you preview the sound level even if you don't play any audio."
 msgstr ""
 
+#: data/com.saivert.pwvucontrol.gschema.xml.in:36
+msgid "The last tab that was open"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:37
+msgid "Stores the last tab that was open."
+msgstr ""
+
 #: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
 msgstr "Perte de connexion au serveur Pipewire !"
@@ -188,39 +197,57 @@ msgstr "Reconnecter"
 msgid "Playback"
 msgstr "Lecture"
 
-#: data/resources/ui/window.ui:127
+#: data/resources/ui/window.ui:98
+msgid "No applications currently playing audio"
+msgstr ""
+
+#: data/resources/ui/window.ui:152
 msgid "Recording"
 msgstr "Enregistrement"
 
-#: data/resources/ui/window.ui:167
+#: data/resources/ui/window.ui:163
+msgid "No applications currently recording audio"
+msgstr ""
+
+#: data/resources/ui/window.ui:217
 msgid "Input Devices"
 msgstr "Peripheriques d'entree"
 
-#: data/resources/ui/window.ui:207
+#: data/resources/ui/window.ui:227
+#, fuzzy
+msgid "No input devices found"
+msgstr "Peripheriques d'entree"
+
+#: data/resources/ui/window.ui:281
 msgid "Output Devices"
 msgstr "Peripheriques de sorties"
 
-#: data/resources/ui/window.ui:247
+#: data/resources/ui/window.ui:292
+#, fuzzy
+msgid "No output devices found"
+msgstr "Peripheriques de sorties"
+
+#: data/resources/ui/window.ui:347
 msgid "Cards"
 msgstr "Cartes"
 
-#: data/resources/ui/window.ui:299
+#: data/resources/ui/window.ui:399
 msgid "_Enable over-amplification"
 msgstr "_Activer la suramplification"
 
-#: data/resources/ui/window.ui:303
+#: data/resources/ui/window.ui:403
 msgid "Use led peak meter"
 msgstr ""
 
-#: data/resources/ui/window.ui:307
+#: data/resources/ui/window.ui:407
 msgid "_Keyboard Shortcuts"
 msgstr "_Raccourcis clavier"
 
-#: data/resources/ui/window.ui:311
+#: data/resources/ui/window.ui:411
 msgid "Beep on volume changes"
 msgstr ""
 
-#: data/resources/ui/window.ui:315
+#: data/resources/ui/window.ui:415
 msgid "_About Pwvucontrol"
 msgstr "A propos de Pwvucontrol"
 
@@ -243,6 +270,15 @@ msgstr "Ouvrir le menu"
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Quitter"
+
+#: data/resources/ui/volumebox.ui:81
+msgid "Mute audio"
+msgstr ""
+
+#: data/resources/ui/volumebox.ui:95
+#, fuzzy
+msgid "Lock channels together"
+msgstr "Verrouiller les canaux"
 
 #: data/resources/ui/volumebox.ui:133
 msgid "_Advanced"
@@ -268,15 +304,15 @@ msgstr ""
 msgid "on"
 msgstr "marche"
 
-#: src/main.rs:71
+#: src/main.rs:67
 msgid "Could not load resources"
 msgstr "Impossible de charger les ressources"
 
-#: src/ui/streambox.rs:123
+#: src/ui/streambox.rs:126 src/ui/streambox.rs:129
 msgid "Default ({})"
 msgstr "Defaut ({})"
 
-#: src/ui/streambox.rs:128
+#: src/ui/streambox.rs:131
 msgid "Default"
 msgstr "Defaut"
 
@@ -292,12 +328,12 @@ msgstr ""
 msgid "150%"
 msgstr ""
 
-#: src/ui/window.rs:307
+#: src/ui/window.rs:312
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr ""
 "Aucune carte son n'est detectee. Verifier la configuration de PipeWire."
 
-#: src/ui/window.rs:309
+#: src/ui/window.rs:314
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr ""
 "Aucun peripherique sonore n'est detecte. Verifier les profils dans l'onglet "

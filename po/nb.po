@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 20:11+0100\n"
+"POT-Creation-Date: 2025-10-13 22:10+0200\n"
 "PO-Revision-Date: 2023-06-13 22:28+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,18 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:3
+#: data/com.saivert.pwvucontrol.desktop.in.in:2
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
 msgid "pwvucontrol"
 msgstr "pwvucontrol"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:4 data/resources/ui/window.ui:11
+#: data/com.saivert.pwvucontrol.desktop.in.in:3 data/resources/ui/window.ui:11
 msgid "Pipewire Volume Control"
 msgstr "Pipewire volumkontroll"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:10
-msgid "Volume"
-msgstr "Lydnivå"
+#: data/com.saivert.pwvucontrol.desktop.in.in:9
+msgid "PipeWire;Volume;Audio;Mixer;Control;Sound"
+msgstr "PipeWire;Volume;Audio;Mixer;Kontroll;Lyd"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -173,6 +173,14 @@ msgstr "Spill pipelyd ved lydnivåendringer"
 msgid "Lets you preview the sound level even if you don't play any audio."
 msgstr "Lar deg lytte til lydnivået selv om du ikke spiller av noe lyd."
 
+#: data/com.saivert.pwvucontrol.gschema.xml.in:36
+msgid "The last tab that was open"
+msgstr "Den siste fanen som var åpen"
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:37
+msgid "Stores the last tab that was open."
+msgstr "Lagrer den siste fanen som var åpen"
+
 #: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
 msgstr "Mistet forbindelsen med Pipewire server!"
@@ -185,39 +193,57 @@ msgstr "Koble til på nytt"
 msgid "Playback"
 msgstr "Avspilling"
 
-#: data/resources/ui/window.ui:127
+#: data/resources/ui/window.ui:98
+msgid "No applications currently playing audio"
+msgstr "Ingen programmer spiller av lyd"
+
+#: data/resources/ui/window.ui:152
 msgid "Recording"
 msgstr "Opptak"
 
-#: data/resources/ui/window.ui:167
+#: data/resources/ui/window.ui:163
+msgid "No applications currently recording audio"
+msgstr "Ingen programmer tar opp lyd"
+
+#: data/resources/ui/window.ui:217
 msgid "Input Devices"
 msgstr "Inngangsenheter"
 
-#: data/resources/ui/window.ui:207
+#: data/resources/ui/window.ui:227
+#, fuzzy
+msgid "No input devices found"
+msgstr "Inngangsenheter"
+
+#: data/resources/ui/window.ui:281
 msgid "Output Devices"
 msgstr "Utgangsenheter"
 
-#: data/resources/ui/window.ui:247
+#: data/resources/ui/window.ui:292
+#, fuzzy
+msgid "No output devices found"
+msgstr "Utgangsenheter"
+
+#: data/resources/ui/window.ui:347
 msgid "Cards"
 msgstr "Lydkort"
 
-#: data/resources/ui/window.ui:299
+#: data/resources/ui/window.ui:399
 msgid "_Enable over-amplification"
 msgstr "Aktiver over-_forsterkning"
 
-#: data/resources/ui/window.ui:303
+#: data/resources/ui/window.ui:403
 msgid "Use led peak meter"
 msgstr "Bruk LED lydindikator"
 
-#: data/resources/ui/window.ui:307
+#: data/resources/ui/window.ui:407
 msgid "_Keyboard Shortcuts"
 msgstr "_Hurtigtaster"
 
-#: data/resources/ui/window.ui:311
+#: data/resources/ui/window.ui:411
 msgid "Beep on volume changes"
 msgstr "Spill pipelyd ved lydnivåendringer"
 
-#: data/resources/ui/window.ui:315
+#: data/resources/ui/window.ui:415
 msgid "_About Pwvucontrol"
 msgstr "_Om Pwvucontrol"
 
@@ -240,6 +266,15 @@ msgstr "Åpne applikasjonsmeny"
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Avslutt"
+
+#: data/resources/ui/volumebox.ui:81
+msgid "Mute audio"
+msgstr "Demp lyd"
+
+#: data/resources/ui/volumebox.ui:95
+#, fuzzy
+msgid "Lock channels together"
+msgstr "Lås kanaler"
 
 #: data/resources/ui/volumebox.ui:133
 msgid "_Advanced"
@@ -265,15 +300,15 @@ msgstr "Port:"
 msgid "on"
 msgstr "på"
 
-#: src/main.rs:71
+#: src/main.rs:67
 msgid "Could not load resources"
 msgstr "Kan ikke laste ressurser"
 
-#: src/ui/streambox.rs:123
+#: src/ui/streambox.rs:126 src/ui/streambox.rs:129
 msgid "Default ({})"
 msgstr "Standard ({})"
 
-#: src/ui/streambox.rs:128
+#: src/ui/streambox.rs:131
 msgid "Default"
 msgstr "Standard"
 
@@ -289,10 +324,13 @@ msgstr "100%"
 msgid "150%"
 msgstr "150%"
 
-#: src/ui/window.rs:307
+#: src/ui/window.rs:312
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr "Ingen lydkort oppdaget. Sjekk pipewire konfigurasjonen."
 
-#: src/ui/window.rs:309
+#: src/ui/window.rs:314
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr "Ingen lydenheter oppdaget. Sjekk profiler i fanen for Lydkort."
+
+#~ msgid "Volume"
+#~ msgstr "Lydnivå"

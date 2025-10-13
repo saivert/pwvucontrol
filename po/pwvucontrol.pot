@@ -3,11 +3,12 @@
 # This file is distributed under the same license as the pwvucontrol package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+
 msgid ""
 msgstr ""
 "Project-Id-Version: pwvucontrol\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-17 20:11+0100\n"
+"POT-Creation-Date: 2025-10-13 22:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,17 +17,17 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:3
+#: data/com.saivert.pwvucontrol.desktop.in.in:2
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:7
 msgid "pwvucontrol"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:4 data/resources/ui/window.ui:11
+#: data/com.saivert.pwvucontrol.desktop.in.in:3 data/resources/ui/window.ui:11
 msgid "Pipewire Volume Control"
 msgstr ""
 
-#: data/com.saivert.pwvucontrol.desktop.in.in:10
-msgid "Volume"
+#: data/com.saivert.pwvucontrol.desktop.in.in:9
+msgid "PipeWire;Volume;Audio;Mixer;Control;Sound"
 msgstr ""
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
@@ -169,6 +170,14 @@ msgstr ""
 msgid "Lets you preview the sound level even if you don't play any audio."
 msgstr ""
 
+#: data/com.saivert.pwvucontrol.gschema.xml.in:36
+msgid "The last tab that was open"
+msgstr ""
+
+#: data/com.saivert.pwvucontrol.gschema.xml.in:37
+msgid "Stores the last tab that was open."
+msgstr ""
+
 #: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
 msgstr ""
@@ -181,39 +190,55 @@ msgstr ""
 msgid "Playback"
 msgstr ""
 
-#: data/resources/ui/window.ui:127
+#: data/resources/ui/window.ui:98
+msgid "No applications currently playing audio"
+msgstr ""
+
+#: data/resources/ui/window.ui:152
 msgid "Recording"
 msgstr ""
 
-#: data/resources/ui/window.ui:167
+#: data/resources/ui/window.ui:163
+msgid "No applications currently recording audio"
+msgstr ""
+
+#: data/resources/ui/window.ui:217
 msgid "Input Devices"
 msgstr ""
 
-#: data/resources/ui/window.ui:207
+#: data/resources/ui/window.ui:227
+msgid "No input devices found"
+msgstr ""
+
+#: data/resources/ui/window.ui:281
 msgid "Output Devices"
 msgstr ""
 
-#: data/resources/ui/window.ui:247
+#: data/resources/ui/window.ui:292
+msgid "No output devices found"
+msgstr ""
+
+#: data/resources/ui/window.ui:347
 msgid "Cards"
 msgstr ""
 
-#: data/resources/ui/window.ui:299
+#: data/resources/ui/window.ui:399
 msgid "_Enable over-amplification"
 msgstr ""
 
-#: data/resources/ui/window.ui:303
+#: data/resources/ui/window.ui:403
 msgid "Use led peak meter"
 msgstr ""
 
-#: data/resources/ui/window.ui:307
+#: data/resources/ui/window.ui:407
 msgid "_Keyboard Shortcuts"
 msgstr ""
 
-#: data/resources/ui/window.ui:311
+#: data/resources/ui/window.ui:411
 msgid "Beep on volume changes"
 msgstr ""
 
-#: data/resources/ui/window.ui:315
+#: data/resources/ui/window.ui:415
 msgid "_About Pwvucontrol"
 msgstr ""
 
@@ -235,6 +260,14 @@ msgstr ""
 #: data/resources/ui/help-overlay.ui:27
 msgctxt "shortcut window"
 msgid "Quit"
+msgstr ""
+
+#: data/resources/ui/volumebox.ui:81
+msgid "Mute audio"
+msgstr ""
+
+#: data/resources/ui/volumebox.ui:95
+msgid "Lock channels together"
 msgstr ""
 
 #: data/resources/ui/volumebox.ui:133
@@ -261,15 +294,15 @@ msgstr ""
 msgid "on"
 msgstr ""
 
-#: src/main.rs:71
+#: src/main.rs:67
 msgid "Could not load resources"
 msgstr ""
 
-#: src/ui/streambox.rs:123
+#: src/ui/streambox.rs:126 src/ui/streambox.rs:129
 msgid "Default ({})"
 msgstr ""
 
-#: src/ui/streambox.rs:128
+#: src/ui/streambox.rs:131
 msgid "Default"
 msgstr ""
 
@@ -285,10 +318,10 @@ msgstr ""
 msgid "150%"
 msgstr ""
 
-#: src/ui/window.rs:307
+#: src/ui/window.rs:312
 msgid "No sound cards detected. Check pipewire configuration."
 msgstr ""
 
-#: src/ui/window.rs:309
+#: src/ui/window.rs:314
 msgid "No sound devices detected. Check profiles in Card tab."
 msgstr ""
