@@ -117,6 +117,18 @@ mod imp {
                 }
             }));
             
+            let action_switchtab = gio::ActionEntry::builder("switchtab")
+                .parameter_type(Some(&i32::static_variant_type()))
+                .activate(move |window: &super::PwvucontrolWindow, _action, parameter| {
+                    let parameter = parameter
+                        .expect("Could not get parameter.")
+                        .get::<i32>()
+                        .expect("The variant needs to be of type `i32`.");
+
+                    window.select_tab(parameter);
+                })
+                .build();
+            self.obj().add_action_entries([action_switchtab]);
 
             crate::ui::remember_window_size(self.obj().upcast_ref(), &self.settings);
 

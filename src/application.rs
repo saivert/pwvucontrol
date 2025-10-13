@@ -42,6 +42,12 @@ mod imp {
             let obj = self.obj();
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
+
+            obj.set_accels_for_action("win.switchtab(1)", &["<alt>1"]);
+            obj.set_accels_for_action("win.switchtab(2)", &["<alt>2"]);
+            obj.set_accels_for_action("win.switchtab(3)", &["<alt>3"]);
+            obj.set_accels_for_action("win.switchtab(4)", &["<alt>4"]);
+            obj.set_accels_for_action("win.switchtab(5)", &["<alt>5"]);
         }
     }
 
