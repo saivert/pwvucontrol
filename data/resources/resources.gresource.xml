@@ -23,5 +23,7 @@
      <file preprocess="xml-stripblanks" alias="output-symbolic.svg">ui/output-symbolic.svg</file>
      <file preprocess="xml-stripblanks" alias="soundcard-symbolic.svg">ui/soundcard-symbolic.svg</file>
      <file preprocess="xml-stripblanks" alias="lock-small-symbolic.svg">ui/lock-small-symbolic.svg</file>
+     <file preprocess="xml-stripblanks" alias="pwvucontrol-speakers-symbolic.svg">ui/speakers-symbolic.svg</file>
+     <file preprocess="xml-stripblanks" alias="pwvucontrol-microphone-symbolic.svg">ui/microphone-symbolic.svg</file>
   </gresource>
 </gresources>

@@ -85,7 +85,7 @@
                       <object class="AdwViewStackPage">
                         <property name="name">playback</property>
                         <property name="title" translatable="yes">Playback</property>
-                        <property name="icon-name">audio-speakers-symbolic</property>
+                        <property name="icon-name">pwvucontrol-speakers-symbolic</property>
                         <property name="child">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
@@ -125,7 +125,7 @@
                         <property name="visible">true</property>
                         <property name="name">recording</property>
                         <property name="title" translatable="yes">Recording</property>
-                        <property name="icon-name">audio-input-microphone-symbolic</property>
+                        <property name="icon-name">pwvucontrol-microphone-symbolic</property>
                         <property name="child">
                           <object class="GtkScrolledWindow">
                             <property name="hscrollbar-policy">never</property>
