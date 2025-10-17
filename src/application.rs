@@ -113,8 +113,8 @@ impl PwvucontrolApplication {
             .property("resource-base-path", "/com/saivert/pwvucontrol")
             .build();
 
-        app.add_main_option("tab", glib::Char('t' as i8), OptionFlags::NONE, OptionArg::Int, "Select tab to open.", Some("number"));
-        app.add_main_option("version", glib::Char('v' as i8), OptionFlags::NONE, OptionArg::None, "Show version.", None);
+        app.add_main_option("tab", b't'.into(), OptionFlags::NONE, OptionArg::Int, "Select tab to open.", Some("number"));
+        app.add_main_option("version", b'v'.into(), OptionFlags::NONE, OptionArg::None, "Show version.", None);
 
         ApplicationExtManual::run(&app)
     }
