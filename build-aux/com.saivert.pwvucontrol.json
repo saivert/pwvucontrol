@@ -1,11 +1,11 @@
 {
     "app-id": "com.saivert.pwvucontrol",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "48",
+    "runtime-version": "49",
     "sdk": "org.gnome.Sdk",
     "sdk-extensions": [
         "org.freedesktop.Sdk.Extension.rust-stable",
-        "org.freedesktop.Sdk.Extension.llvm18"
+        "org.freedesktop.Sdk.Extension.llvm20"
     ],
     "command": "pwvucontrol",
     "finish-args": [
@@ -54,7 +54,7 @@
             "sources": [
                 {
                     "type": "git",
-                    "tag": "0.4.16",
+                    "tag": "0.5.12",
                     "url": "https://github.com/PipeWire/wireplumber.git"
                 }
             ]

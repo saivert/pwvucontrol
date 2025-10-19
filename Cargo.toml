@@ -19,9 +19,13 @@ pipewire = "0.8"
 formatx = "0.2.3"
 
 [dependencies.wireplumber]
+version = "0.2"
 git = "https://github.com/arcnmx/wireplumber.rs.git"
-rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda"
-features = ["v0_4_16"]
+branch = "wp-0.5"
+features = ["v0_5"]
+
+#rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda"
+#features = ["v0_4_16"]
 
 [dependencies.adw]
 package = "libadwaita"

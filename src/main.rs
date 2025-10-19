@@ -25,6 +25,10 @@ mod config {
 }
 mod macros;
 
+log_topic! {
+   static TOPIC = "pwvucontrol";
+}
+
 mod application;
 mod backend;
 mod ui;
@@ -39,6 +43,7 @@ use self::application::PwvucontrolApplication;
 use self::config::{GETTEXT_PACKAGE, LOCALEDIR, RESOURCES_FILE};
 use gettextrs::{bind_textdomain_codeset, bindtextdomain, gettext, textdomain};
 use gtk::gio;
+use wireplumber::log_topic;
 
 fn path_override_from_env<K>(var: K, default: K, append: Option<K>) -> OsString
 where

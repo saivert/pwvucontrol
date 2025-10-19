@@ -11,12 +11,16 @@ use gtk::{
 use std::cell::{OnceCell, RefCell};
 use wireplumber as wp;
 use wp::{
-    plugin::{PluginFeatures, *},
+    plugin::*,
     pw::{MetadataExt, PipewireObjectExt2, ProxyExt},
     registry::{Constraint, ConstraintType, Interest, ObjectManager},
 };
 
 mod imp {
+    use std::cell::Cell;
+
+    use wireplumber::core::ObjectExt2;
+
     use super::*;
 
     #[derive(Properties)]
@@ -56,6 +60,8 @@ mod imp {
 
         #[property(get, set, construct_only)]
         application: RefCell<Option<PwvucontrolApplication>>,
+
+        pub plugin_count: Cell<u32>,
     }
 
     impl Default for PwvucontrolManager {
@@ -75,6 +81,7 @@ mod imp {
                 default_nodes_api: Default::default(),
                 mixer_api: Default::default(),
                 application: Default::default(),
+                plugin_count: Default::default(),
             }
         }
     }
@@ -99,19 +106,14 @@ mod imp {
         fn setup_wp_connection(&self) {
             wp::core::Core::init_with_flags(wp::InitFlags::ALL);
 
-            if !wp::Log::level_is_enabled(glib::LogLevelFlags::LEVEL_WARNING) {
-                wp::Log::set_default_level("1");
-            }
+            wp::Log::set_default_level("3");
 
             let props = wp::pw::Properties::new_string("media.category=Manager");
 
-            let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), Some(props));
+            let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), None, Some(props));
             let wp_om = ObjectManager::new();
 
             wp_core.connect();
-
-            wp_core.load_component("libwireplumber-module-mixer-api", "module", None).expect("loadig mixer-api plugin");
-            wp_core.load_component("libwireplumber-module-default-nodes-api", "module", None).expect("loadig mixer-api plugin");
 
             wp_om.add_interest({
                 let interest: Interest<wp::pw::Node> = wp::registry::Interest::new();
@@ -197,11 +199,20 @@ mod imp {
             }));
 
             glib::MainContext::default().spawn_local(clone!(@weak self as manager, @weak wp_core as core, @weak wp_om as om => async move {
-                let plugin_names = vec![("mixer-api", &manager.mixer_api), ("default-nodes-api", &manager.default_nodes_api)];
+                let plugins = [
+                    ("libwireplumber-module-mixer-api", "mixer-api", &manager.mixer_api),
+                    ("libwireplumber-module-default-nodes-api", "default-nodes-api", &manager.default_nodes_api)
+                ];
 
                 let mut count = 0;
-                for (plugin_name, plugin_cell) in plugin_names.iter() {
+                for (component_name, plugin_name, plugin_cell) in plugins.iter() {
+                    if core.load_component_future(Some(std::borrow::Cow::Borrowed(component_name)), ComponentLoader::TYPE_WIREPLUMBER_MODULE, None, None).await.is_err() {
+                        pwvucontrol_critical!("Cannot load component {component_name}");
+                        PwvucontrolApplication::default().quit();
+                        return;
+                    }
                     if let Some(plugin) = Plugin::find(&core, plugin_name) {
+                        
                         let result = plugin.activate_future(PluginFeatures::ENABLED).await;
                         if result.is_err() {
                             pwvucontrol_critical!("Cannot activate plugin {plugin_name}");
@@ -209,7 +220,7 @@ mod imp {
                             plugin_cell.set(plugin).expect("Plugin not set");
                             pwvucontrol_info!("Activated plugin {plugin_name}");
                             count += 1;
-                            if count == plugin_names.len() {
+                            if count == plugins.len() {
                                 core.install_object_manager(&om);
                             }
                         }
@@ -265,10 +276,10 @@ mod imp {
             if let Some(metadataobj) = object.dynamic_cast_ref::<wp::pw::Metadata>() {
                 self.metadata.replace(Some(metadataobj.clone()));
 
-                for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
-                    let (s, k, t, v) = wp::pw::Metadata::iterator_item_extract(&a);
-                    self.metadata_changed(s, Some(&k), Some(&t), Some(&v));
-                }
+                // TODO: Fix when bindings for WpMetadataitem are available.
+                // for a in metadataobj.new_iterator(u32::MAX).expect("iterator") {
+                //     pwvucontrol_info!("Metadata item: {:?}", a);
+                // }
 
                 metadataobj.connect_changed(clone!(@weak self as manager => move |_,s,k,t,v| manager.metadata_changed(s, k, t, v)));
             } else {
