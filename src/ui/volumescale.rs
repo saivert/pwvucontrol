@@ -47,6 +47,10 @@ mod imp {
 
     #[glib::derived_properties]
     impl ObjectImpl for PwVolumeScale {
+        fn dispose(&self) {
+            self.dispose_template();
+        }
+        
         fn constructed(&self) {
             self.parent_constructed();
 

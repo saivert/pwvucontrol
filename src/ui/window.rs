@@ -99,6 +99,10 @@ mod imp {
     }
 
     impl ObjectImpl for PwvucontrolWindow {
+        fn dispose(&self) {
+            self.dispose_template();
+        }
+        
         fn constructed(&self) {
             self.parent_constructed();
 

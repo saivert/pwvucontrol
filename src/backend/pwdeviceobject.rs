@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::backend::{ParamAvailability, PwProfileObject};
-use glib::{
+use gtk::glib::{
     self, clone,
     subclass::{prelude::*, Signal},
     ParamSpec, Properties, Value,
