@@ -240,6 +240,8 @@ impl PwDeviceObject {
 
         podbuilder.add_property("index");
         podbuilder.add_int(index);
+        podbuilder.add_property("save");
+        podbuilder.add_boolean(true);
 
         if let Some(pod) = podbuilder.end() {
             device.set_param("Profile", 0, pod);
