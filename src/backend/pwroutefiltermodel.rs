@@ -57,7 +57,7 @@ mod imp {
                 assert!(self.item_type().is_a(new_model.item_type()));
 
                 let widget = self.obj();
-                let handler = closure_local!(@watch widget => move |listmodel: &gio::ListModel, position: u32, _removed: u32, _added: u32| {
+                let handler = closure_local!(#[watch] widget, move |listmodel: &gio::ListModel, position: u32, _removed: u32, _added: u32| {
                     let removed = widget.imp().hashset.borrow().len() as u32;
 
                     let mut hashset = OrdSet::new();

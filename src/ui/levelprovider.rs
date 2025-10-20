@@ -56,7 +56,7 @@ impl LevelbarProvider {
 
         let listener = stream
             .add_local_listener::<f32>()
-            .process(clone!(@weak volumebox => @default-return (), move |stream, last_peak| {
+            .process(clone!(#[weak] volumebox, move |stream, last_peak| {
                 match stream.dequeue_buffer() {
                     None => println!("No buffer received"),
                     Some(mut buffer) => {
@@ -78,7 +78,10 @@ impl LevelbarProvider {
                 };
             }))
             .state_changed(
-                clone!(@weak volumebox => @default-return (), move |_stream, _user_data, _oldstate, state| {
+                clone!(
+                    #[weak]
+                    volumebox,
+                    move |_stream, _user_data, _oldstate, state| {
                     if state == StreamState::Paused {
                         volumebox.set_level(0.0);
                     }

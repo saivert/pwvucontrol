@@ -19,6 +19,7 @@ use wp::{
 mod imp {
     use std::cell::Cell;
 
+    use glib::closure_local;
     use wireplumber::core::ObjectExt2;
 
     use super::*;
@@ -147,7 +148,10 @@ mod imp {
 
             wp_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
-            wp_om.connect_object_added(clone!(@weak self as imp, @weak wp_core as core => move |_, object| {
+            wp_om.connect_object_added(clone!(
+                #[weak(rename_to = imp)]
+                self,
+                move |_, object| {
                 if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
                     let mut hidden: bool = false;
                     // Hide ourselves.
@@ -187,7 +191,10 @@ mod imp {
                 }
             }));
 
-            wp_om.connect_object_removed(clone!(@weak self as imp => move |_, object| {
+            wp_om.connect_object_removed(clone!(
+                #[weak(rename_to = imp)]
+                self,
+                move |_, object| {
                 if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
                     pwvucontrol_info!("removed: {} id: {}", node.name().unwrap_or_default(), node.bound_id());
                     imp.obj().remove_node_by_id(node.bound_id());
@@ -198,7 +205,14 @@ mod imp {
                 }
             }));
 
-            glib::MainContext::default().spawn_local(clone!(@weak self as manager, @weak wp_core as core, @weak wp_om as om => async move {
+            glib::MainContext::default().spawn_local(clone!(
+                #[weak(rename_to = manager)]
+                self,
+                #[weak(rename_to = core)]
+                wp_core,
+                #[weak(rename_to = om)]
+                wp_om,
+                async move {
                 let plugins = [
                     ("libwireplumber-module-mixer-api", "mixer-api", &manager.mixer_api),
                     ("libwireplumber-module-default-nodes-api", "default-nodes-api", &manager.default_nodes_api)
@@ -249,7 +263,7 @@ mod imp {
             metadata_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
             metadata_om.connect_object_added(
-                clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)),
+                clone!(#[weak(rename_to = manager)] self, move |_, object| manager.metadata_object_added(object)),
             );
 
             wp_core.install_object_manager(&metadata_om);
@@ -281,7 +295,7 @@ mod imp {
                 //     pwvucontrol_info!("Metadata item: {:?}", a);
                 // }
 
-                metadataobj.connect_changed(clone!(@weak self as manager => move |_,s,k,t,v| manager.metadata_changed(s, k, t, v)));
+                metadataobj.connect_changed(clone!(#[weak(rename_to = manager)] self, move |_,s,k,t,v| manager.metadata_changed(s, k, t, v)));
             } else {
                 unreachable!("Object must be one of the above, but is {:?} instead", object.type_());
             }

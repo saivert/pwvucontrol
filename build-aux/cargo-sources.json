@@ -2,8 +2,8 @@
     {
         "type": "git",
         "url": "https://github.com/arcnmx/wireplumber.rs",
-        "commit": "6e48383a85aecfca22dac3ffc589fb3f25404eda",
-        "dest": "flatpak-cargo/git/wireplumber.rs-6e48383"
+        "commit": "f6f43324f231fe6f6508b417c20728ffa75eea80",
+        "dest": "flatpak-cargo/git/wireplumber.rs-f6f4332"
     },
     {
         "type": "archive",
@@ -658,14 +658,14 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/hashbrown/hashbrown-0.15.2.crate",
-        "sha256": "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289",
-        "dest": "cargo/vendor/hashbrown-0.15.2"
+        "url": "https://static.crates.io/crates/hashbrown/hashbrown-0.16.0.crate",
+        "sha256": "5419bdc4f6a9207fbeba6d11b604d481addf78ecd10c11ad51e76c2f6482748d",
+        "dest": "cargo/vendor/hashbrown-0.16.0"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289\", \"files\": {}}",
-        "dest": "cargo/vendor/hashbrown-0.15.2",
+        "contents": "{\"package\": \"5419bdc4f6a9207fbeba6d11b604d481addf78ecd10c11ad51e76c2f6482748d\", \"files\": {}}",
+        "dest": "cargo/vendor/hashbrown-0.16.0",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -710,14 +710,14 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/indexmap/indexmap-2.8.0.crate",
-        "sha256": "3954d50fe15b02142bf25d3b8bdadb634ec3948f103d04ffe3031bc8fe9d7058",
-        "dest": "cargo/vendor/indexmap-2.8.0"
+        "url": "https://static.crates.io/crates/indexmap/indexmap-2.12.0.crate",
+        "sha256": "6717a8d2a5a929a1a2eb43a12812498ed141a0bcfb7e8f7844fbdbe4303bba9f",
+        "dest": "cargo/vendor/indexmap-2.12.0"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"3954d50fe15b02142bf25d3b8bdadb634ec3948f103d04ffe3031bc8fe9d7058\", \"files\": {}}",
-        "dest": "cargo/vendor/indexmap-2.8.0",
+        "contents": "{\"package\": \"6717a8d2a5a929a1a2eb43a12812498ed141a0bcfb7e8f7844fbdbe4303bba9f\", \"files\": {}}",
+        "dest": "cargo/vendor/indexmap-2.12.0",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -879,14 +879,14 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/memchr/memchr-2.7.4.crate",
-        "sha256": "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3",
-        "dest": "cargo/vendor/memchr-2.7.4"
+        "url": "https://static.crates.io/crates/memchr/memchr-2.7.6.crate",
+        "sha256": "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273",
+        "dest": "cargo/vendor/memchr-2.7.6"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3\", \"files\": {}}",
-        "dest": "cargo/vendor/memchr-2.7.4",
+        "contents": "{\"package\": \"f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273\", \"files\": {}}",
+        "dest": "cargo/vendor/memchr-2.7.6",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -1230,27 +1230,40 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/serde/serde-1.0.219.crate",
-        "sha256": "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6",
-        "dest": "cargo/vendor/serde-1.0.219"
+        "url": "https://static.crates.io/crates/serde/serde-1.0.228.crate",
+        "sha256": "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e",
+        "dest": "cargo/vendor/serde-1.0.228"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6\", \"files\": {}}",
-        "dest": "cargo/vendor/serde-1.0.219",
+        "contents": "{\"package\": \"9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e\", \"files\": {}}",
+        "dest": "cargo/vendor/serde-1.0.228",
         "dest-filename": ".cargo-checksum.json"
     },
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/serde_derive/serde_derive-1.0.219.crate",
-        "sha256": "5b0276cf7f2c73365f7157c8123c21cd9a50fbbd844757af28ca1f5925fc2a00",
-        "dest": "cargo/vendor/serde_derive-1.0.219"
+        "url": "https://static.crates.io/crates/serde_core/serde_core-1.0.228.crate",
+        "sha256": "41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad",
+        "dest": "cargo/vendor/serde_core-1.0.228"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"5b0276cf7f2c73365f7157c8123c21cd9a50fbbd844757af28ca1f5925fc2a00\", \"files\": {}}",
-        "dest": "cargo/vendor/serde_derive-1.0.219",
+        "contents": "{\"package\": \"41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad\", \"files\": {}}",
+        "dest": "cargo/vendor/serde_core-1.0.228",
+        "dest-filename": ".cargo-checksum.json"
+    },
+    {
+        "type": "archive",
+        "archive-type": "tar-gzip",
+        "url": "https://static.crates.io/crates/serde_derive/serde_derive-1.0.228.crate",
+        "sha256": "d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79",
+        "dest": "cargo/vendor/serde_derive-1.0.228"
+    },
+    {
+        "type": "inline",
+        "contents": "{\"package\": \"d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79\", \"files\": {}}",
+        "dest": "cargo/vendor/serde_derive-1.0.228",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -1295,27 +1308,27 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/smallvec/smallvec-1.14.0.crate",
-        "sha256": "7fcf8323ef1faaee30a44a340193b1ac6814fd9b7b4e88e9d4519a3e4abe1cfd",
-        "dest": "cargo/vendor/smallvec-1.14.0"
+        "url": "https://static.crates.io/crates/smallvec/smallvec-1.15.1.crate",
+        "sha256": "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03",
+        "dest": "cargo/vendor/smallvec-1.15.1"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"7fcf8323ef1faaee30a44a340193b1ac6814fd9b7b4e88e9d4519a3e4abe1cfd\", \"files\": {}}",
-        "dest": "cargo/vendor/smallvec-1.14.0",
+        "contents": "{\"package\": \"67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03\", \"files\": {}}",
+        "dest": "cargo/vendor/smallvec-1.15.1",
         "dest-filename": ".cargo-checksum.json"
     },
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/syn/syn-2.0.100.crate",
-        "sha256": "b09a44accad81e1ba1cd74a32461ba89dee89095ba17b32f5d03683b1b1fc2a0",
-        "dest": "cargo/vendor/syn-2.0.100"
+        "url": "https://static.crates.io/crates/syn/syn-2.0.107.crate",
+        "sha256": "2a26dbd934e5451d21ef060c018dae56fc073894c5a7896f882928a76e6d081b",
+        "dest": "cargo/vendor/syn-2.0.107"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"b09a44accad81e1ba1cd74a32461ba89dee89095ba17b32f5d03683b1b1fc2a0\", \"files\": {}}",
-        "dest": "cargo/vendor/syn-2.0.100",
+        "contents": "{\"package\": \"2a26dbd934e5451d21ef060c018dae56fc073894c5a7896f882928a76e6d081b\", \"files\": {}}",
+        "dest": "cargo/vendor/syn-2.0.107",
         "dest-filename": ".cargo-checksum.json"
     },
     {
@@ -1659,25 +1672,25 @@
     {
         "type": "archive",
         "archive-type": "tar-gzip",
-        "url": "https://static.crates.io/crates/winnow/winnow-0.7.4.crate",
-        "sha256": "0e97b544156e9bebe1a0ffbc03484fc1ffe3100cbce3ffb17eac35f7cdd7ab36",
-        "dest": "cargo/vendor/winnow-0.7.4"
+        "url": "https://static.crates.io/crates/winnow/winnow-0.7.13.crate",
+        "sha256": "21a0236b59786fed61e2a80582dd500fe61f18b5dca67a4a067d0bc9039339cf",
+        "dest": "cargo/vendor/winnow-0.7.13"
     },
     {
         "type": "inline",
-        "contents": "{\"package\": \"0e97b544156e9bebe1a0ffbc03484fc1ffe3100cbce3ffb17eac35f7cdd7ab36\", \"files\": {}}",
-        "dest": "cargo/vendor/winnow-0.7.4",
+        "contents": "{\"package\": \"21a0236b59786fed61e2a80582dd500fe61f18b5dca67a4a067d0bc9039339cf\", \"files\": {}}",
+        "dest": "cargo/vendor/winnow-0.7.13",
         "dest-filename": ".cargo-checksum.json"
     },
     {
         "type": "shell",
         "commands": [
-            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-6e48383/.\" \"cargo/vendor/wireplumber\""
+            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-f6f4332/.\" \"cargo/vendor/wireplumber\""
         ]
     },
     {
         "type": "inline",
-        "contents": "[package]\nname = \"wireplumber\"\nversion = \"0.1.0\"\nauthors = [ \"arcnmx\",]\nbuild = \"build.rs\"\nedition = \"2021\"\nrust-version = \"1.70\"\ndescription = \"WirePlumber bindings\"\nkeywords = [ \"pipewire\", \"wireplumber\", \"gobject\",]\ncategories = [ \"multimedia::audio\", \"api-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.1.0/wireplumber/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/build.rs\", \"/COPYING*\",]\n\n[dependencies]\nlibc = \"0.2\"\nbitflags = \"2\"\n\n[build-dependencies]\npkg-config = \"0.3\"\nsemver = \"1.0\"\n\n[features]\ndefault = []\nexperimental = []\nglib-signal = [ \"dep:glib-signal\",]\nfutures = [ \"glib-signal?/futures\", \"dep:futures-channel\",]\nlibspa = [ \"dep:libspa\",]\nserde = [ \"dep:serde\",]\nv0_4_2 = [ \"ffi/v0_4_2\",]\nv0_4_3 = [ \"ffi/v0_4_3\", \"v0_4_2\",]\nv0_4_5 = [ \"ffi/v0_4_5\", \"v0_4_3\",]\nv0_4_6 = [ \"ffi/v0_4_6\", \"v0_4_5\",]\nv0_4_8 = [ \"ffi/v0_4_8\", \"v0_4_6\",]\nv0_4_10 = [ \"ffi/v0_4_10\", \"v0_4_8\",]\nv0_4_11 = [ \"ffi/v0_4_11\", \"v0_4_10\",]\nv0_4_12 = [ \"ffi/v0_4_12\", \"v0_4_11\",]\nv0_4_15 = [ \"ffi/v0_4_15\", \"v0_4_12\",]\nv0_4_16 = [ \"ffi/v0_4_16\", \"v0_4_15\",]\n\n[workspace]\nmembers = [ \"sys\", \"examples\",]\n\n[package.metadata]\nbranches = [ \"main\", \"dev\",]\n\n[badges.maintenance]\nstatus = \"actively-maintained\"\n\n[dependencies.glib]\nversion = \"0.19\"\n\n[dependencies.gio]\nversion = \"0.19\"\n\n[dependencies.pipewire-sys]\nversion = \"0.8\"\n\n[dependencies.libspa-sys]\nversion = \"0.8\"\n\n[dependencies.libspa]\nversion = \"0.8\"\noptional = true\n\n[dependencies.serde]\nversion = \"1.0\"\noptional = true\n\n[dependencies.ffi]\nversion = \"0.1.0\"\npath = \"sys\"\npackage = \"wireplumber-sys\"\n\n[dependencies.futures-channel]\nversion = \"0.3\"\noptional = true\n\n[dependencies.glib-signal]\nversion = \"0.4\"\noptional = true\n\n[dev-dependencies.futures-util]\nversion = \"0.3\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_4_16\", \"experimental\", \"glib-signal\", \"libspa\", \"futures\", \"serde\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n",
+        "contents": "[package]\nname = \"wireplumber\"\nversion = \"0.2.0\"\nauthors = [ \"arcnmx\",]\nbuild = \"build.rs\"\nedition = \"2021\"\nrust-version = \"1.70\"\ndescription = \"WirePlumber bindings\"\nkeywords = [ \"pipewire\", \"wireplumber\", \"gobject\",]\ncategories = [ \"multimedia::audio\", \"api-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.2.0/wireplumber/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/build.rs\", \"/COPYING*\",]\n\n[dependencies]\nlibc = \"0.2\"\nbitflags = \"2\"\n\n[build-dependencies]\npkg-config = \"0.3\"\nsemver = \"1.0\"\n\n[features]\ndefault = [ \"v0_5\",]\nlua = []\nexperimental = []\nglib-signal = [ \"dep:glib-signal\",]\nfutures = [ \"glib-signal?/futures\", \"dep:futures-channel\",]\nlibspa = [ \"dep:libspa\",]\nserde = [ \"dep:serde\",]\nv0_5 = [ \"ffi/v0_5\", \"v0_4_16\",]\nv0_4_2 = []\nv0_4_3 = [ \"v0_4_2\",]\nv0_4_5 = [ \"v0_4_3\",]\nv0_4_6 = [ \"v0_4_5\",]\nv0_4_8 = [ \"v0_4_6\",]\nv0_4_10 = [ \"v0_4_8\",]\nv0_4_11 = [ \"v0_4_10\",]\nv0_4_12 = [ \"v0_4_11\",]\nv0_4_15 = [ \"v0_4_12\",]\nv0_4_16 = [ \"v0_4_15\",]\n\n[workspace]\nmembers = [ \"sys\", \"examples\",]\n\n[package.metadata]\nbranches = [ \"main\", \"dev\",]\n\n[badges.maintenance]\nstatus = \"actively-maintained\"\n\n[dependencies.glib]\nversion = \"0.19\"\n\n[dependencies.gio]\nversion = \"0.19\"\n\n[dependencies.pipewire-sys]\nversion = \"0.8\"\n\n[dependencies.libspa-sys]\nversion = \"0.8\"\n\n[dependencies.libspa]\nversion = \"0.8\"\noptional = true\n\n[dependencies.serde]\nversion = \"1.0\"\noptional = true\n\n[dependencies.ffi]\nversion = \"0.2.0\"\npath = \"sys\"\npackage = \"wireplumber-sys\"\n\n[dependencies.futures-channel]\nversion = \"0.3\"\noptional = true\n\n[dependencies.glib-signal]\nversion = \"0.4\"\noptional = true\n\n[dev-dependencies.futures-util]\nversion = \"0.3\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_5\", \"lua\", \"experimental\", \"glib-signal\", \"libspa\", \"futures\", \"serde\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n",
         "dest": "cargo/vendor/wireplumber",
         "dest-filename": "Cargo.toml"
     },
@@ -1690,12 +1703,12 @@
     {
         "type": "shell",
         "commands": [
-            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-6e48383/sys\" \"cargo/vendor/wireplumber-sys\""
+            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-f6f4332/sys\" \"cargo/vendor/wireplumber-sys\""
         ]
     },
     {
         "type": "inline",
-        "contents": "[package]\nname = \"wireplumber-sys\"\nversion = \"0.1.0\"\nedition = \"2021\"\nbuild = \"./generate/build.rs\"\ndescription = \"WirePlumber FFI bindings\"\nkeywords = [ \"pipewire\",]\ncategories = [ \"external-ffi-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.1.0/wireplumber_sys/\"\nhomepage = \"https://arcnmx.github.io/wireplumber.rs/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs/tree/main/sys\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/generate/build.rs\", \"/generate/build_version.rs\", \"/generate/src/lib.rs\", \"/build.rs\",]\n\n[dependencies]\nlibc = \"0.2\"\n\n[build-dependencies]\nsystem-deps = \"6\"\n\n[dev-dependencies]\nshell-words = \"1.0.0\"\ntempfile = \"3\"\n\n[features]\nv0_4_2 = []\nv0_4_3 = [ \"v0_4_2\",]\nv0_4_5 = [ \"v0_4_3\",]\nv0_4_6 = [ \"v0_4_5\",]\nv0_4_8 = [ \"v0_4_6\",]\nv0_4_10 = [ \"v0_4_8\",]\nv0_4_11 = [ \"v0_4_10\",]\nv0_4_12 = [ \"v0_4_11\",]\nv0_4_15 = [ \"v0_4_12\",]\nv0_4_16 = [ \"v0_4_15\",]\n\n[dependencies.glib-sys]\nversion = \"0.19\"\n\n[dependencies.gobject-sys]\nversion = \"0.19\"\n\n[dependencies.gio-sys]\nversion = \"0.19\"\n\n[dependencies.pipewire]\nversion = \"0.8\"\npackage = \"pipewire-sys\"\n\n[dependencies.libspa]\nversion = \"0.8\"\npackage = \"libspa-sys\"\n\n[package.metadata.system-deps.wireplumber_0_4]\nname = \"wireplumber-0.4\"\nversion = \"0.4\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_4_16\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_2]\nversion = \"0.4.2\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_3]\nversion = \"0.4.3\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_5]\nversion = \"0.4.5\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_6]\nversion = \"0.4.6\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_8]\nversion = \"0.4.8\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_10]\nversion = \"0.4.10\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_11]\nversion = \"0.4.11\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_12]\nversion = \"0.4.12\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_15]\nversion = \"0.4.15\"\n\n[package.metadata.system-deps.wireplumber_0_4.v0_4_16]\nversion = \"0.4.16\"\n",
+        "contents": "[package]\nname = \"wireplumber-sys\"\nversion = \"0.2.0\"\nedition = \"2021\"\nbuild = \"./generate/build.rs\"\ndescription = \"WirePlumber FFI bindings\"\nkeywords = [ \"pipewire\",]\ncategories = [ \"external-ffi-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.2.0/wireplumber_sys/\"\nhomepage = \"https://arcnmx.github.io/wireplumber.rs/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs/tree/main/sys\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/generate/build.rs\", \"/generate/build_version.rs\", \"/generate/src/lib.rs\", \"/build.rs\",]\n\n[dependencies]\nlibc = \"0.2\"\n\n[build-dependencies]\nsystem-deps = \"6\"\n\n[dev-dependencies]\nshell-words = \"1.0.0\"\ntempfile = \"3\"\n\n[features]\ndefault = [ \"v0_5\",]\nv0_5 = []\n\n[dependencies.glib-sys]\nversion = \"0.19\"\n\n[dependencies.gobject-sys]\nversion = \"0.19\"\n\n[dependencies.gio-sys]\nversion = \"0.19\"\n\n[dependencies.pipewire]\nversion = \"0.8\"\npackage = \"pipewire-sys\"\n\n[dependencies.libspa]\nversion = \"0.8\"\npackage = \"libspa-sys\"\n\n[package.metadata.system-deps.wireplumber_0_5]\nname = \"wireplumber-0.5\"\nversion = \"0.5\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_5\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n",
         "dest": "cargo/vendor/wireplumber-sys",
         "dest-filename": "Cargo.toml"
     },
@@ -1720,7 +1733,7 @@
     },
     {
         "type": "inline",
-        "contents": "[source.vendored-sources]\ndirectory = \"cargo/vendor\"\n\n[source.crates-io]\nreplace-with = \"vendored-sources\"\n\n[source.\"https://github.com/arcnmx/wireplumber.rs\"]\ngit = \"https://github.com/arcnmx/wireplumber.rs\"\nreplace-with = \"vendored-sources\"\nrev = \"6e48383a85aecfca22dac3ffc589fb3f25404eda\"\n",
+        "contents": "[source.vendored-sources]\ndirectory = \"cargo/vendor\"\n\n[source.crates-io]\nreplace-with = \"vendored-sources\"\n\n[source.\"https://github.com/arcnmx/wireplumber.rs\"]\ngit = \"https://github.com/arcnmx/wireplumber.rs\"\nreplace-with = \"vendored-sources\"\nbranch = \"wp-0.5\"\n",
         "dest": "cargo",
         "dest-filename": "config"
     }

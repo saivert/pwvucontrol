@@ -9,8 +9,8 @@ sandboxed = []
 
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
-gtk = { version = "0.8.2", package = "gtk4", features = ["v4_12"] }
-glib = { version = "0.19", features = ["log"] }
+gtk = { version = "0.10.1", package = "gtk4", features = ["v4_12"] }
+glib = { version = "0.21", features = ["log"] }
 log = "0.4.11"
 imbl = "3.0.0"
 futures = "0.3"
@@ -20,14 +20,17 @@ formatx = "0.2.3"
 
 [dependencies.wireplumber]
 version = "0.2"
-git = "https://github.com/arcnmx/wireplumber.rs.git"
-branch = "wp-0.5"
 features = ["v0_5"]
+
+path = "/home/saivert/code/wireplumber.rs"
+
+#git = "https://github.com/arcnmx/wireplumber.rs.git"
+#branch = "wp-0.5"
 
 #rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda"
 #features = ["v0_4_16"]
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.6"
+version = "0.8.0"
 features = ["v1_4"]

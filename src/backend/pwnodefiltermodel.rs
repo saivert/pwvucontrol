@@ -72,7 +72,7 @@ mod imp {
             if let Some(new_model) = new_model {
                 assert!(self.item_type().is_a(new_model.item_type()));
 
-                let handler = closure_local!(@watch widget => move |_listmodel: &gio::ListModel, position: u32, removed: u32, added: u32| {
+                let handler = closure_local!(#[weak(rename_to = widget)] widget, move |_listmodel: &gio::ListModel, position: u32, removed: u32, added: u32| {
                     widget.items_changed(position, removed, added);
                 });
                 //handler.invoke::<()>(&[&new_model, &0u32, &0u32, &0u32]);

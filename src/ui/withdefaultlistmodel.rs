@@ -73,7 +73,7 @@ mod imp {
             let flattened_model = gtk::FlattenListModel::new(Some(composite_store));
 
             let widget = self.obj();
-            let handler = closure_local!(@watch widget => move |_listmodel: &gio::ListModel, position: u32, removed: u32, added: u32| {
+            let handler = closure_local!(#[watch] widget, move |_listmodel: &gio::ListModel, position: u32, removed: u32, added: u32| {
                 widget.items_changed(position, removed, added);
             });
             flattened_model.connect_closure("items-changed", true, handler);

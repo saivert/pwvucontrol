@@ -120,13 +120,16 @@ pub mod imp {
 
             obj.update_routes();
 
-            obj.wpdevice().connect_properties_notify(clone!(@weak obj => move |device| {
+            obj.wpdevice().connect_properties_notify(clone!(#[weak] obj, move |device| {
                 pwvucontrol_debug!("properties changed! id: {}", device.object_id().unwrap());
 
                 obj.label_set_name();
             }));
 
-            obj.wpdevice().connect_params_changed(clone!(@weak obj => move |device, what| {
+            obj.wpdevice().connect_params_changed(clone!(
+                #[weak]
+                obj,
+                move |device, what| {
                 pwvucontrol_debug!("params-changed! {what} id: {}", device.object_id().unwrap());
 
                 match what {
@@ -168,7 +171,7 @@ impl PwDeviceObject {
             Some("EnumProfile"),
             None,
             gtk::gio::Cancellable::NONE,
-            clone!(@weak self as widget => move |res| {
+            clone!(#[weak(rename_to = widget)] self, move |res| {
 
                 if let Ok(Some(iter)) = res {
                     let mut profiles: Vec<PwProfileObject> = Vec::new();
@@ -253,10 +256,11 @@ impl PwDeviceObject {
             Some("EnumRoute"),
             None,
             gtk::gio::Cancellable::NONE,
-            clone!(@weak self as widget => move |res| {
+            clone!(#[weak(rename_to = widget)] self, move |res| {
 
                 if let Ok(Some(iter)) = res {
                     let removed = widget.imp().routemodel.n_items();
+                    
 
                     let mut routes: Vec<PwRouteObject> = Vec::new();
 
