@@ -116,8 +116,6 @@ pub mod imp {
             obj.update_icon_name();
             obj.update_profiles();
 
-            obj.update_current_profile_index();
-
             obj.update_routes();
 
             obj.wpdevice().connect_properties_notify(clone!(@weak obj => move |device| {
