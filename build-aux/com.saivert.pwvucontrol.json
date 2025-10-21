@@ -1,11 +1,11 @@
 {
     "app-id": "com.saivert.pwvucontrol",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "48",
+    "runtime-version": "49",
     "sdk": "org.gnome.Sdk",
     "sdk-extensions": [
         "org.freedesktop.Sdk.Extension.rust-stable",
-        "org.freedesktop.Sdk.Extension.llvm18"
+        "org.freedesktop.Sdk.Extension.llvm20"
     ],
     "command": "pwvucontrol",
     "finish-args": [
@@ -18,8 +18,8 @@
         "--filesystem=xdg-run/pipewire-0"
     ],
     "build-options": {
-        "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm18/bin",
-        "prepend-ld-library-path": "/usr/lib/sdk/llvm18/lib",
+        "append-path": "/usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/llvm20/bin",
+        "prepend-ld-library-path": "/usr/lib/sdk/llvm20/lib",
         "env": {
             "CARGO_REGISTRIES_CRATES_IO_PROTOCOL": "sparse",
             "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "clang",
@@ -54,8 +54,12 @@
             "sources": [
                 {
                     "type": "git",
-                    "tag": "0.4.16",
+                    "tag": "0.4.17",
                     "url": "https://github.com/PipeWire/wireplumber.git"
+                },
+                {
+                    "type": "patch",
+                    "path": "0001-node-cast-proxy-to-pw_node-when-calling-pw_node-func.patch"
                 }
             ]
         },

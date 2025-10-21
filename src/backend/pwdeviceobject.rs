@@ -116,7 +116,8 @@ pub mod imp {
             obj.update_icon_name();
             obj.update_profiles();
 
-            obj.update_current_profile_index();
+            // Don't run this here as we need all the profiles to be loaded first:
+            // obj.update_current_profile_index();
 
             obj.update_routes();
 
