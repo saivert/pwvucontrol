@@ -78,8 +78,8 @@ mod imp {
             // Create our custom output dropdown widget and add it to the layout
             self.output_dropdown.set_nodeobj(Some(&item));
 
-            glib::idle_add_local_once(clone!(@weak self as widget => move || {
-                widget.obj().update_output_device_dropdown();
+            glib::idle_add_local_once(clone!(@weak widget => move || {
+                widget.update_output_device_dropdown();
             }));
         }
     }
