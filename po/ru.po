@@ -1,21 +1,21 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# SPDX-FileCopyrightText: 2024 Olesya Gerasimenko <translation-team@basealt.ru>
+# SPDX-FileCopyrightText: 2024, 2025 Olesya Gerasimenko <translation-team@basealt.ru>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-13 22:10+0200\n"
-"PO-Revision-Date: 2024-07-16 16:42+0300\n"
-"Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
+"PO-Revision-Date: 2025-10-20 09:25+0300\n"
+"Last-Translator: Olesya Gerasimenko <goa@altlinux.org>\n"
 "Language-Team: Basealt Translation Team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<"
+"=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Lokalize 23.08.5\n"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:2
@@ -28,9 +28,8 @@ msgid "Pipewire Volume Control"
 msgstr "Управление громкостью pipewire"
 
 #: data/com.saivert.pwvucontrol.desktop.in.in:9
-#, fuzzy
 msgid "PipeWire;Volume;Audio;Mixer;Control;Sound"
-msgstr "Управление громкостью pipewire"
+msgstr "PipeWire;Громкость;Аудио;Микшер;Управление;Звук"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:8
 msgid "Volume control for pipewire"
@@ -52,15 +51,19 @@ msgstr "Журнал изменений с 0.4.8"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:29
 msgid "Add LED peak meter option."
-msgstr ""
+msgstr "Добавлена опция светодиодного измерителя пиков."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:30
 msgid "Add beep on volume change option (only output devices)."
 msgstr ""
+"Добавлен звуковой сигнал для опции изменения громкости (только устройства "
+"вывода)."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:31
 msgid "Show product name in port dropdown (e.g. for HDMI ports)."
 msgstr ""
+"Отображение имени продукта в раскрывающемся списке портов (например, для "
+"портов HDMI)."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:37
 msgid "Changelog since 0.4.7"
@@ -69,10 +72,12 @@ msgstr "Журнал изменений с 0.4.7"
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:39
 msgid "Fix displaying of default device name in stream dropdown."
 msgstr ""
+"Исправлено отображение имени устройства по умолчанию в раскрывающемся списке "
+"потоков."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:40
 msgid "Increase responsiveness of peak meters."
-msgstr ""
+msgstr "Повышена скорость ответа измерителей пиков."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:46
 msgid "Changelog since 0.4.6"
@@ -80,7 +85,7 @@ msgstr "Журнал изменений с 0.4.6"
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:48
 msgid "Fix crash when selecting Pro Audio profile."
-msgstr ""
+msgstr "Исправлен сбой программы при выборе профиля Pro Audio."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:54
 msgid "Changelog since 0.4.5"
@@ -89,10 +94,13 @@ msgstr "Журнал изменений с 0.4.5"
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:56
 msgid "Added polish, georgian, russian and french translation."
 msgstr ""
+"Добавлены переводы на польский, грузинский, русский и французский языки."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:57
 msgid "Fix not all ports being visible in device port dropdown."
 msgstr ""
+"Исправлено отображение не всех портов в раскрывающем списке портов "
+"устройства."
 
 #: data/com.saivert.pwvucontrol.metainfo.xml.in.in:63
 msgid "Changelog since 0.4.4"
@@ -168,23 +176,25 @@ msgstr "Включить уровень звука выше 100%"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:26
 msgid "Use led style peak meter"
-msgstr ""
+msgstr "Использовать светодиодный измеритель пиков"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:31
 msgid "Play system beep on volume change"
-msgstr ""
+msgstr "Воспроизводить системный звуковой сигнал при изменении громкости"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:32
 msgid "Lets you preview the sound level even if you don't play any audio."
 msgstr ""
+"Позволяет получить представление об уровне громкости даже без "
+"воспроизведения какого-либо аудио."
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:36
 msgid "The last tab that was open"
-msgstr ""
+msgstr "Последняя открытая вкладка"
 
 #: data/com.saivert.pwvucontrol.gschema.xml.in:37
 msgid "Stores the last tab that was open."
-msgstr ""
+msgstr "Сохраняет последнюю открытую вкладку."
 
 #: data/resources/ui/window.ui:40
 msgid "Lost connection to Pipewire server!"
@@ -200,7 +210,7 @@ msgstr "Воспроизведение"
 
 #: data/resources/ui/window.ui:98
 msgid "No applications currently playing audio"
-msgstr ""
+msgstr "Ни одно из приложений сейчас не воспроизводит звук"
 
 #: data/resources/ui/window.ui:152
 msgid "Recording"
@@ -208,25 +218,23 @@ msgstr "Запись"
 
 #: data/resources/ui/window.ui:163
 msgid "No applications currently recording audio"
-msgstr ""
+msgstr "Ни одно из приложений сейчас не записывает звук"
 
 #: data/resources/ui/window.ui:217
 msgid "Input Devices"
 msgstr "Устройства ввода"
 
 #: data/resources/ui/window.ui:227
-#, fuzzy
 msgid "No input devices found"
-msgstr "Устройства ввода"
+msgstr "Устройства ввода не найдены"
 
 #: data/resources/ui/window.ui:281
 msgid "Output Devices"
 msgstr "Устройства вывода"
 
 #: data/resources/ui/window.ui:292
-#, fuzzy
 msgid "No output devices found"
-msgstr "Устройства вывода"
+msgstr "Устройства вывода не найдены"
 
 #: data/resources/ui/window.ui:347
 msgid "Cards"
@@ -238,7 +246,7 @@ msgstr "_Включить уровень звука выше 100%"
 
 #: data/resources/ui/window.ui:403
 msgid "Use led peak meter"
-msgstr ""
+msgstr "Использовать светодиодный измеритель пиков"
 
 #: data/resources/ui/window.ui:407
 msgid "_Keyboard Shortcuts"
@@ -246,7 +254,7 @@ msgstr "_Комбинации клавиш"
 
 #: data/resources/ui/window.ui:411
 msgid "Beep on volume changes"
-msgstr ""
+msgstr "Издавать звук при изменении громкости"
 
 #: data/resources/ui/window.ui:415
 msgid "_About Pwvucontrol"
@@ -274,12 +282,11 @@ msgstr "Выйти"
 
 #: data/resources/ui/volumebox.ui:81
 msgid "Mute audio"
-msgstr ""
+msgstr "Отключить звук"
 
 #: data/resources/ui/volumebox.ui:95
-#, fuzzy
 msgid "Lock channels together"
-msgstr "Заблокировать каналы"
+msgstr "Связать каналы"
 
 #: data/resources/ui/volumebox.ui:133
 msgid "_Advanced"
@@ -340,3 +347,7 @@ msgstr ""
 
 #~ msgid "GTK"
 #~ msgstr "GTK"
+
+#~ msgid "Volume"
+#~ msgstr "Громкость"
+
