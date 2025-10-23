@@ -237,9 +237,8 @@ mod imp {
 
             metadata_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
-            metadata_om.connect_object_added(
-                clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)),
-            );
+            metadata_om
+                .connect_object_added(clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)));
 
             wp_core.install_object_manager(&metadata_om);
             self.metadata_om.set(metadata_om).expect("metadata object manager set already");
@@ -247,6 +246,12 @@ mod imp {
 
         fn metadata_changed(&self, _subject: u32, key: Option<&str>, type_: Option<&str>, value: Option<&str>) {
             if let (Some(key), Some(json_str), Some("Spa:String:JSON")) = (key, value, type_) {
+                // Experiment with using SpaJson parser.
+                // let json = wp::spa::SpaJson::from_string(&json_str);
+                // if let Some(name) = json.parse_object().and_then(|obj| obj.into_iter().find(|x| x.0 == "name").and_then(|x| x.1.parse_str())) {
+                //     pwvucontrol_critical!("Property {:?}", name);
+                // }
+
                 if let Some(node_name) = json_str.split(r#"{"name":""#).nth(1).and_then(|x| x.split('"').next()) {
                     match key {
                         "default.audio.sink" => {
