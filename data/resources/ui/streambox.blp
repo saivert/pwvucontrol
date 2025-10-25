@@ -1,0 +1,17 @@
+using Gtk 4.0;
+
+template $PwStreamBox: ListBoxRow {
+  $PwVolumeBox volumebox {
+    [extra]
+    Box {
+      orientation: horizontal;
+      spacing: 6;
+
+      Label onlabel {
+        label: _("on");
+      }
+
+      $PwStreamDropDown output_dropdown {}
+    }
+  }
+}
