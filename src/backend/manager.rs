@@ -60,14 +60,15 @@ mod imp {
 
     impl Default for PwvucontrolManager {
         fn default() -> Self {
+            let node_model = gio::ListStore::new::<PwNodeObject>();
             Self {
                 wp_core: Default::default(),
                 wp_object_manager: Default::default(),
-                node_model: gio::ListStore::new::<PwNodeObject>(),
-                stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, None::<gio::ListModel>),
-                stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, None::<gio::ListModel>),
-                source_model: PwNodeFilterModel::new(NodeType::Source, None::<gio::ListModel>),
-                sink_model: PwNodeFilterModel::new(NodeType::Sink, None::<gio::ListModel>),
+                node_model: node_model.clone(),
+                stream_input_model: PwNodeFilterModel::new(NodeType::StreamInput, Some(node_model.clone())),
+                stream_output_model: PwNodeFilterModel::new(NodeType::StreamOutput, Some(node_model.clone())),
+                source_model: PwNodeFilterModel::new(NodeType::Source, Some(node_model.clone())),
+                sink_model: PwNodeFilterModel::new(NodeType::Sink, Some(node_model.clone())),
                 device_model: gio::ListStore::new::<PwDeviceObject>(),
                 metadata_om: Default::default(),
                 metadata: Default::default(),
@@ -88,11 +89,6 @@ mod imp {
     impl ObjectImpl for PwvucontrolManager {
         fn constructed(&self) {
             self.parent_constructed();
-
-            self.stream_input_model.set_model(Some(self.node_model.clone()));
-            self.stream_output_model.set_model(Some(self.node_model.clone()));
-            self.sink_model.set_model(Some(self.node_model.clone()));
-            self.source_model.set_model(Some(self.node_model.clone()));
 
             self.setup_wp_connection();
             self.setup_metadata_om();
@@ -153,7 +149,7 @@ mod imp {
                 if let Some(node) = object.downcast_ref::<wp::pw::Node>() {
                     let mut hidden: bool = false;
                     // Hide ourselves.
-                    if node.name().unwrap_or_default() == "pwvucontrol-peak-detect" {
+                    if node.name().unwrap_or_default() == "PulseAudio Volume Control" {
                         hidden = true;
                     }
 
@@ -243,9 +239,8 @@ mod imp {
 
             metadata_om.request_object_features(wp::pw::GlobalProxy::static_type(), wp::core::ObjectFeatures::ALL);
 
-            metadata_om.connect_object_added(
-                clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)),
-            );
+            metadata_om
+                .connect_object_added(clone!(@weak self as manager, @weak wp_core as core => move |_, object| manager.metadata_object_added(object)));
 
             wp_core.install_object_manager(&metadata_om);
             self.metadata_om.set(metadata_om).expect("metadata object manager set already");
@@ -253,6 +248,12 @@ mod imp {
 
         fn metadata_changed(&self, _subject: u32, key: Option<&str>, type_: Option<&str>, value: Option<&str>) {
             if let (Some(key), Some(json_str), Some("Spa:String:JSON")) = (key, value, type_) {
+                // Experiment with using SpaJson parser.
+                // let json = wp::spa::SpaJson::from_string(&json_str);
+                // if let Some(name) = json.parse_object().and_then(|obj| obj.into_iter().find(|x| x.0 == "name").and_then(|x| x.1.parse_str())) {
+                //     pwvucontrol_critical!("Property {:?}", name);
+                // }
+
                 if let Some(node_name) = json_str.split(r#"{"name":""#).nth(1).and_then(|x| x.split('"').next()) {
                     match key {
                         "default.audio.sink" => {

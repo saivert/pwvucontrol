@@ -1,0 +1,341 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $PwvucontrolWindow: Adw.ApplicationWindow {
+  default-width: 600;
+  default-height: 300;
+  width-request: 470;
+  height-request: 300;
+  title: _("Pipewire Volume Control");
+
+  Adw.Breakpoint {
+    condition ("max-width: 550sp")
+
+    setters {
+      header_bar.title-widget: null;
+      switcher_bar.reveal: true;
+    }
+  }
+
+  content: Stack viewstack {
+    StackPage {
+      name: "disconnected";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar {
+          centering-policy: strict;
+
+          [end]
+          MenuButton {
+            icon-name: "open-menu-symbolic";
+            menu-model: primary_menu;
+            primary: true;
+          }
+        }
+
+        content: Adw.StatusPage {
+          title: _("Lost connection to Pipewire server!");
+
+          child: Button reconnectbtn {
+            halign: center;
+            label: _("Reconnect");
+          };
+        };
+      };
+    }
+
+    StackPage {
+      name: "connected";
+
+      child: Adw.ToolbarView {
+        [top]
+        Adw.HeaderBar header_bar {
+          title-widget: Adw.ViewSwitcher {
+            policy: wide;
+            stack: stack;
+          };
+
+          [end]
+          MenuButton {
+            icon-name: "open-menu-symbolic";
+            menu-model: primary_menu;
+            primary: true;
+          }
+        }
+
+        [top]
+        Adw.Banner info_banner {}
+
+        content: Adw.ViewStack stack {
+          hexpand: true;
+          vexpand: true;
+
+          Adw.ViewStackPage {
+            name: "playback";
+            title: _("Playback");
+            icon-name: "pwvucontrol-speakers-symbolic";
+
+            child: Stack playbackviewstack {
+              StackPage {
+                name: "empty";
+
+                child: Adw.StatusPage {
+                  title: _("No applications currently playing audio");
+                };
+              }
+
+              StackPage {
+                name: "notempty";
+
+                child: ScrolledWindow {
+                  hscrollbar-policy: never;
+                  min-content-height: 200;
+                  hexpand: false;
+                  vexpand: true;
+
+                  Viewport {
+                    scroll-to-focus: true;
+
+                    Box {
+                      orientation: vertical;
+                      margin-start: 10;
+                      margin-end: 10;
+                      margin-top: 5;
+                      margin-bottom: 5;
+
+                      ListBox playbacklist {
+                        selection-mode: none;
+                        show-separators: false;
+
+                        styles [
+                          "boxed-list",
+                        ]
+                      }
+                    }
+                  }
+                };
+              }
+            };
+          }
+
+          Adw.ViewStackPage {
+            visible: true;
+            name: "recording";
+            title: _("Recording");
+            icon-name: "pwvucontrol-microphone-symbolic";
+
+            child: Stack recordviewstack {
+              StackPage {
+                name: "empty";
+
+                child: Adw.StatusPage {
+                  title: _("No applications currently recording audio");
+                };
+              }
+
+              StackPage {
+                name: "notempty";
+
+                child: ScrolledWindow {
+                  hscrollbar-policy: never;
+                  min-content-height: 200;
+                  hexpand: false;
+                  vexpand: true;
+
+                  Viewport {
+                    scroll-to-focus: true;
+
+                    Box {
+                      orientation: vertical;
+                      margin-start: 10;
+                      margin-end: 10;
+                      margin-top: 5;
+                      margin-bottom: 5;
+
+                      ListBox recordlist {
+                        selection-mode: none;
+                        show-separators: true;
+
+                        styles [
+                          "boxed-list",
+                        ]
+                      }
+                    }
+                  }
+                };
+              }
+            };
+          }
+
+          Adw.ViewStackPage {
+            visible: true;
+            name: "inputdevices";
+            title: _("Input Devices");
+            icon-name: "input-symbolic";
+
+            child: Stack inputviewstack {
+              StackPage {
+                name: "empty";
+
+                child: Adw.StatusPage {
+                  title: _("No input devices found");
+                };
+              }
+
+              StackPage {
+                name: "notempty";
+
+                child: ScrolledWindow {
+                  hscrollbar-policy: never;
+                  min-content-height: 200;
+                  hexpand: false;
+                  vexpand: true;
+
+                  Viewport {
+                    scroll-to-focus: true;
+
+                    Box {
+                      orientation: vertical;
+                      margin-start: 10;
+                      margin-end: 10;
+                      margin-top: 5;
+                      margin-bottom: 5;
+
+                      ListBox inputlist {
+                        selection-mode: none;
+                        show-separators: true;
+
+                        styles [
+                          "boxed-list",
+                        ]
+                      }
+                    }
+                  }
+                };
+              }
+            };
+          }
+
+          Adw.ViewStackPage {
+            visible: true;
+            name: "outputdevices";
+            title: _("Output Devices");
+            icon-name: "output-symbolic";
+
+            child: Stack outputviewstack {
+              StackPage {
+                name: "empty";
+
+                child: Adw.StatusPage {
+                  title: _("No output devices found");
+                };
+              }
+
+              StackPage {
+                name: "notempty";
+
+                child: ScrolledWindow {
+                  hscrollbar-policy: never;
+                  min-content-height: 200;
+                  hexpand: false;
+                  vexpand: true;
+
+                  Viewport {
+                    scroll-to-focus: true;
+
+                    Box {
+                      orientation: vertical;
+                      margin-start: 10;
+                      margin-end: 10;
+                      margin-top: 5;
+                      margin-bottom: 5;
+
+                      ListBox outputlist {
+                        selection-mode: none;
+                        show-separators: true;
+
+                        styles [
+                          "boxed-list",
+                        ]
+                      }
+                    }
+                  }
+                };
+              }
+            };
+          }
+
+          Adw.ViewStackPage {
+            visible: true;
+            name: "cards";
+            title: _("Cards");
+            icon-name: "soundcard-symbolic";
+
+            child: ScrolledWindow {
+              hscrollbar-policy: never;
+              min-content-height: 200;
+              hexpand: false;
+              vexpand: true;
+
+              Viewport {
+                scroll-to-focus: true;
+
+                Box {
+                  orientation: vertical;
+                  margin-start: 10;
+                  margin-end: 10;
+                  margin-top: 5;
+                  margin-bottom: 5;
+
+                  ListBox cardlist {
+                    selection-mode: none;
+                    show-separators: true;
+
+                    styles [
+                      "boxed-list",
+                    ]
+                  }
+                }
+              }
+            };
+          }
+        };
+
+        [bottom]
+        Adw.ViewSwitcherBar switcher_bar {
+          stack: stack;
+        }
+      };
+    }
+  };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Enable over-amplification");
+      action: "win.enable-overamplification";
+    }
+
+    item {
+      label: _("Use led peak meter");
+      action: "win.use-peakmeter-led";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+
+    item {
+      label: _("Beep on volume changes");
+      action: "win.beep-on-volume-changes";
+    }
+
+    item {
+      label: _("_About Pwvucontrol");
+      action: "app.about";
+    }
+  }
+}

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use crate::backend::{ParamAvailability, PwProfileObject};
-use glib::{
+use gtk::glib::{
     self, clone,
     subclass::{prelude::*, Signal},
     ParamSpec, Properties, Value,
@@ -116,7 +116,8 @@ pub mod imp {
             obj.update_icon_name();
             obj.update_profiles();
 
-            obj.update_current_profile_index();
+            // Don't run this here as we need all the profiles to be loaded first:
+            // obj.update_current_profile_index();
 
             obj.update_routes();
 
@@ -240,6 +241,8 @@ impl PwDeviceObject {
 
         podbuilder.add_property("index");
         podbuilder.add_int(index);
+        podbuilder.add_property("save");
+        podbuilder.add_boolean(true);
 
         if let Some(pod) = podbuilder.end() {
             device.set_param("Profile", 0, pod);

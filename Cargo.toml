@@ -1,7 +1,8 @@
 [package]
 name = "pwvucontrol"
-version = "0.4.9"
+version = "0.5.1"
 edition = "2021"
+rust-version = "1.80"
 
 [features]
 sandboxed = []
@@ -19,7 +20,7 @@ formatx = "0.2.3"
 
 [dependencies.wireplumber]
 git = "https://github.com/arcnmx/wireplumber.rs.git"
-rev = "6e48383a85aecfca22dac3ffc589fb3f25404eda"
+rev = "ef3407c623840fa855dbe12c2574875e01ff361d"
 features = ["v0_4_16"]
 
 [dependencies.adw]

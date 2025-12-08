@@ -7,10 +7,11 @@ use crate::{
 };
 use glib::{clone, closure_local};
 use gtk::{prelude::*, subclass::prelude::*};
-use std::cell::RefCell;
+use std::cell::OnceCell;
 use wireplumber as wp;
 
 mod imp {
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -18,7 +19,7 @@ mod imp {
     #[properties(wrapper_type = super::PwStreamBox)]
     pub struct PwStreamBox {
         #[property(get, set, construct_only)]
-        pub(super) node_object: RefCell<Option<PwNodeObject>>,
+        pub(super) node_object: OnceCell<PwNodeObject>,
 
         #[template_child]
         pub volumebox: TemplateChild<PwVolumeBox>,
@@ -48,7 +49,7 @@ mod imp {
             let manager = PwvucontrolManager::default();
 
             let obj = self.obj();
-            let item = obj.node_object().expect("nodeobj");
+            let item = obj.node_object();
 
             self.volumebox.set_node_object(&item);
 
@@ -77,8 +78,8 @@ mod imp {
             // Create our custom output dropdown widget and add it to the layout
             self.output_dropdown.set_nodeobj(Some(&item));
 
-            glib::idle_add_local_once(clone!(@weak self as widget => move || {
-                widget.obj().update_output_device_dropdown();
+            glib::idle_add_local_once(clone!(@weak widget => move || {
+                widget.update_output_device_dropdown();
             }));
         }
     }
@@ -100,7 +101,7 @@ impl PwStreamBox {
     fn update_output_device_dropdown(&self) {
         let manager = PwvucontrolManager::default();
 
-        let item = self.node_object().expect("nodeobj");
+        let item = self.node_object();
 
         let stream_model = match item.nodetype() {
             crate::backend::NodeType::StreamInput => manager.source_model(),

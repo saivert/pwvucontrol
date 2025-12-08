@@ -48,6 +48,15 @@ mod imp {
         #[template_child]
         pub info_banner: TemplateChild<adw::Banner>,
 
+        #[template_child]
+        pub playbackviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub recordviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub inputviewstack: TemplateChild<gtk::Stack>,
+        #[template_child]
+        pub outputviewstack: TemplateChild<gtk::Stack>,
+
         pub settings: gio::Settings,
 
         pub beep_elapsed: Cell<time::Instant>,
@@ -71,6 +80,10 @@ mod imp {
                 reconnectbtn: TemplateChild::default(),
                 settings: gio::Settings::new(APP_ID),
                 info_banner: TemplateChild::default(),
+                playbackviewstack: TemplateChild::default(),
+                recordviewstack: TemplateChild::default(),
+                inputviewstack: TemplateChild::default(),
+                outputviewstack: TemplateChild::default(),
                 beep_elapsed: Cell::new(std::time::Instant::now()),
                 experimental_toggle: Cell::new(false),
                 filtermodel: Default::default(),
@@ -94,6 +107,10 @@ mod imp {
     }
 
     impl ObjectImpl for PwvucontrolWindow {
+        fn dispose(&self) {
+            self.dispose_template();
+        }
+        
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -101,6 +118,29 @@ mod imp {
             if PROFILE == "Devel" {
                 self.obj().add_css_class("devel");
             }
+
+            self.stack.set_visible_child_name(&self.settings.string("last-tab-name"));
+
+            self.stack.connect_visible_child_name_notify(clone!(@weak self as widget => move |stack| {
+                if let Some(name) = stack.visible_child_name(){
+                    if widget.settings.set_string("last-tab-name", &name).is_err() {
+                        crate::pwvucontrol_warning!("Unable to save tab to gsettings");
+                    }
+                }
+            }));
+            
+            let action_switchtab = gio::ActionEntry::builder("switchtab")
+                .parameter_type(Some(&i32::static_variant_type()))
+                .activate(move |window: &super::PwvucontrolWindow, _action, parameter| {
+                    let parameter = parameter
+                        .expect("Could not get parameter.")
+                        .get::<i32>()
+                        .expect("The variant needs to be of type `i32`.");
+
+                    window.select_tab(parameter);
+                })
+                .build();
+            self.obj().add_action_entries([action_switchtab]);
 
             crate::ui::remember_window_size(self.obj().upcast_ref(), &self.settings);
 
@@ -147,14 +187,15 @@ mod imp {
             });
             factory.connect_unbind(|_, item| {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
-                // let streambox: PwStreamBox = item.child().and_downcast().expect("RowData is of wrong type");
-                // streambox.emit_by_name::<()>("destroy", &[]);
                 item.set_child(gtk::Widget::NONE);
             });
 
             self.playbacklist.set_factory(Some(&factory));
             self.playbacklist.set_show_separators(true);
 
+            /* Use the filter model (all node types) as the underlying model for the
+             * ListView. The filter model gets its source set to `manager.node_model()`
+             * and we sort/section it by node type so headers work as intended. */
             self.filtermodel.set_model(Some(manager.node_model()));
 
             let sorter = gtk::CustomSorter::new(|a, b| {
@@ -162,14 +203,43 @@ mod imp {
                 let node_b: &PwNodeObject = b.downcast_ref().unwrap();
                 node_a.nodetype().cmp(&node_b.nodetype()).into()
             });
+
             let sorted_model = gtk::SortListModel::new(Some(self.filtermodel.clone()), None::<gtk::Sorter>);
             sorted_model.set_section_sorter(Some(&sorter));
 
             let selection_model = gtk::NoSelection::new(Some(sorted_model));
 
             self.playbacklist.set_header_factory(Some(&Self::create_header_factory()));
-
             self.playbacklist.set_model(Some(&selection_model));
+
+            /* Keep the per-view "empty/notempty" stack handling from the main branch
+             * so the UI shows placeholders when no items are present. */
+            manager.stream_output_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.playbackviewstack.set_visible_child_name("empty"),
+                    _ => widget.playbackviewstack.set_visible_child_name("notempty")
+                }
+            }));
+
+            /* Record list is still bound to the dedicated stream input model so
+             * the separate Recording tab remains functional. */
+            self.recordlist.bind_model(
+                Some(&manager.stream_input_model()),
+                clone!(@weak self as window => @default-panic, move |item| {
+                    PwStreamBox::new(
+                        item.downcast_ref::<PwNodeObject>()
+                            .expect("RowData is of wrong type"),
+                    )
+                    .upcast::<gtk::Widget>()
+                }),
+            );
+
+            manager.stream_input_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.recordviewstack.set_visible_child_name("empty"),
+                    _ => widget.recordviewstack.set_visible_child_name("notempty")
+                }
+            }));
 
             self.inputlist.bind_model(
                 Some(&manager.source_model()),
@@ -182,6 +252,13 @@ mod imp {
                 }),
             );
 
+            manager.source_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.inputviewstack.set_visible_child_name("empty"),
+                    _ => widget.inputviewstack.set_visible_child_name("notempty")
+                }
+            }));
+
             self.outputlist.bind_model(
                 Some(&manager.sink_model()),
                 clone!(@weak self as window => @default-panic, move |item| {
@@ -192,6 +269,13 @@ mod imp {
                     .upcast::<gtk::Widget>()
                 }),
             );
+
+            manager.sink_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+                match x.n_items() {
+                    0 => widget.outputviewstack.set_visible_child_name("empty"),
+                    _ => widget.outputviewstack.set_visible_child_name("notempty")
+                }
+            }));
 
             self.cardlist.bind_model(
                 Some(&manager.device_model()),

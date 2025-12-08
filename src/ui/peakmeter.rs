@@ -42,9 +42,9 @@ mod imp {
 
     impl WidgetImpl for PwPeakMeter {
         fn snapshot(&self, snapshot: &gtk::Snapshot) {
-            const NUM_BLOCKS: u32 = 20;
-            const GREEN_LIMIT: u32 = (0.6 * NUM_BLOCKS as f32) as u32;
-            const YELLOW_LIMIT: u32 = (0.9 * NUM_BLOCKS as f32) as u32;
+            let num_blocks: u32 = (self.obj().width() / 20) as u32;
+            let green_limit: u32 = (0.6 * num_blocks as f32) as u32;
+            let yellow_limit: u32 = (0.9 * num_blocks as f32) as u32;
 
             let color_green = hex_to_rgb(0x33d17a);
             let color_yellow = hex_to_rgb(0xf6d32d);
@@ -64,9 +64,9 @@ mod imp {
             if !self.use_led.get() {
                 snapshot.append_color(&color_green, &graphene::Rect::new(0.0, 0.0, level * w, h));
             } else {
-                let discrete_level = (level * NUM_BLOCKS as f32).floor() as u32;
-                let mut block_width = width / NUM_BLOCKS;
-                let extra_space = width - block_width * NUM_BLOCKS;
+                let discrete_level = (level * num_blocks as f32).floor() as u32;
+                let mut block_width = width / num_blocks;
+                let extra_space = width - block_width * num_blocks;
                 if extra_space > 0 {
                     block_width += 1;
                 }
@@ -78,10 +78,12 @@ mod imp {
                         block_area_width -= 1;
                     }
 
-                    let color = match i {
-                        0..GREEN_LIMIT => color_green,
-                        GREEN_LIMIT..YELLOW_LIMIT => color_yellow,
-                        _ => color_red,
+                    let color = if i < green_limit {
+                        color_green
+                    } else if i < yellow_limit {
+                        color_yellow
+                    } else {
+                        color_red
                     };
                     snapshot.append_color(&color, &graphene::Rect::new(block_area_x as f32, 0.0, block_area_width as f32 - 1.0, h));
                     block_area_x += block_area_width;
@@ -94,7 +96,7 @@ mod imp {
         fn measure(&self, orientation: gtk::Orientation, _for_size: i32) -> (i32, i32, i32, i32) {
             match orientation {
                 gtk::Orientation::Horizontal => (10, 10, -1, -1),
-                gtk::Orientation::Vertical => (10, 20, -1, -1),
+                gtk::Orientation::Vertical => (10, 10, -1, -1),
                 _ => panic!("Invalid orientation passed to measure"),
             }
         }

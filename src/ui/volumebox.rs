@@ -89,6 +89,8 @@ mod imp {
                     metadata.disconnect(sid);
                 };
             };
+
+            self.dispose_template();
         }
     }
 

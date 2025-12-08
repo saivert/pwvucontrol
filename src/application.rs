@@ -42,6 +42,12 @@ mod imp {
             let obj = self.obj();
             obj.setup_gactions();
             obj.set_accels_for_action("app.quit", &["<primary>q"]);
+
+            obj.set_accels_for_action("win.switchtab(1)", &["<alt>1"]);
+            obj.set_accels_for_action("win.switchtab(2)", &["<alt>2"]);
+            obj.set_accels_for_action("win.switchtab(3)", &["<alt>3"]);
+            obj.set_accels_for_action("win.switchtab(4)", &["<alt>4"]);
+            obj.set_accels_for_action("win.switchtab(5)", &["<alt>5"]);
         }
     }
 
@@ -107,8 +113,8 @@ impl PwvucontrolApplication {
             .property("resource-base-path", "/com/saivert/pwvucontrol")
             .build();
 
-        app.add_main_option("tab", glib::Char('t' as i8), OptionFlags::NONE, OptionArg::Int, "Select tab to open.", Some("number"));
-        app.add_main_option("version", glib::Char('v' as i8), OptionFlags::NONE, OptionArg::None, "Show version.", None);
+        app.add_main_option("tab", b't'.into(), OptionFlags::NONE, OptionArg::Int, "Select tab to open.", Some("number"));
+        app.add_main_option("version", b'v'.into(), OptionFlags::NONE, OptionArg::None, "Show version.", None);
 
         ApplicationExtManual::run(&app)
     }

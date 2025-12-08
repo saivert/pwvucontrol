@@ -1,0 +1,22 @@
+using Gtk 4.0;
+
+template $PwChannelBox: ListBoxRow {
+  activatable: false;
+  selectable: false;
+
+  Box {
+    spacing: 6;
+
+    Label label {
+      width-chars: 3;
+      xalign: 1.0;
+      margin-end: 8;
+    }
+
+    $PwVolumeScale scale {
+      hexpand: "True";
+      hexpand-set: "True";
+      use-overamplification: "1";
+    }
+  }
+}
