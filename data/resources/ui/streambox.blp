@@ -1,6 +1,10 @@
 using Gtk 4.0;
 
-template $PwStreamBox: ListBoxRow {
+template $PwStreamBox: Gtk.Widget {
+  layout-manager: BinLayout
+  {
+    
+  };
   $PwVolumeBox volumebox {
     [extra]
     Box {
