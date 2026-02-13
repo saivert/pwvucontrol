@@ -354,10 +354,13 @@ impl PwNodeObject {
                         }
                     }
 
-                    let choice = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_format).expect("Format!");
+                    let Some(choice) = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_format) else {
+                        pwvucontrol_warning!("Format is missing for \"{}\"", node.name().unwrap_or_default());
+                        return;
+                    };
                     let format = get_pod_maybe_choice(choice).id().expect("Format id");
                     if format == 0 {
-                        pwvucontrol_warning!("Format is 0, ignoring...");
+                        pwvucontrol_warning!("Format is 0 for \"{}\"", node.name().unwrap_or_default());
                         return;
                     }
 
@@ -371,12 +374,13 @@ impl PwNodeObject {
                         None => 0
                     };
 
-                    let choice = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_position).expect("Position!");
-                    let positionpod = get_pod_maybe_choice(choice);
-                    let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
                     let mut a = [0u32;64];
-                    for (i,v) in (0..).zip(vec.iter()) {
-                        a[i] = *v;
+                    if let Some(choice) = pod.find_spa_property(&wp::spa::ffi::SPA_FORMAT_AUDIO_position) {
+                        let positionpod = get_pod_maybe_choice(choice);
+                        let vec: Vec<u32> = positionpod.array_iterator().map(|x: i32| x as u32).collect();
+                        for (i,v) in (0..).zip(vec.iter()) {
+                            a[i] = *v;
+                        }
                     }
 
                     pwvucontrol_info!("For {} bound id {}, Got rate {rate}, format {format}, channels {channels}", node.name().unwrap_or_default(), node.bound_id());
