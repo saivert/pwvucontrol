@@ -381,7 +381,10 @@ impl PwNodeObject {
                         for (i,v) in (0..).zip(vec.iter()) {
                             a[i] = *v;
                         }
-                    }
+                    } else {
+                        pwvucontrol_warning!("Position is missing for \"{}\"", node.name().unwrap_or_default());
+                        return;
+                    };
 
                     pwvucontrol_info!("For {} bound id {}, Got rate {rate}, format {format}, channels {channels}", node.name().unwrap_or_default(), node.bound_id());
 
