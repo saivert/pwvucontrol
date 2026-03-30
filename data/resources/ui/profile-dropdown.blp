@@ -1,0 +1,14 @@
+using Gtk 4.0;
+
+template $PwProfileDropDown: Widget {
+  layout-manager: BinLayout {};
+
+  DropDown profile_dropdown {
+    hexpand: false;
+    valign: center;
+
+    styles [
+      "suffixes",
+    ]
+  }
+}

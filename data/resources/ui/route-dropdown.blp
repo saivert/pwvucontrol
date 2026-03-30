@@ -1,0 +1,14 @@
+using Gtk 4.0;
+
+template $PwRouteDropDown: Widget {
+  layout-manager: BinLayout {};
+
+  DropDown route_dropdown {
+    hexpand: false;
+    valign: center;
+
+    styles [
+      "suffixes",
+    ]
+  }
+}

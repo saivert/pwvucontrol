@@ -1,0 +1,31 @@
+using Gtk 4.0;
+
+template $PwSinkBox: ListBoxRow {
+  $PwVolumeBox volumebox {
+    [extra]
+    Box {
+      orientation: horizontal;
+      spacing: 6;
+
+      Label onlabel {
+        label: _("Port:");
+      }
+
+      $PwRouteDropDown route_dropdown {}
+
+      ToggleButton default_sink_toggle {
+        hexpand: false;
+        valign: center;
+        tooltip-text: _("Set default");
+        toggled => $default_sink_toggle_toggled() swapped;
+
+        styles [
+          "suffixes",
+          "expander-row-arrow",
+        ]
+
+        icon-name: "emblem-default-symbolic";
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+using Gtk 4.0;
+
+template $PwDeviceBox: ListBoxRow {
+  Box {
+    orientation: horizontal;
+    margin-start: 12;
+    margin-end: 12;
+    margin-top: 12;
+    margin-bottom: 12;
+    spacing: 6;
+
+    Image icon {
+      use-fallback: true;
+    }
+
+    Label label {}
+
+    $PwProfileDropDown profile_dropdown {}
+  }
+}
