@@ -15,14 +15,16 @@ log = "0.4.11"
 imbl = "3.0.0"
 futures = "0.3"
 anyhow = "1.0"
-pipewire = "0.8"
+pipewire = "0.9"
 formatx = "0.2.3"
 
 [dependencies.wireplumber]
 version = "0.2"
 features = ["v0_5"]
+git = "https://github.com/saivert/wireplumber.rs.git"
+branch = "wp-0.5-glib-0.21-pipewire-0.9"
 
-path = "/home/saivert/code/wireplumber.rs"
+#path = "/home/saivert/code/wireplumber.rs"
 
 #git = "https://github.com/arcnmx/wireplumber.rs.git"
 #branch = "wp-0.5"
