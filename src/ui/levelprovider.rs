@@ -87,6 +87,10 @@ impl LevelbarProvider {
                     }
                 }),
             )
+            .param_changed(|stream, _, _, _| {
+                let _ = stream.set_control(pipewire::spa::sys::SPA_PROP_channelVolumes, &[1.0]);
+
+            })
             .register()?;
 
         let mut buffer: Vec<u8> = Vec::new();
@@ -98,7 +102,7 @@ impl LevelbarProvider {
             StreamFlags::AUTOCONNECT | StreamFlags::MAP_BUFFERS | StreamFlags::RT_PROCESS | StreamFlags::DONT_RECONNECT,
             &mut [fmtpod],
         )?;
-
+        
         Ok(Self {
             _loop: loop_,
             _context: context,
