@@ -42,7 +42,6 @@ pub(crate) enum PropertyChanged {
 
 pub mod imp {
     use glib::property::PropertySet;
-    use wireplumber::core::ObjectExt2;
 
     use super::*;
 

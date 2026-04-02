@@ -19,7 +19,6 @@ use wp::{
 mod imp {
     use std::cell::Cell;
 
-    use glib::closure_local;
     use wireplumber::core::ObjectExt2;
 
     use super::*;

@@ -4,7 +4,7 @@ use std::{fmt::Debug, time::Duration};
 
 use crate::ui::PwVolumeBox;
 use glib::{self, clone, ControlFlow, SourceId};
-use pipewire::{context::{Context, ContextRc}, loop_::{Loop, LoopRc}, properties::*, spa::{self, utils::Direction}, stream::*};
+use pipewire::{context::ContextRc, loop_::LoopRc, properties::properties, spa::{self, utils::Direction}, stream::*};
 use std::os::fd::AsRawFd;
 
 const PEAK_RATE: u32 = 144;
