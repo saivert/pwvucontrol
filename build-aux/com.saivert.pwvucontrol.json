@@ -56,10 +56,6 @@
                     "type": "git",
                     "tag": "0.5.12",
                     "url": "https://github.com/PipeWire/wireplumber.git"
-                },
-                {
-                    "type": "patch",
-                    "path": "0001-node-cast-proxy-to-pw_node-when-calling-pw_node-func.patch"
                 }
             ]
         },
