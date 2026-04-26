@@ -1,0 +1,182 @@
+using Gtk 4.0;
+
+template $PwVolumeBox: ListBoxRow {
+  activatable: false;
+  selectable: false;
+
+  Box {
+    orientation: vertical;
+    valign: center;
+    hexpand: false;
+    margin-start: 12;
+    margin-end: 12;
+    margin-top: 12;
+    margin-bottom: 12;
+    spacing: 6;
+
+    Box {
+      orientation: horizontal;
+      spacing: 6;
+
+      Image icon {
+        icon-name: "library-music-symbolic";
+      }
+
+      Box {
+        orientation: vertical;
+        valign: center;
+        hexpand: true;
+        halign: fill;
+
+        Label title_label {
+          styles [
+            "title",
+          ]
+
+          xalign: 0;
+          wrap: true;
+          wrap-mode: word_char;
+          lines: 2;
+          ellipsize: end;
+        }
+
+        Label subtitle_label {
+          styles [
+            "subtitle",
+          ]
+
+          xalign: 0;
+          lines: 1;
+          ellipsize: end;
+        }
+      }
+
+      Box container {
+        orientation: horizontal;
+        spacing: 6;
+      }
+
+      ToggleButton mutebtn {
+        hexpand: false;
+        valign: center;
+
+        styles [
+          "suffixes",
+          "expander-row-arrow",
+        ]
+
+        icon-name: "audio-volume-muted-symbolic";
+        tooltip-text: _("Mute audio");
+      }
+
+      ToggleButton toggle {
+        hexpand: false;
+        valign: center;
+
+        styles [
+          "suffixes",
+          "expander-row-arrow",
+        ]
+
+        icon-name: "pan-down-symbolic";
+        tooltip-text: _("Lock channels together");
+      }
+    }
+
+    Box {
+      orientation: vertical;
+      valign: center;
+      hexpand: true;
+      spacing: 6;
+
+      $PwVolumeScale volume_scale {
+        use-overamplification: "1";
+      }
+
+      $PwPeakMeter peak_meter {
+        hexpand: true;
+        hexpand-set: true;
+      }
+    }
+
+    Revealer revealer {
+      reveal-child: bind toggle.active;
+
+      Box {
+        orientation: vertical;
+        spacing: 6;
+
+        CenterBox {
+          [start]
+          MenuButton {
+            label: _("_Advanced");
+            use-underline: true;
+            popover: advancedvolumes;
+          }
+
+          [center]
+          Label format {
+            xalign: 0.5;
+            margin-top: 2;
+            margin-bottom: 2;
+          }
+
+          [end]
+          ToggleButton channellock {
+            hexpand: false;
+            valign: center;
+            tooltip-text: _("Lock channels");
+            icon-name: "lock-small-symbolic";
+          }
+        }
+
+        ListBox channel_listbox {
+          selection-mode: none;
+
+          styles [
+            "boxed-list",
+          ]
+        }
+      }
+    }
+  }
+}
+
+Popover advancedvolumes {
+  Box {
+    orientation: vertical;
+    width-request: 300;
+
+    Box {
+      spacing: 6;
+      hexpand: true;
+
+      Label {
+        xalign: 1.0;
+        label: _("Main");
+      }
+
+      $PwVolumeScale mainvolumescale {
+        hexpand: "1";
+        hexpand-set: "1";
+        show-ticks: "0";
+      }
+    }
+
+    Box {
+      spacing: 6;
+      hexpand: true;
+
+      Label {
+        xalign: 1.0;
+        label: _("Monitor");
+      }
+
+      $PwVolumeScale monitorvolumescale {
+        hexpand: "1";
+        hexpand-set: "1";
+        show-ticks: "0";
+      }
+    }
+  }
+}

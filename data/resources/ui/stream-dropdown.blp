@@ -1,0 +1,14 @@
+using Gtk 4.0;
+
+template $PwStreamDropDown: Widget {
+  layout-manager: BinLayout {};
+
+  DropDown outputdevice_dropdown {
+    hexpand: false;
+    valign: center;
+
+    styles [
+      "suffixes",
+    ]
+  }
+}

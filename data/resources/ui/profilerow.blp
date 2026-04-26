@@ -1,0 +1,16 @@
+using Gtk 4.0;
+
+template $PwProfileRow: Box {
+  Label label {
+    xalign: 0.0;
+  }
+
+  Image unavailable_icon {
+    icon-name: "action-unavailable-symbolic";
+  }
+
+  Image checkmark_icon {
+    icon-name: "object-select-symbolic";
+    opacity: 0;
+  }
+}

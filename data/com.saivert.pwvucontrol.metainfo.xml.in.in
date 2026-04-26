@@ -22,7 +22,16 @@
   <url type="bugtracker">https://github.com/saivert/pwvucontrol/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
-      <release version="0.5.0" date="2025-10-17">
+    <release version="0.5.1" date="2025-10-22">
+      <description>
+        <p>Changelog since 0.5.0</p>
+        <ul>
+          <li>More granular LED blocks in the peak meter.</li>
+          <li>Now saves the selected card profile.</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.5.0" date="2025-10-17">
       <description>
         <p>Changelog since 0.4.9</p>
         <ul>
