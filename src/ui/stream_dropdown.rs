@@ -123,7 +123,7 @@ mod imp {
 
             let widget = self.obj();
             let selected_handler = closure_local!(
-                @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
+                #[watch] widget, move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
                 pwvucontrol_info!("selected-item");
                 let nodeobj = widget.imp().nodeobj.borrow();
                 if nodeobj.is_none() {
@@ -156,7 +156,10 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwStreamDropDown(ObjectSubclass<imp::PwStreamDropDown>) @extends gtk::Widget;
+    pub struct PwStreamDropDown(ObjectSubclass<imp::PwStreamDropDown>)
+    @extends gtk::Widget,
+    @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwStreamDropDown {

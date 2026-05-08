@@ -1,0 +1,12 @@
+Steps to making a new release
+
+1. Bump version in Cargo.toml and meson.build
+2. Add new release in appdata metainfo
+3. Create git tag
+4. Run meson dist -C builddir --no-tests
+5. Make new github release, upload tarballs from meson dist.
+6. Create new branch and commit for flathub project, setting new url and sha256sum.
+7. Do pull request on flathub project.
+8. Merge.
+
+

@@ -65,7 +65,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwDeviceBox(ObjectSubclass<imp::PwDeviceBox>)
         @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                    gtk::ConstraintTarget;
 }
 
 impl PwDeviceBox {

@@ -4,15 +4,15 @@ use std::{fmt::Debug, time::Duration};
 
 use crate::ui::PwVolumeBox;
 use glib::{self, clone, ControlFlow, SourceId};
-use pipewire::{context::Context, loop_::Loop, properties::*, spa, spa::utils::Direction, stream::*};
+use pipewire::{context::ContextRc, loop_::LoopRc, properties::properties, spa::{self, utils::Direction}, stream::*};
 use std::os::fd::AsRawFd;
 
 const PEAK_RATE: u32 = 144;
 
 pub struct LevelbarProvider {
-    _loop: Loop,
-    _context: Context,
-    stream: Option<Stream>,
+    _loop: LoopRc,
+    _context: ContextRc,
+    stream: Option<StreamRc>,
     _listener: StreamListener<f32>,
     sig: Option<SourceId>,
 }
@@ -25,9 +25,9 @@ impl Debug for LevelbarProvider {
 
 impl LevelbarProvider {
     pub fn new(volumebox: &PwVolumeBox, id: u32) -> Result<Self, anyhow::Error> {
-        let loop_ = Loop::new(None)?;
-        let context = Context::new(&loop_)?;
-        let core = context.connect(None)?;
+        let loop_ = LoopRc::new(None)?;
+        let context = ContextRc::new(&loop_, None)?;
+        let core = context.connect_rc(None)?;
 
         let fd = loop_.fd();
 
@@ -51,12 +51,12 @@ impl LevelbarProvider {
             "stream.monitor" => "true",
             "application.id" => "org.PulseAudio.pavucontrol",
         };
-
-        let stream: Stream = Stream::new(&core, "peakdetect", props)?;
+        
+        let stream = StreamRc::new(core, "peakdetect", props)?;
 
         let listener = stream
             .add_local_listener::<f32>()
-            .process(clone!(@weak volumebox => @default-return (), move |stream, last_peak| {
+            .process(clone!(#[weak] volumebox, move |stream, last_peak| {
                 match stream.dequeue_buffer() {
                     None => println!("No buffer received"),
                     Some(mut buffer) => {
@@ -78,12 +78,19 @@ impl LevelbarProvider {
                 };
             }))
             .state_changed(
-                clone!(@weak volumebox => @default-return (), move |_stream, _user_data, _oldstate, state| {
+                clone!(
+                    #[weak]
+                    volumebox,
+                    move |_stream, _user_data, _oldstate, state| {
                     if state == StreamState::Paused {
                         volumebox.set_level(0.0);
                     }
                 }),
             )
+            .param_changed(|stream, _, _, _| {
+                let _ = stream.set_control(pipewire::spa::sys::SPA_PROP_channelVolumes, &[1.0]);
+
+            })
             .register()?;
 
         let mut buffer: Vec<u8> = Vec::new();
@@ -95,7 +102,7 @@ impl LevelbarProvider {
             StreamFlags::AUTOCONNECT | StreamFlags::MAP_BUFFERS | StreamFlags::RT_PROCESS | StreamFlags::DONT_RECONNECT,
             &mut [fmtpod],
         )?;
-
+        
         Ok(Self {
             _loop: loop_,
             _context: context,

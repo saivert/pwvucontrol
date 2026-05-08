@@ -14,7 +14,7 @@ dependency('gio-2.0', version: '>= 2.66')
 dependency('gtk4', version: '>= 4.0.0')
 dependency('libadwaita-1', version: '>= 1.2')
 dependency('libpipewire-0.3', version: '>= 0.3.83')
-dependency('wireplumber-0.4', version: '>= 0.4.15')
+dependency('wireplumber-0.5', version: '>= 0.5.11')
 
 find_program('glib-compile-resources', required: true)
 glib_compile_schemas = find_program('glib-compile-schemas', required: true)

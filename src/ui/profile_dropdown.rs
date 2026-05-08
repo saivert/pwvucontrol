@@ -66,7 +66,7 @@ mod imp {
                 deviceobject.connect_local(
                     "pre-update-profile",
                     false,
-                    clone!(@weak self as widget => @default-return None, move |_| {
+                    clone!(#[weak(rename_to = widget)] self, #[upgrade_or]None, move |_| {
                         widget.block_signal.set(true);
 
                         None
@@ -76,7 +76,7 @@ mod imp {
                 deviceobject.connect_local(
                     "post-update-profile",
                     false,
-                    clone!(@weak self as widget => @default-return None, move |_| {
+                    clone!(#[weak(rename_to = widget)] self, #[upgrade_or]None, move |_| {
                         widget.block_signal.set(false);
                         pwvucontrol_info!("About to call widget.update_selected() inside post-update-route handler");
                         // widget.update_selected();
@@ -85,7 +85,7 @@ mod imp {
                     }),
                 );
 
-                deviceobject.connect_profile_index_notify(clone!(@weak self as widget => move |_| widget.update_selected()));
+                deviceobject.connect_profile_index_notify(clone!(#[weak(rename_to = widget)] self, move |_| widget.update_selected()));
             } else {
                 self.profile_dropdown.set_model(gtk::gio::ListModel::NONE);
             }
@@ -113,7 +113,7 @@ mod imp {
                 let item: &gtk::ListItem = item.downcast_ref().expect("ListItem");
                 let profilerow = item.child().and_downcast::<PwProfileRow>().expect("PwProfileRow child");
 
-                let signal = dropdown.connect_selected_item_notify(clone!(@weak item => move |dropdown| {
+                let signal = dropdown.connect_selected_item_notify(clone!(#[weak] item, move |dropdown| {
                     let profilerow = item
                         .child()
                         .and_downcast::<PwProfileRow>()
@@ -139,7 +139,7 @@ mod imp {
 
             let list_factory = gtk::SignalListItemFactory::new();
             list_factory.connect_setup(|_, item| setup_handler(item, true));
-            list_factory.connect_bind(clone!(@weak dropdown => move |_, item| bind_handler(item, &dropdown)));
+            list_factory.connect_bind(clone!(#[weak]dropdown, move |_, item| bind_handler(item, &dropdown)));
             list_factory.connect_unbind(|_, item| unbind_handler(item));
 
             let expression = gtk::PropertyExpression::new(PwProfileObject::static_type(), gtk::Expression::NONE, "description");
@@ -152,7 +152,7 @@ mod imp {
 
             let widget = self.obj();
             let selected_handler = closure_local!(
-                @watch widget => move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
+                #[watch] widget, move |dropdown: &gtk::DropDown, _pspec: &glib::ParamSpec| {
                 pwvucontrol_info!("Inside selected handler");
                 if widget.imp().block_signal.get() {
                     pwvucontrol_info!("Early return from selected handler due to being blocked");
@@ -176,7 +176,10 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwProfileDropDown(ObjectSubclass<imp::PwProfileDropDown>) @extends gtk::Widget;
+    pub struct PwProfileDropDown(ObjectSubclass<imp::PwProfileDropDown>)
+    @extends gtk::Widget,
+    @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwProfileDropDown {

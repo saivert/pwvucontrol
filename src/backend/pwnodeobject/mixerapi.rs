@@ -13,7 +13,7 @@ impl PwNodeObject {
         let manager = PwvucontrolManager::default();
         let mixerapi = manager.mixer_api();
 
-        let changed_handler = closure_local!(@watch self as widget => move |_mixerapi: &wp::plugin::Plugin, id: u32|{
+        let changed_handler = closure_local!(#[watch(rename_to = widget)] self, move |_mixerapi: &wp::plugin::Plugin, id: u32|{
             if id == widget.boundid() {
                 widget.imp().block.set(true);
                 widget.update_volume_using_mixerapi();

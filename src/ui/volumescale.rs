@@ -50,7 +50,7 @@ mod imp {
         fn dispose(&self) {
             self.dispose_template();
         }
-        
+
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -144,7 +144,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwVolumeScale(ObjectSubclass<imp::PwVolumeScale>)
         @extends gtk::Widget,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwVolumeScale {

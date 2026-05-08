@@ -104,7 +104,10 @@ mod imp {
 }
 
 glib::wrapper! {
-    pub struct PwPeakMeter(ObjectSubclass<imp::PwPeakMeter>) @extends gtk::Widget;
+    pub struct PwPeakMeter(ObjectSubclass<imp::PwPeakMeter>)
+    @extends gtk::Widget,
+    @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwPeakMeter {

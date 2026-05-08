@@ -9,6 +9,8 @@ use gtk::{prelude::*, subclass::prelude::*};
 use std::cell::{Cell, RefCell};
 
 mod imp {
+    use glib::property::PropertySet;
+
     use super::*;
 
     #[derive(Default, gtk::CompositeTemplate, glib::Properties)]
@@ -74,7 +76,7 @@ mod imp {
         fn constructed(&self) {
             self.parent_constructed();
 
-            self.revealer.connect_child_revealed_notify(clone!(@weak self as widget => move |_| {
+            self.revealer.connect_child_revealed_notify(clone!(#[weak(rename_to = widget)] self, move |_| {
                 widget.obj().grab_focus();
             }));
 
@@ -165,13 +167,13 @@ mod imp {
 
             self.channel_listbox.bind_model(
                 Some(&item.channelmodel()),
-                clone!(@weak self as widget => @default-panic, move |item| {
+                move |item| {
                     PwChannelBox::new(
                         item.clone().downcast_ref::<PwChannelObject>()
                         .expect("RowData is of wrong type")
                     )
                     .upcast::<gtk::Widget>()
-                }),
+                },
             );
         }
 
@@ -194,8 +196,9 @@ mod imp {
 
 glib::wrapper! {
     pub struct PwVolumeBox(ObjectSubclass<imp::PwVolumeBox>)
-        @extends gtk::Widget,
-        @implements gtk::Actionable, gtk::Buildable;
+        @extends gtk::Widget, gtk::ListBoxRow,
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwVolumeBox {

@@ -61,7 +61,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwChannelBox(ObjectSubclass<imp::PwChannelBox>)
         @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                    gtk::ConstraintTarget;
 }
 
 impl PwChannelBox {

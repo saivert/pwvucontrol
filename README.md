@@ -1,5 +1,9 @@
 # pwvucontrol
 
+## Experimental wireplumber-rs wp-5.0 branch
+
+This is an experiment to see if using the in-progress wp-0.5 branch of wireplumber-rs is goin going to work.
+
 ## Flatpak
 
 
@@ -17,7 +21,7 @@ by using this command:
 
 ## General info
 
-This is an attempt at making a volume control applet for Pipewire.
+This is an attempt at making a volume control applet for PipeWire.
 
 Current implemented features as of 2024-05-04:
 

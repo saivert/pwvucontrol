@@ -83,14 +83,14 @@ mod imp {
             ExitCode::SUCCESS
         }
 
-        fn handle_local_options(&self, options: &glib::VariantDict) -> ExitCode {
-            if options.lookup_value("version", None).is_some() {
-                println!("pwvucontrol version {}", VERSION);
-                return ExitCode::SUCCESS;
+        fn handle_local_options(&self, options: &glib::VariantDict) -> std::ops::ControlFlow<ExitCode> {
+            if options.contains("version") {
+                println!("pwvucontrol {}", VERSION);
+                return std::ops::ControlFlow::Break(ExitCode::SUCCESS);
             }
-
             self.parent_handle_local_options(options)
         }
+
     }
 
     impl GtkApplicationImpl for PwvucontrolApplication {}

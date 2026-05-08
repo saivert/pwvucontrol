@@ -71,13 +71,13 @@ mod imp {
             let manager = PwvucontrolManager::default();
             let defaultnodesapi = manager.default_nodes_api();
             let widget = self.obj();
-            let defaultnodesapi_closure = closure_local!(@watch widget => move |_: wp::plugin::Plugin| widget.imp().default_node_changed());
+            let defaultnodesapi_closure = closure_local!(#[watch] widget, move |_: wp::plugin::Plugin| widget.imp().default_node_changed());
             defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
             self.default_node_changed();
 
             // Only set nodeobject once it has a device associated.
             if let Some(node) = obj.node_object() {
-                node.connect_device_notify(clone!(@weak self as widget => move |nodeobject| {
+                node.connect_device_notify(clone!(#[weak(rename_to = widget)] self, move |nodeobject| {
                     widget.route_dropdown.set_nodeobject(Some(nodeobject));
                     widget.default_node_changed();
                 }));
@@ -139,7 +139,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwSinkBox(ObjectSubclass<imp::PwSinkBox>)
         @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwSinkBox {

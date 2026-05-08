@@ -55,7 +55,7 @@ mod imp {
 
             let defaultnodesapi = manager.default_nodes_api();
             let widget = self.obj();
-            let defaultnodesapi_closure = closure_local!(@watch widget => move |_: wp::plugin::Plugin| widget.update_output_device_dropdown());
+            let defaultnodesapi_closure = closure_local!(#[watch] widget, move |_: wp::plugin::Plugin| widget.update_output_device_dropdown());
             defaultnodesapi.connect_closure("changed", false, defaultnodesapi_closure);
             widget.update_output_device_dropdown();
 
@@ -64,7 +64,7 @@ mod imp {
             if let Some(metadata) = manager.metadata() {
                 let boundid = item.boundid();
                 let widget = self.obj();
-                let changed_closure = closure_local!(@watch widget =>
+                let changed_closure = closure_local!(#[watch] widget,
                     move |_obj: &wp::pw::Metadata, id: u32, key: Option<String>, _type: Option<String>, _value: Option<String>| {
                     let key = key.unwrap_or_default();
                     if id == boundid && key.contains("target.") {
@@ -78,8 +78,8 @@ mod imp {
             // Create our custom output dropdown widget and add it to the layout
             self.output_dropdown.set_nodeobj(Some(&item));
 
-            glib::idle_add_local_once(clone!(@weak widget => move || {
-                widget.update_output_device_dropdown();
+            glib::idle_add_local_once(clone!(#[weak(rename_to = widget)] self, move || {
+                widget.obj().update_output_device_dropdown();
             }));
         }
     }
@@ -92,7 +92,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwStreamBox(ObjectSubclass<imp::PwStreamBox>)
         @extends gtk::Widget, gtk::ListBoxRow,
-        @implements gtk::Actionable;
+        @implements gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget;
 }
 
 impl PwStreamBox {

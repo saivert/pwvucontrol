@@ -102,7 +102,7 @@ mod imp {
         fn dispose(&self) {
             self.dispose_template();
         }
-        
+
         fn constructed(&self) {
             self.parent_constructed();
 
@@ -113,7 +113,7 @@ mod imp {
 
             self.stack.set_visible_child_name(&self.settings.string("last-tab-name"));
 
-            self.stack.connect_visible_child_name_notify(clone!(@weak self as widget => move |stack| {
+            self.stack.connect_visible_child_name_notify(clone!(#[weak(rename_to = widget)] self, move |stack| {
                 if let Some(name) = stack.visible_child_name(){
                     if widget.settings.set_string("last-tab-name", &name).is_err() {
                         crate::pwvucontrol_warning!("Unable to save tab to gsettings");
@@ -145,35 +145,35 @@ mod imp {
 
             let wp_core = manager.wp_core();
 
-            wp_core.connect_connected(clone!(@weak self as window => move |_obj| {
+            wp_core.connect_connected(clone!(#[weak(rename_to = window)] self, move |_obj| {
                 window.obj().set_view(PwvucontrolWindowView::Connected);
             }));
 
-            wp_core.connect_disconnected(clone!(@weak self as window => move |_obj| {
+            wp_core.connect_disconnected(clone!(#[weak(rename_to = window)] self, move |_obj| {
                 window.obj().set_view(PwvucontrolWindowView::Disconnected);
             }));
 
-            manager.node_model().connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
+            manager.node_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |_,_,_,_| {
                 widget.obj().update_info_bar();
             }));
-            manager.device_model().connect_items_changed(clone!(@weak self as widget => move |_,_,_,_| {
+            manager.device_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |_,_,_,_| {
                 widget.obj().update_info_bar();
             }));
 
-            glib::idle_add_local_once(clone!(@weak self as widget => move || {widget.obj().update_info_bar();}));
+            glib::idle_add_local_once(clone!(#[weak(rename_to = widget)] self, move || {widget.obj().update_info_bar();}));
 
             self.playbacklist.bind_model(
                 Some(&manager.stream_output_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
+                move |item| {
                     PwStreamBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
                     .upcast::<gtk::Widget>()
-                }),
+                },
             );
 
-            manager.stream_output_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+            manager.stream_output_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |x, _, _, _| {
                 match x.n_items() {
                     0 => widget.playbackviewstack.set_visible_child_name("empty"),
                     _ => widget.playbackviewstack.set_visible_child_name("notempty")
@@ -182,16 +182,16 @@ mod imp {
 
             self.recordlist.bind_model(
                 Some(&manager.stream_input_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
+                move |item| {
                     PwStreamBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
                     .upcast::<gtk::Widget>()
-                }),
+                },
             );
             
-            manager.stream_input_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+            manager.stream_input_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |x, _, _, _| {
                 match x.n_items() {
                     0 => widget.recordviewstack.set_visible_child_name("empty"),
                     _ => widget.recordviewstack.set_visible_child_name("notempty")
@@ -200,16 +200,16 @@ mod imp {
 
             self.inputlist.bind_model(
                 Some(&manager.source_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
+                move |item| {
                     PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
                     .upcast::<gtk::Widget>()
-                }),
+                },
             );
 
-            manager.source_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+            manager.source_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |x, _, _, _| {
                 match x.n_items() {
                     0 => widget.inputviewstack.set_visible_child_name("empty"),
                     _ => widget.inputviewstack.set_visible_child_name("notempty")
@@ -218,16 +218,16 @@ mod imp {
 
             self.outputlist.bind_model(
                 Some(&manager.sink_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
+                move |item| {
                     PwSinkBox::new(
                         item.downcast_ref::<PwNodeObject>()
                             .expect("RowData is of wrong type"),
                     )
                     .upcast::<gtk::Widget>()
-                }),
+                },
             );
 
-            manager.sink_model().connect_items_changed(clone!(@weak self as widget => move |x, _, _, _| {
+            manager.sink_model().connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |x, _, _, _| {
                 match x.n_items() {
                     0 => widget.outputviewstack.set_visible_child_name("empty"),
                     _ => widget.outputviewstack.set_visible_child_name("notempty")
@@ -236,10 +236,10 @@ mod imp {
 
             self.cardlist.bind_model(
                 Some(&manager.device_model()),
-                clone!(@weak self as window => @default-panic, move |item| {
+                move |item| {
                     let obj: &PwDeviceObject = item.downcast_ref().expect("PwDeviceObject");
                     PwDeviceBox::new(obj).upcast::<gtk::Widget>()
-                }),
+                },
             );
 
             self.reconnectbtn.connect_clicked(|_| {
@@ -270,7 +270,8 @@ mod imp {
 glib::wrapper! {
     pub struct PwvucontrolWindow(ObjectSubclass<imp::PwvucontrolWindow>)
         @extends gtk::Widget, gtk::Window, gtk::ApplicationWindow, adw::ApplicationWindow,
-        @implements gio::ActionGroup, gio::ActionMap;
+        @implements gio::ActionGroup, gio::ActionMap, gtk::Actionable, gtk::Accessible, gtk::Buildable,
+                gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
 }
 
 impl PwvucontrolWindow {
@@ -302,7 +303,7 @@ impl PwvucontrolWindow {
         ecs.connect_local(
             "scroll",
             false,
-            clone!(@weak scrolledwindow => @default-return None, move |v| {
+            clone!(#[weak] scrolledwindow, #[upgrade_or]None, move |v| {
                 let y: f64 = v.get(2).unwrap().get().unwrap();
 
                 // No way to redirect this event to underlying widget so we need to reimplement the scroll handling
@@ -338,7 +339,7 @@ impl PwvucontrolWindow {
             return;
         }
         if self.imp().beep_elapsed.get().elapsed() > Duration::from_secs(1) {
-            self.display().beep();
+            WidgetExt::display(self).beep();
             self.imp().beep_elapsed.set(time::Instant::now());
         }
     }

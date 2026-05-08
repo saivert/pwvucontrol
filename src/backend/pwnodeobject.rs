@@ -41,6 +41,8 @@ pub(crate) enum PropertyChanged {
 }
 
 pub mod imp {
+    use glib::property::PropertySet;
+
     use super::*;
 
     #[derive(Properties)]
@@ -183,19 +185,19 @@ pub mod imp {
 
             node.connect_notify_local(
                 Some("global-properties"),
-                clone!(@weak obj => move  |_, _| {
+                clone!(#[weak] obj, move  |_, _| {
                     obj.label_set_name()
                 }),
             );
 
             node.connect_notify_local(
                 Some("properties"),
-                clone!(@weak obj => move  |_, _| {
+                clone!(#[weak] obj, move  |_, _| {
                     obj.label_set_description();
                 }),
             );
 
-            node.connect_params_changed(clone!(@weak obj => move |node,what| {
+            node.connect_params_changed(clone!(#[weak] obj, move |node,what| {
                 pwvucontrol_debug!("params-changed! {what} id: {}", node.bound_id());
                 obj.imp().block.set(true);
                 match what {
@@ -231,7 +233,7 @@ pub mod imp {
                 );
             }
 
-            om.connect_object_added(clone!(@weak self as nodeobject => move |_om, obj| {
+            om.connect_object_added(clone!(#[weak(rename_to = nodeobject)] self, move |_om, obj| {
                 if let Some(link) = obj.downcast_ref::<wp::pw::Link>() {
                     let linked_node_id: u32 = link.pw_property("link.input.node").expect("link.input.node property");
                     let linked_node = PwvucontrolManager::default().get_node_by_id(linked_node_id);
@@ -337,7 +339,11 @@ impl PwNodeObject {
     fn update_format(&self) {
         let node = self.imp().wpnode.get().expect("node");
 
-        node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(@weak self as widget, @weak node => move |res| {
+        node.enum_params(Some("Format"), None, gtk::gio::Cancellable::NONE, clone!(
+            #[weak(rename_to = widget)]
+            self,
+            #[weak] node,
+            move |res| {
             if let Ok(Some(iter)) = res {
 
                 for a in iter {
