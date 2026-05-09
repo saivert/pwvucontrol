@@ -1,7 +1,7 @@
 {
     "app-id": "com.saivert.pwvucontrol",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "49",
+    "runtime-version": "50",
     "sdk": "org.gnome.Sdk",
     "sdk-extensions": [
         "org.freedesktop.Sdk.Extension.rust-stable",
@@ -30,14 +30,12 @@
     },
     "cleanup": [
         "/include",
+        "/lib/girepository-1.0",
         "/lib/pkgconfig",
-        "/man",
+        "/share/bash-completion",
         "/share/doc",
-        "/share/gtk-doc",
-        "/share/man",
-        "/share/pkgconfig",
-        "*.la",
-        "*.a"
+        "/share/gir-1.0",
+        "/share/zsh"
     ],
     "modules": [
         "flatpak-shared-modules/lua5.4/lua-5.4.json",
@@ -54,20 +52,9 @@
             "sources": [
                 {
                     "type": "git",
-                    "tag": "0.5.12",
-                    "url": "https://github.com/PipeWire/wireplumber.git"
-                }
-            ]
-        },
-        {
-            "name": "blueprint-compiler",
-            "buildsystem": "meson",
-            "cleanup": ["*"],
-            "sources": [
-                {
-                    "type": "git",
-                    "url": "https://gitlab.gnome.org/GNOME/blueprint-compiler",
-                    "tag": "v0.18.0"
+                    "url": "https://github.com/PipeWire/wireplumber.git",
+                    "tag": "0.5.14",
+                    "commit": "07e730b279ac7a520699ae9f6b0797848a731b30"
                 }
             ]
         },
