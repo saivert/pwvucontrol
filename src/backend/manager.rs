@@ -106,8 +106,6 @@ mod imp {
         fn setup_wp_connection(&self) {
             wp::core::Core::init_with_flags(wp::InitFlags::ALL);
 
-            wp::Log::set_default_level("3");
-
             let props = wp::pw::Properties::new_string("media.category=Manager");
 
             let wp_core = wp::core::Core::new(Some(&glib::MainContext::default()), None, Some(props));
