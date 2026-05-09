@@ -1,11 +1,6 @@
 # pwvucontrol
 
-## Experimental wireplumber-rs wp-5.0 branch
-
-This is an experiment to see if using the in-progress wp-0.5 branch of wireplumber-rs is goin going to work.
-
 ## Flatpak
-
 
 The recommended way of installing pwvucontrol is through Flatpak. If you don't have
 Flatpak installed, you can get it from [the Flatpak website](https://flatpak.org/setup).
@@ -48,6 +43,7 @@ Use meson to build.
 
 
 ## Help needed
+
 Help with making code robust.
 
 UI ideas and mockups welcome!
