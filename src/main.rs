@@ -64,7 +64,11 @@ fn main() -> gtk::glib::ExitCode {
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8").expect("Unable to set the text domain encoding");
     textdomain(GETTEXT_PACKAGE).expect("Unable to switch to the text domain");
 
-    gtk::init().unwrap_or_else(|_| panic!("Failed to initialize GTK."));
+    // We use adw::init() here rather than gtk::init() so that libadwaita's
+    // style manager is set up and the app follows the system color-scheme.
+    // It calls gtk_init() internally, which PwvucontrolManager relies on
+    // when it's constructed below.
+    adw::init().expect("Failed to initialize libadwaita");
     gtk::glib::set_application_name("Pwvucontrol");
 
     let resources = gio::Resource::load(path_override_from_env("PWVUCONTROL_RESOURCEDIR", "../data/resources", Some("resources.gresource")))
