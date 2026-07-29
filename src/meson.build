@@ -51,3 +51,11 @@ custom_target(
     '@OUTPUT@',
   ],
 )
+
+test(
+  'cargo-test',
+  cargo,
+  args: ['test'] + cargo_options,
+  env: cargo_env,
+  timeout: 300,
+)

@@ -66,7 +66,9 @@ mod imp {
                         .skip(position as usize)
                         .map_while(Result::ok)
                         .enumerate() {
-                        if routeobject.direction() == widget.direction() && routeobject.availability() == ParamAvailability::Yes || routeobject.availability() == ParamAvailability::Unknown {
+                        if routeobject.direction() == widget.direction()
+                            && matches!(routeobject.availability(), ParamAvailability::Yes | ParamAvailability::Unknown)
+                        {
                             hashset.insert(a as u32);
                         }
                     }
@@ -95,5 +97,27 @@ glib::wrapper! {
 impl PwRouteFilterModel {
     pub(crate) fn new(direction: RouteDirection, model: Option<&impl IsA<gio::ListModel>>) -> Self {
         glib::Object::builder().property("model", model).property("direction", direction).build()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn filters_unknown_routes_by_direction() {
+        let routes = gio::ListStore::new::<PwRouteObject>();
+        routes.append(&PwRouteObject::new(0, "Internal microphone", ParamAvailability::Unknown, RouteDirection::Input, &[]));
+        routes.append(&PwRouteObject::new(3, "Speakers", ParamAvailability::Unknown, RouteDirection::Output, &[]));
+        routes.append(&PwRouteObject::new(4, "Headphones", ParamAvailability::No, RouteDirection::Output, &[]));
+
+        for (direction, expected_index) in [(RouteDirection::Input, 0), (RouteDirection::Output, 3)] {
+            let filtered = PwRouteFilterModel::new(direction, Some(&routes));
+
+            assert_eq!(filtered.n_items(), 1);
+            let route = filtered.item(0).and_downcast::<PwRouteObject>().expect("filtered route");
+            assert_eq!(route.index(), expected_index);
+            assert_eq!(route.direction(), direction);
+        }
     }
 }
