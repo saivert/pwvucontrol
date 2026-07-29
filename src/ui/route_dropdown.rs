@@ -12,6 +12,10 @@ use std::cell::{Cell, RefCell};
 use wireplumber as wp;
 use wp::pw::ProxyExt;
 
+fn route_control_should_be_visible(model: Option<&gtk::gio::ListModel>) -> bool {
+    model.is_some_and(|model| model.n_items() > 0)
+}
+
 mod imp {
     use super::*;
 
@@ -51,9 +55,14 @@ mod imp {
             }
         }
 
+        fn update_visibility(&self) {
+            self.obj()
+                .set_visible(route_control_should_be_visible(self.route_dropdown.model().as_ref()));
+        }
+
         fn get_route_index(&self) -> Option<u32> {
             let nodeobject = self.nodeobject.borrow();
-            let nodeobject = nodeobject.as_ref().unwrap();
+            let nodeobject = nodeobject.as_ref()?;
 
             let Some(deviceobject) = nodeobject.device() else {
                 return None;
@@ -67,9 +76,9 @@ mod imp {
 
         fn get_route_model(&self) -> Option<PwRouteFilterModel> {
             let nodeobject = self.nodeobject.borrow();
-            let nodeobject = nodeobject.as_ref().unwrap();
+            let nodeobject = nodeobject.as_ref()?;
 
-            let deviceobject = nodeobject.device().expect("device");
+            let deviceobject = nodeobject.device()?;
             match nodeobject.nodetype() {
                 NodeType::Source => Some(deviceobject.routemodel_input()),
                 NodeType::Sink => Some(deviceobject.routemodel_output()),
@@ -78,18 +87,32 @@ mod imp {
         }
 
         pub fn set_nodeobject(&self, new_nodeobject: Option<&PwNodeObject>) {
+            self.block_signal.set(true);
             self.nodeobject.replace(new_nodeobject.cloned());
+            self.route_dropdown.set_model(gtk::gio::ListModel::NONE);
+            self.update_visibility();
 
             if let Some(nodeobject) = new_nodeobject {
-                let deviceobject = nodeobject.device().expect("nodeobject with associated device on PwRouteDropDown");
+                let Some(deviceobject) = nodeobject.device() else {
+                    self.block_signal.set(false);
+                    return;
+                };
+                let Some(route_model) = self.get_route_model() else {
+                    self.block_signal.set(false);
+                    return;
+                };
 
-                self.block_signal.set(true);
                 pwvucontrol_info!("self.route_dropdown.set_model({});", deviceobject.wpdevice().bound_id());
-                self.route_dropdown.set_model(self.get_route_model().as_ref());
+                self.route_dropdown.set_model(Some(&route_model));
+                self.update_visibility();
                 if let Some(index) = self.get_route_index() {
                     pwvucontrol_info!("self.route_dropdown.set_selected({index});");
                     self.route_dropdown.set_selected(index);
                 }
+
+                route_model.connect_items_changed(clone!(#[weak(rename_to = widget)] self, move |_, _, _, _| {
+                    widget.update_visibility();
+                }));
 
                 self.block_signal.set(false);
 
@@ -117,7 +140,7 @@ mod imp {
 
                 deviceobject.connect_route_index_output_notify(clone!(#[weak(rename_to = widget)] self, move |_| widget.update_selected()));
             } else {
-                self.route_dropdown.set_model(gtk::gio::ListModel::NONE);
+                self.block_signal.set(false);
             }
         }
     }
@@ -220,5 +243,24 @@ impl PwRouteDropDown {
 impl Default for PwRouteDropDown {
     fn default() -> Self {
         glib::Object::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn visibility_follows_route_model_contents() {
+        let routes = gtk::gio::ListStore::new::<glib::BoxedAnyObject>();
+
+        assert!(!route_control_should_be_visible(None));
+        assert!(!route_control_should_be_visible(Some(routes.upcast_ref())));
+
+        routes.append(&glib::BoxedAnyObject::new(()));
+        assert!(route_control_should_be_visible(Some(routes.upcast_ref())));
+
+        routes.remove(0);
+        assert!(!route_control_should_be_visible(Some(routes.upcast_ref())));
     }
 }
