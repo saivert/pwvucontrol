@@ -33,7 +33,7 @@ mod imp {
         pub default_sink_toggle: TemplateChild<gtk::ToggleButton>,
 
         #[template_child]
-        pub route_controls: TemplateChild<gtk::Box>,
+        pub portlabel: TemplateChild<gtk::Label>,
 
         #[template_child]
         pub route_dropdown: TemplateChild<PwRouteDropDown>,
@@ -80,9 +80,9 @@ mod imp {
 
             self.route_dropdown.set_nodeobject(Some(&item));
             self.route_dropdown.connect_visible_notify(clone!(#[weak(rename_to = widget)] self, move |dropdown| {
-                widget.route_controls.set_visible(dropdown.is_visible());
+                widget.portlabel.set_visible(dropdown.is_visible());
             }));
-            self.route_controls.set_visible(self.route_dropdown.is_visible());
+            self.portlabel.set_visible(self.route_dropdown.is_visible());
 
             if let Some(node) = obj.node_object() {
                 node.connect_device_notify(clone!(#[weak(rename_to = widget)] self, move |nodeobject| {

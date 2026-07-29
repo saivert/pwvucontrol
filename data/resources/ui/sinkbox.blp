@@ -7,16 +7,11 @@ template $PwSinkBox: ListBoxRow {
       orientation: horizontal;
       spacing: 6;
 
-      Box route_controls {
-        visible: false;
-        spacing: 6;
-
-        Label onlabel {
-          label: _("Port:");
-        }
-
-        $PwRouteDropDown route_dropdown {}
+      Label portlabel {
+        label: _("Port:");
       }
+
+      $PwRouteDropDown route_dropdown {}
 
       ToggleButton default_sink_toggle {
         hexpand: false;
