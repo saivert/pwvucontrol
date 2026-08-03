@@ -2,29 +2,30 @@
 name = "pwvucontrol"
 version = "0.5.3"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.92"
 
 [features]
 sandboxed = []
 
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
-gtk = { version = "0.10.1", package = "gtk4", features = ["v4_12"] }
-glib = { version = "0.21", features = ["log"] }
+gtk = { version = "0.11", package = "gtk4", features = ["v4_12"] }
+glib = { version = "0.22", features = ["log"] }
+glib-unix = "0.22"
 log = "0.4.11"
 imbl = "3.0.0"
 futures = "0.3"
 anyhow = "1.0"
-pipewire = "0.9"
+pipewire = "0.10"
 formatx = "0.2.3"
 
 [dependencies.wireplumber]
 version = "0.2"
 features = ["v0_5"]
 git = "https://github.com/saivert/wireplumber.rs.git"
-branch = "wp-0.5-glib-0.21-pipewire-0.9"
+rev = "5b18696e2ba340a7bf8e7ac61bee0499d75075a7"
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.8.0"
+version = "0.9"
 features = ["v1_4"]
