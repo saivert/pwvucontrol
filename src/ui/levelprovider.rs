@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use std::{fmt::Debug, time::Duration};
+use std::fmt::Debug;
 
 use crate::ui::PwVolumeBox;
 use glib::{self, clone, ControlFlow, SourceId};
@@ -31,10 +31,10 @@ impl LevelbarProvider {
 
         let fd = loop_.fd();
 
-        let sig = glib::source::unix_fd_add_local(fd.as_raw_fd(), glib::IOCondition::all(), {
+        let sig = glib_unix::unix_fd_add_local(fd.as_raw_fd(), glib::IOCondition::all(), {
             let loop_ = loop_.clone();
             move |_, _| {
-                loop_.iterate(Duration::ZERO);
+                loop_.iterate(pipewire::loop_::Timeout::None);
 
                 ControlFlow::Continue
             }
