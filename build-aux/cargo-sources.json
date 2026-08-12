@@ -2,8 +2,8 @@
     {
         "type": "git",
         "url": "https://github.com/saivert/wireplumber.rs",
-        "commit": "5b18696e2ba340a7bf8e7ac61bee0499d75075a7",
-        "dest": "flatpak-cargo/git/wireplumber.rs-5b18696"
+        "commit": "6cbefe8b0e9e5ed2a7ff431b95b98c54e17c29da",
+        "dest": "flatpak-cargo/git/wireplumber.rs-6cbefe8"
     },
     {
         "type": "archive",
@@ -1737,12 +1737,12 @@
     {
         "type": "shell",
         "commands": [
-            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-5b18696/.\" \"cargo/vendor/wireplumber\""
+            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-6cbefe8/.\" \"cargo/vendor/wireplumber\""
         ]
     },
     {
         "type": "inline",
-        "contents": "[package]\nname = \"wireplumber\"\nversion = \"0.2.0\"\nauthors = [ \"arcnmx\",]\nbuild = \"build.rs\"\nedition = \"2021\"\nrust-version = \"1.92\"\ndescription = \"WirePlumber bindings\"\nkeywords = [ \"pipewire\", \"wireplumber\", \"gobject\",]\ncategories = [ \"multimedia::audio\", \"api-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.2.0/wireplumber/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/build.rs\", \"/COPYING*\",]\n\n[dependencies]\nlibc = \"0.2\"\nbitflags = \"2\"\n\n[build-dependencies]\npkg-config = \"0.3\"\nsemver = \"1.0\"\n\n[features]\ndefault = [ \"v0_5\",]\nlua = []\nexperimental = []\nglib-signal = [ \"dep:glib-signal\",]\nfutures = [ \"glib-signal?/futures\", \"dep:futures-channel\",]\nlibspa = [ \"dep:libspa\",]\nserde = [ \"dep:serde\",]\nv0_5 = [ \"ffi/v0_5\", \"v0_4_16\",]\nv0_5_3 = [ \"v0_5\",]\nv0_4_2 = []\nv0_4_3 = [ \"v0_4_2\",]\nv0_4_5 = [ \"v0_4_3\",]\nv0_4_6 = [ \"v0_4_5\",]\nv0_4_8 = [ \"v0_4_6\",]\nv0_4_10 = [ \"v0_4_8\",]\nv0_4_11 = [ \"v0_4_10\",]\nv0_4_12 = [ \"v0_4_11\",]\nv0_4_15 = [ \"v0_4_12\",]\nv0_4_16 = [ \"v0_4_15\",]\n\n[workspace]\nmembers = [ \"sys\", \"examples\",]\n\n[package.metadata]\nbranches = [ \"main\", \"dev\",]\n\n[badges.maintenance]\nstatus = \"actively-maintained\"\n\n[dependencies.glib]\nversion = \"0.22\"\n\n[dependencies.gio]\nversion = \"0.22\"\n\n[dependencies.pipewire-sys]\nversion = \"0.10\"\n\n[dependencies.libspa-sys]\nversion = \"0.10\"\n\n[dependencies.libspa]\nversion = \"0.10\"\noptional = true\n\n[dependencies.serde]\nversion = \"1.0\"\noptional = true\n\n[dependencies.ffi]\nversion = \"0.2.0\"\npath = \"sys\"\npackage = \"wireplumber-sys\"\n\n[dependencies.futures-channel]\nversion = \"0.3\"\noptional = true\n\n[dependencies.glib-signal]\nversion = \"0.4\"\noptional = true\ngit = \"https://github.com/playtron-os/glib-signal.rs.git\"\nrev = \"9273ea7371d44f7bc821e6b821f5334618a0a4a6\"\n\n[dev-dependencies.futures-util]\nversion = \"0.3\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_5\", \"lua\", \"experimental\", \"glib-signal\", \"libspa\", \"futures\", \"serde\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n",
+        "contents": "[package]\nname = \"wireplumber\"\nversion = \"0.2.0\"\nauthors = [ \"arcnmx\",]\nbuild = \"build.rs\"\nedition = \"2021\"\nrust-version = \"1.92\"\ndescription = \"WirePlumber bindings\"\nkeywords = [ \"pipewire\", \"wireplumber\", \"gobject\",]\ncategories = [ \"multimedia::audio\", \"api-bindings\",]\ndocumentation = \"https://arcnmx.github.io/wireplumber.rs/v0.2.0/wireplumber/\"\nrepository = \"https://github.com/arcnmx/wireplumber.rs\"\nreadme = \"src/README.md\"\nlicense = \"MIT\"\ninclude = [ \"/src/**\", \"/build.rs\", \"/COPYING*\",]\n\n[dependencies]\nlibc = \"0.2\"\nbitflags = \"2\"\n\n[build-dependencies]\npkg-config = \"0.3\"\nsemver = \"1.0\"\n\n[features]\ndefault = [ \"v0_5\",]\nlua = []\nexperimental = []\nglib-signal = [ \"dep:glib-signal\",]\nfutures = [ \"glib-signal?/futures\", \"dep:futures-channel\",]\nlibspa = [ \"dep:libspa\",]\nserde = [ \"dep:serde\",]\nv0_5 = [ \"ffi/v0_5\", \"v0_4_16\",]\nv0_5_3 = [ \"v0_5\",]\nv0_4_2 = []\nv0_4_3 = [ \"v0_4_2\",]\nv0_4_5 = [ \"v0_4_3\",]\nv0_4_6 = [ \"v0_4_5\",]\nv0_4_8 = [ \"v0_4_6\",]\nv0_4_10 = [ \"v0_4_8\",]\nv0_4_11 = [ \"v0_4_10\",]\nv0_4_12 = [ \"v0_4_11\",]\nv0_4_15 = [ \"v0_4_12\",]\nv0_4_16 = [ \"v0_4_15\",]\n\n[workspace]\nmembers = [ \"sys\", \"examples\",]\n\n[package.metadata]\nbranches = [ \"main\", \"dev\",]\n\n[badges.maintenance]\nstatus = \"actively-maintained\"\n\n[dependencies.glib]\nversion = \"0.22\"\n\n[dependencies.gio]\nversion = \"0.22\"\n\n[dependencies.pipewire-sys]\nversion = \"0.10\"\n\n[dependencies.libspa-sys]\nversion = \"0.10\"\n\n[dependencies.libspa]\nversion = \"0.10\"\noptional = true\n\n[dependencies.serde]\nversion = \"1.0\"\noptional = true\n\n[dependencies.ffi]\nversion = \"0.2.0\"\npath = \"sys\"\npackage = \"wireplumber-sys\"\n\n[dependencies.futures-channel]\nversion = \"0.3\"\noptional = true\n\n[dependencies.glib-signal]\nversion = \"0.4\"\noptional = true\ngit = \"https://github.com/saivert/glib-signal.rs.git\"\nrev = \"af37f9026adc9b23ce9a6b650409f5d2bdcf7870\"\n\n[dev-dependencies.futures-util]\nversion = \"0.3\"\n\n[package.metadata.docs.rs]\nfeatures = [ \"v0_5\", \"lua\", \"experimental\", \"glib-signal\", \"libspa\", \"futures\", \"serde\",]\nrustc-args = [ \"--cfg\", \"docsrs\",]\nrustdoc-args = [ \"--cfg\", \"docsrs\", \"--generate-link-to-definition\",]\n",
         "dest": "cargo/vendor/wireplumber",
         "dest-filename": "Cargo.toml"
     },
@@ -1755,7 +1755,7 @@
     {
         "type": "shell",
         "commands": [
-            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-5b18696/sys\" \"cargo/vendor/wireplumber-sys\""
+            "cp -r --reflink=auto \"flatpak-cargo/git/wireplumber.rs-6cbefe8/sys\" \"cargo/vendor/wireplumber-sys\""
         ]
     },
     {
@@ -1772,7 +1772,7 @@
     },
     {
         "type": "inline",
-        "contents": "[source.vendored-sources]\ndirectory = \"cargo/vendor\"\n\n[source.crates-io]\nreplace-with = \"vendored-sources\"\n\n[source.\"https://github.com/saivert/wireplumber.rs\"]\ngit = \"https://github.com/saivert/wireplumber.rs\"\nreplace-with = \"vendored-sources\"\nrev = \"5b18696e2ba340a7bf8e7ac61bee0499d75075a7\"\n",
+        "contents": "[source.vendored-sources]\ndirectory = \"cargo/vendor\"\n\n[source.crates-io]\nreplace-with = \"vendored-sources\"\n\n[source.\"https://github.com/saivert/wireplumber.rs\"]\ngit = \"https://github.com/saivert/wireplumber.rs\"\nreplace-with = \"vendored-sources\"\nrev = \"6cbefe8b0e9e5ed2a7ff431b95b98c54e17c29da\"\n",
         "dest": "cargo",
         "dest-filename": "config"
     }

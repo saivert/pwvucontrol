@@ -23,7 +23,7 @@ formatx = "0.2.3"
 version = "0.2"
 features = ["v0_5"]
 git = "https://github.com/saivert/wireplumber.rs.git"
-rev = "5b18696e2ba340a7bf8e7ac61bee0499d75075a7"
+rev = "6cbefe8b0e9e5ed2a7ff431b95b98c54e17c29da"
 
 [dependencies.adw]
 package = "libadwaita"
