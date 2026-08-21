@@ -5,7 +5,7 @@
     <file preprocess="xml-stripblanks" alias="gtk/volumebox.ui">ui/volumebox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/channelbox.ui">ui/channelbox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/window.ui">ui/window.ui</file>
-    <file preprocess="xml-stripblanks" alias="gtk/help-overlay.ui">ui/help-overlay.ui</file>
+    <file preprocess="xml-stripblanks" alias="shortcuts-dialog.ui">ui/shortcuts-dialog.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/stream-dropdown.ui">ui/stream-dropdown.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/sinkbox.ui">ui/sinkbox.ui</file>
     <file preprocess="xml-stripblanks" alias="gtk/streambox.ui">ui/streambox.ui</file>

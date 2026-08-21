@@ -1,29 +1,24 @@
 using Gtk 4.0;
+using Adw 1;
 
-ShortcutsWindow help_overlay {
-  modal: true;
+Adw.ShortcutsDialog shortcuts_dialog {
+  
+  Adw.ShortcutsSection {
+    title: C_("shortcut window", "General");
 
-  ShortcutsSection {
-    section-name: "shortcuts";
-    max-height: 10;
-
-    ShortcutsGroup {
-      title: C_("shortcut window", "General");
-
-      ShortcutsShortcut {
+      Adw.ShortcutsItem {
         title: C_("shortcut window", "Show Shortcuts");
         action-name: "win.show-help-overlay";
       }
 
-      ShortcutsShortcut {
+      Adw.ShortcutsItem {
         accelerator: "F10";
         title: C_("shortcut window", "Open application menu");
       }
 
-      ShortcutsShortcut {
+      Adw.ShortcutsItem {
         title: C_("shortcut window", "Quit");
         action-name: "app.quit";
       }
-    }
   }
 }
